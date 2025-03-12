@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BusinessLogic.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Entities;
@@ -30,4 +31,16 @@ public class TaskEntity : BaseModelEntity
 
     [StringLength(5000)]
     public string? Description { get; set; }
+
+    [Required]
+    public required StatusEnum Status { get; set; }
+
+    [Required]
+    public required EstimateEnum Estimate { get; set; }
+
+    [Required]
+    public required TypeEnum Type { get; set; }
+
+    [Required]
+    public required PriorityEnum Priority { get; set; }
 }
