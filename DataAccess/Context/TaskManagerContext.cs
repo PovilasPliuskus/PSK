@@ -11,9 +11,40 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
     public DbSet<TaskEntity>? Tasks { get; set; }
     public DbSet<UserEntity>? Users { get; set; }
     public DbSet<WorkspaceEntity>? Workspaces { get; set; }
+    public DbSet<WorkspaceUsersEntity>? WorkspaceUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // UserEntity
+        modelBuilder.Entity<UserEntity>()
+            .HasIndex(u => u.StudentId)
+            .IsUnique();
 
+        modelBuilder.Entity<UserEntity>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+
+        // WorkspaceEntity
+        modelBuilder.Entity<WorkspaceEntity>()
+            .HasOne(w => w.CreatedByUserId)
+            .WithMany()
+            .HasForeignKey(w => w.FkCreatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // WorkspaceUsersEntity
+        modelBuilder.Entity<WorkspaceUsersEntity>()
+            .HasKey(wu => new { wu.FkUserId, wu.FkWorkspaceId });
+
+        modelBuilder.Entity<WorkspaceUsersEntity>()
+            .HasOne<UserEntity>()
+            .WithMany()
+            .HasForeignKey(wu => wu.FkUserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<WorkspaceUsersEntity>()
+            .HasOne<WorkspaceEntity>()
+            .WithMany()
+            .HasForeignKey(wu => wu.FkWorkspaceId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
