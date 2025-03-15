@@ -84,5 +84,43 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
             .WithMany()
             .HasForeignKey(st => st.FkAssignedToUserId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        // CommentEntity
+        modelBuilder.Entity<CommentEntity>()
+            .HasOne(c => c.Task)
+            .WithMany()
+            .HasForeignKey(c => c.FkTaskId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CommentEntity>()
+            .HasOne(c => c.SubTask)
+            .WithMany()
+            .HasForeignKey(c => c.FkSubTaskId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CommentEntity>()
+            .HasOne(c => c.WrittenByUserId)
+            .WithMany()
+            .HasForeignKey(c => c.FkWrittenByUserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // AttachmentEntity
+        modelBuilder.Entity<AttachmentEntity>()
+            .HasOne(a => a.Task)
+            .WithMany()
+            .HasForeignKey(a => a.FkTaskId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<AttachmentEntity>()
+            .HasOne(a => a.SubTask)
+            .WithMany()
+            .HasForeignKey(a => a.FkSubTaskId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<AttachmentEntity>()
+            .HasOne(a => a.CreatedByUserId)
+            .WithMany()
+            .HasForeignKey(a => a.FkCreatedByUserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
