@@ -46,5 +46,24 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
             .WithMany()
             .HasForeignKey(wu => wu.FkWorkspaceId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // TaskEntity
+        modelBuilder.Entity<TaskEntity>()
+            .HasOne(t => t.Workspace)
+            .WithMany()
+            .HasForeignKey(t => t.FkWorkspaceId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<TaskEntity>()
+            .HasOne(t => t.CreatedByUserId)
+            .WithMany()
+            .HasForeignKey(t => t.FkCreatedByUserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<TaskEntity>()
+            .HasOne(t => t.AssignedToUserId)
+            .WithMany()
+            .HasForeignKey(t => t.FkAssignedToUserId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
