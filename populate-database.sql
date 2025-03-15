@@ -1,3 +1,4 @@
+DELETE FROM public."SubTask";
 DELETE FROM public."Task";
 DELETE FROM public."Workspace";
 DELETE FROM public."User";
@@ -45,3 +46,13 @@ VALUES
     ('6b2f6e80-35f2-4272-9553-c4b8556bde90', 'Test analysis', '8388f8cb-760b-4e42-8f2e-d0f01ece0757', '4', '0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP, 'c2646792-8d3f-444c-8b21-f5120292ef3e', CURRENT_TIMESTAMP, 'Find out which test framework to use and its pros and cons',
         '2', '4', '1');
+
+INSERT INTO public."SubTask" ("Id", "Name", "FkCreatedByUserId", "Status", "FkTaskId", "CreatedAt",
+    "UpdatedAt", "FkAssignedToUserId", "DueDate", "Description", "Estimate", "Type", "Priority")
+VALUES
+    ('fbcaa83e-0077-49e6-be24-f13154feda2d', 'MSTEST', '8388f8cb-760b-4e42-8f2e-d0f01ece0757', '2', '6b2f6e80-35f2-4272-9553-c4b8556bde90', CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP, 'c2646792-8d3f-444c-8b21-f5120292ef3e', CURRENT_TIMESTAMP, NULL, '0', '0', '1'),
+    ('3d7c75c3-124a-4de2-b426-1eb70525f325', 'XTest', '8388f8cb-760b-4e42-8f2e-d0f01ece0757', '2', '6b2f6e80-35f2-4272-9553-c4b8556bde90', CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP, 'c2646792-8d3f-444c-8b21-f5120292ef3e', CURRENT_TIMESTAMP, NULL, '0', '0', '1'),
+    ('32a8a6b3-fb15-4e44-ad16-77d01b53d80c', 'NTest', '7df40370-4300-48ae-806e-d59ab18a7c74', '2', '6b2f6e80-35f2-4272-9553-c4b8556bde90', CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP, 'c2646792-8d3f-444c-8b21-f5120292ef3e', CURRENT_TIMESTAMP, NULL, '0', '0', '1');
