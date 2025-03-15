@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Entities;
 
+[Table("Attachment")]
 public class AttachmentEntity : BaseModelEntity
 {
     [Required]
