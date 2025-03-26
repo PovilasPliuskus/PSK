@@ -8,6 +8,7 @@ interface BaseInputProps {
   className?: string;
   error?: string;
   required?: boolean;
+  editing? : boolean;
 }
 
 // Text Input Component
@@ -36,6 +37,7 @@ export const TextInput: React.FC<TextInputProps> = ({
         type="text"
         isInvalid={!!error}
         className={className}
+        disabled={!props.editing}
         {...props}
       />
       <Form.Control.Feedback type="invalid">
@@ -71,6 +73,7 @@ export const TextareaInput: React.FC<TextareaInputProps> = ({
         as="textarea"
         isInvalid={!!error}
         className={className}
+        disabled={!props.editing}
         {...props}
       />
       <Form.Control.Feedback type="invalid">
@@ -108,6 +111,7 @@ export const SelectInput: React.FC<SelectInputProps> = ({
       <Form.Select
         isInvalid={!!error}
         className={className}
+        disabled={!props.editing}
         {...props}
       >
         {placeholder && <option value="">{placeholder}</option>}
@@ -155,6 +159,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
         max={max}
         isInvalid={!!error}
         className={className}
+        disabled={!props.editing}
         {...props}
       />
       <Form.Control.Feedback type="invalid">
@@ -186,6 +191,7 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
         label={label}
         isInvalid={!!error}
         className={className}
+        disabled={!props.editing}
         {...props}
       />
       {error && (
@@ -228,6 +234,7 @@ export const DateInput: React.FC<DateInputProps> = ({
         max={max}
         isInvalid={!!error}
         className={className}
+        disabled={!props.editing}
         {...props}
       />
       <Form.Control.Feedback type="invalid">

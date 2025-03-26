@@ -30,6 +30,8 @@ const DemoForm: React.FC = () => {
     newsletter: false
   });
 
+  const [editing, setEditing] = useState(true);
+
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
   const handleInputChange = (
@@ -89,6 +91,10 @@ const DemoForm: React.FC = () => {
     }
   };
 
+  const handleCancel = () => {
+    setEditing(false);
+  };
+
   return (
     <Container className="mt-5">
       <Row className="justify-content-center">
@@ -106,6 +112,7 @@ const DemoForm: React.FC = () => {
                   onChange={handleInputChange}
                   placeholder="Enter your full name"
                   required
+                  editing={editing}
                   error={errors.name}
                 />
 
@@ -117,6 +124,7 @@ const DemoForm: React.FC = () => {
                   onChange={handleInputChange}
                   placeholder="Enter your email"
                   required
+                  editing={editing}
                   error={errors.email}
                 />
 
@@ -128,6 +136,7 @@ const DemoForm: React.FC = () => {
                   min={13}
                   max={120}
                   placeholder="Enter your age"
+                  editing={editing}
                   error={errors.age}
                 />
 
@@ -144,6 +153,7 @@ const DemoForm: React.FC = () => {
                     { value: 'au', label: 'Australia' }
                   ]}
                   required
+                  editing={editing}
                   error={errors.country}
                 />
 
@@ -153,6 +163,7 @@ const DemoForm: React.FC = () => {
                   value={formData.message}
                   onChange={handleInputChange}
                   placeholder="Enter any additional information"
+                  editing={editing}
                 />
 
                 <DateInput 
@@ -161,6 +172,7 @@ const DemoForm: React.FC = () => {
                   value={formData.birthDate}
                   onChange={handleInputChange}
                   max={new Date().toISOString().split('T')[0]}
+                  editing={editing}
                 />
 
                 <CheckboxInput 
@@ -168,13 +180,44 @@ const DemoForm: React.FC = () => {
                   name="newsletter"
                   checked={formData.newsletter}
                   onChange={handleInputChange}
+                  editing={editing}
                 />
 
-                <div className="d-grid">
-                  <Button variant="primary" type="submit">
+            <Row className="g-2">
+                <Col>
+                {editing && (
+                    <Button 
+                    variant="primary" 
+                    type="submit" 
+                    className="w-100"
+                    >
                     Submit Registration
-                  </Button>
-                </div>
+                    </Button>
+                )}
+                </Col>
+                {editing && (
+                    <Col>
+                    <Button 
+                        variant="danger" 
+                        className="w-100" 
+                        onClick={() => setEditing(false)}
+                    >
+                        Cancel
+                    </Button>
+                    </Col>
+                )}
+                </Row>
+                {!editing && (
+                    <Col>
+                    <Button 
+                        variant="info" 
+                        className="w-100" 
+                        onClick={() => setEditing(true)}
+                    >
+                        Edit
+                    </Button>
+                    </Col>
+                )}
               </form>
             </Card.Body>
           </Card>
