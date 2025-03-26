@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Entities;
 
+[Table("Workspace")]
 public class WorkspaceEntity : BaseModelEntity
 {
     [Required]
