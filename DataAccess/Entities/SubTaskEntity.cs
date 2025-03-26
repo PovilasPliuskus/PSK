@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Entities;
 
+[Table("SubTask")]
 public class SubTaskEntity : BaseModelEntity
 {
     [Required]

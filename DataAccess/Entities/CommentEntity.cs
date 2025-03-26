@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Entities;
 
+[Table("Comment")]
 public class CommentEntity : BaseModelEntity
 {
     public Guid? FkTaskId { get; set; }
