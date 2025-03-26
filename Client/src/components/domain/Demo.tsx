@@ -91,10 +91,6 @@ const DemoForm: React.FC = () => {
     }
   };
 
-  const handleCancel = () => {
-    setEditing(false);
-  };
-
   return (
     <Container className="mt-5">
       <Row className="justify-content-center">
