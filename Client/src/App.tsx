@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useKeycloak } from '@react-keycloak/web';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Container, Navbar, Nav } from 'react-bootstrap';
+import { Container, Navbar, Nav, Button } from 'react-bootstrap';
 import DemoForm from './components/domain/Demo';
 
 // Home Page Component
@@ -27,6 +28,29 @@ const NotFoundPage: React.FC = () => {
 };
 
 function App() {
+  const { keycloak, initialized } = useKeycloak();
+
+  const fetchProtectedData = async () => {
+  
+    try {
+      const response = await fetch("http://localhost:5164/api/protected-endpoint", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${keycloak.token}`
+        },
+        credentials: "include"
+      });
+  
+      if (!response.ok) throw new Error("Unauthorized");
+  
+      const data = await response.json();
+      console.log("Protected Data:", data);
+    } catch (error) {
+      console.error("Error fetching protected data:", error);
+    }
+  };
+
   return (
     <Router>
       <div className="App">
@@ -45,6 +69,16 @@ function App() {
                 <Nav.Link as={Link} to="/demo-form">
                   Demo Form
                 </Nav.Link>
+              </Nav>
+              <Nav>
+                {!keycloak.authenticated ? (
+                  <Button onClick={() => keycloak.login()}>Sign In</Button>
+                ) : (
+                  <Button onClick={() => keycloak.logout()}>Sign Out</Button>
+                )}
+              </Nav>
+              <Nav>
+                <Button onClick={fetchProtectedData} className="m-2">Fetch Protected Data</Button>
               </Nav>
             </Navbar.Collapse>
           </Container>
