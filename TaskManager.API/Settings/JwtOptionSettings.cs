@@ -2,9 +2,9 @@ namespace TaskManager.API.Settings
 {
     public class JwtOptions
     {
-        public string Authority { get; set; } = "http://localhost:8080/realms/task-manager";
-        public string Audience { get; set; } = "account";
-        public bool RequireHttpsMetadata { get; set; } = false;
+        public string Authority { get; init; }
+        public string Audience { get; init; }
+        public bool RequireHttpsMetadata { get; init; }
     }
 }
 
