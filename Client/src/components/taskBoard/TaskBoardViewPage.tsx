@@ -25,9 +25,9 @@ const taskList = [
         DueDate: "03/30/2025 14:45:00",
         Description: "task 1 description",
         Status: "todo",
-        Estimate: "idk",
-        Type: "idk",
-        Priority: "Medium"
+        Estimate: "Estimate",
+        Type: "History Exam practice",
+        Priority: "High"
     },
     {
         Id: 2,
@@ -40,8 +40,8 @@ const taskList = [
         DueDate: "03/20/2026 4:45:00",
         Description: "task 2 description",
         Status: "inprogress",
-        Estimate: "idk",
-        Type: "idk",
+        Estimate: "Estimate",
+        Type: "Physics project",
         Priority: "Medium"
     }
 ]
@@ -50,6 +50,7 @@ const TaskBoardView = () => {
     const [tasks, setTasks] = useState<ITask[]>(taskList);
 
     const handleTaskDrop  = (newTask : ITask, boardType : string) => {
+        // api call
         setTasks(prevTasks => 
             prevTasks.map(task => 
                 task.Id === newTask.Id ? {...task, Status: boardType} : task
@@ -58,7 +59,7 @@ const TaskBoardView = () => {
     }
 
     return (
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
             <Board
                 boardType={"todo"}
                 onTaskDrop={handleTaskDrop}

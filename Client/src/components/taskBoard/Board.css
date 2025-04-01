@@ -1,0 +1,12 @@
+.board {
+    margin: 20px;
+    padding: 10px;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 30px;
+    height: 850px;
+    width: 500px;
+    background-color: rgb(255, 255, 255);
+    border-color: rgb(179, 179, 179);
+
+}
