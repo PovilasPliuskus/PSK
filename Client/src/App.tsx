@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Container, Navbar, Nav } from 'react-bootstrap';
 import DemoForm from './components/domain/Demo';
+import TaskPage from './components/domain/TaskBoardViewPage';
+import TaskBoardViewPage from './components/domain/TaskBoardViewPage';
 
 // Home Page Component
 const HomePage: React.FC = () => {
@@ -45,6 +47,9 @@ function App() {
                 <Nav.Link as={Link} to="/demo-form">
                   Demo Form
                 </Nav.Link>
+                <Nav.Link as={Link} to="/task-page">
+                  Task page
+                </Nav.Link>
               </Nav>
             </Navbar.Collapse>
           </Container>
@@ -54,6 +59,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/demo-form" element={<DemoForm />} />
+          <Route path="/task-page" element={<TaskBoardViewPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
