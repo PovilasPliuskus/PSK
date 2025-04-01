@@ -3,6 +3,7 @@ import { useKeycloak } from '@react-keycloak/web';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Container, Navbar, Nav, Button } from 'react-bootstrap';
 import DemoForm from './components/domain/Demo';
+import axiosInstance from './components/utils/axiosInstance';
 
 // Home Page Component
 const HomePage: React.FC = () => {
@@ -28,26 +29,14 @@ const NotFoundPage: React.FC = () => {
 };
 
 function App() {
-  const { keycloak, initialized } = useKeycloak();
+  const { keycloak } = useKeycloak();
 
   const fetchProtectedData = async () => {
-  
     try {
-      const response = await fetch("http://localhost:5164/api/protected-endpoint", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${keycloak.token}`
-        },
-        credentials: "include"
-      });
-  
-      if (!response.ok) throw new Error("Unauthorized");
-  
-      const data = await response.json();
-      console.log("Protected Data:", data);
+      const response = await axiosInstance.get('/protected-endpoint');
+      console.log('Protected data:', response.data);
     } catch (error) {
-      console.error("Error fetching protected data:", error);
+      console.error('Error fetching protected data:', error);
     }
   };
 
