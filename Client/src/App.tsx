@@ -2,8 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Container, Navbar, Nav } from 'react-bootstrap';
 import DemoForm from './components/domain/Demo';
-import TaskPage from './components/taskBoard/TaskBoardViewPage';
-import TaskBoardViewPage from './components/taskBoard/TaskBoardViewPage';
+import {TaskBoardViewPage} from './components/taskBoard/TaskBoardViewPage';
 
 // Home Page Component
 const HomePage: React.FC = () => {
