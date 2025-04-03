@@ -9,8 +9,8 @@ import { FiPlus, FiTrash } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { FaFire } from "react-icons/fa";
 import { BsHammer } from "react-icons/bs";
-import './TaskBoardViewPage.css'; // Import the new CSS file
-import { Button, Modal } from "react-bootstrap";
+import './TaskBoardViewPage.css';
+import { Button, Modal, Form } from "react-bootstrap";
 
 //npm i framer-motion
 //npm install react-icons --save
@@ -30,29 +30,29 @@ const Board = () => {
     <div className="board">
       <Column
         title="Backlog"
-        column="backlog"
-        headingColor="backlog-color" // Use the CSS class name
+        column="Backlog"
+        headingColor="backlog-color"
         cards={cards}
         setCards={setCards}
       />
       <Column
-        title="TODO"
-        column="todo"
-        headingColor="todo-color" // Use the CSS class name
+        title="To-Do"
+        column="Todo"
+        headingColor="todo-color"
         cards={cards}
         setCards={setCards}
       />
       <Column
         title="In progress"
-        column="doing"
-        headingColor="in-progress-color" // Use the CSS class name
+        column="In progress"
+        headingColor="in-progress-color"
         cards={cards}
         setCards={setCards}
       />
       <Column
         title="Complete"
-        column="done"
-        headingColor="complete-color" // Use the CSS class name
+        column="Complete"
+        headingColor="complete-color"
         cards={cards}
         setCards={setCards}
       />
@@ -65,7 +65,7 @@ type ColumnProps = {
   title: string;
   headingColor: string;
   cards: CardType[];
-  column: ColumnType;
+  column: StatusEnum;
   setCards: Dispatch<SetStateAction<CardType[]>>;
 };
 
@@ -81,6 +81,12 @@ const Column = ({
   const handleDragStart = (e: DragEvent, card: CardType) => {
     e.dataTransfer.setData("cardId", card.id);
   };
+
+  const changeCardStatusInBackend = (card : CardType) => {
+    // make patch api call
+    console.log("api call to change task status: ");
+    console.log(card);
+  }
 
   const handleDragEnd = (e: DragEvent) => {
     const cardId = e.dataTransfer.getData("cardId");
@@ -98,12 +104,13 @@ const Column = ({
 
       let cardToTransfer = copy.find((c) => c.id === cardId);
       if (!cardToTransfer) return;
-      cardToTransfer = { ...cardToTransfer, column };
+      cardToTransfer = { ...cardToTransfer, status: column };
+
+      changeCardStatusInBackend(cardToTransfer);
 
       copy = copy.filter((c) => c.id !== cardId);
-
       const moveToBack = before === "-1";
-
+      
       if (moveToBack) {
         copy.push(cardToTransfer);
       } else {
@@ -179,7 +186,7 @@ const Column = ({
     setActive(false);
   };
 
-  const filteredCards = cards.filter((c) => c.column === column);
+  const filteredCards = cards.filter((c) => c.status === column);
 
   return (
     <div className="column">
@@ -210,9 +217,32 @@ type CardProps = CardType & {
 };
 
 
-const Card = ({ title, id, column, handleDragStart }: CardProps) => {
+const Card = ({
+  name,
+  id,
+  status,
+  handleDragStart,
+  description,
+  dueDate,
+  estimate,
+  type,
+  priority,
+}: CardProps) => {
   const [isOver, setIsOver] = useState(null);
   const [show, setShow] = useState(false);
+  const [taskDetails, setTaskDetails] = useState<CardType>({
+    name,
+    id,
+    status,
+    fkCreatedByUserId: "00000000-0000-0000-0000-000000000000", 
+    fkWorkspaceId: "00000000-0000-0000-0000-000000000000", 
+    fkAssignedToUserId: null,
+    dueDate,
+    description,
+    estimate,
+    type,
+    priority,
+  });
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
@@ -222,19 +252,45 @@ const Card = ({ title, id, column, handleDragStart }: CardProps) => {
     console.log("clicked with id" + id);
   }
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setTaskDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = () => {
+    // make api patch call
+    console.log("Saving changes:", taskDetails);
+    setShow(false);
+  };
+
   return (
     <>
-      <DropIndicator beforeId={id} column={column} />
+      <DropIndicator beforeId={id} column={status} />
       <motion.div
         layout
         layoutId={id}
         draggable="true"
-        onDragStart={(e) => handleDragStart(e, { title, id, column })}
+        onDragStart={(e) => handleDragStart(e, {
+          name,
+          id,
+          status,
+          fkCreatedByUserId: taskDetails.fkCreatedByUserId,
+          fkWorkspaceId: taskDetails.fkWorkspaceId,
+          fkAssignedToUserId: taskDetails.fkAssignedToUserId,
+          dueDate: taskDetails.dueDate,
+          description: taskDetails.description,
+          estimate: taskDetails.estimate,
+          type: taskDetails.type,
+          priority: taskDetails.priority,
+        })}
         onHoverStart={() => setIsOver(id)}
         onHoverEnd={() => setIsOver(null)}
         className="card"
       >
-        <p className="card-title">{title}</p>
+        <p className="card-title">{name}</p>
         {isOver === id && (
           <span onClick={handleEditClick} className="edit-button-wrapper">
             <BsHammer style={{ pointerEvents: 'none' }} />
@@ -244,14 +300,86 @@ const Card = ({ title, id, column, handleDragStart }: CardProps) => {
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Modal title</Modal.Title>
+          <Modal.Title>Edit Task</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Modal body text goes here.</Modal.Body>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3" controlId="taskName">
+              <Form.Label>Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter task name"
+                name="name"
+                value={taskDetails.name}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="taskDescription">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                placeholder="Enter description"
+                name="description"
+                value={taskDetails.description || ""}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="taskDueDate">
+              <Form.Label>Due Date</Form.Label>
+              <Form.Control
+                type="date"
+                name="dueDate"
+                value={taskDetails.dueDate ? taskDetails.dueDate.toISOString().split('T')[0] : ""}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="taskEstimate">
+              <Form.Label>Estimate</Form.Label>
+              <Form.Control
+                as="select"
+                name="estimate"
+                value={taskDetails.estimate}
+                onChange={handleInputChange}
+              >
+                <option value="Small">Small</option>
+                <option value="Medium">Medium</option>
+                <option value="Large">Large</option>
+              </Form.Control>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="taskType">
+              <Form.Label>Type</Form.Label>
+              <Form.Control
+                as="select"
+                name="type"
+                value={taskDetails.type}
+                onChange={handleInputChange}
+              >
+                <option value="Feature">Feature</option>
+                <option value="Bug">Bug</option>
+                <option value="Improvement">Improvement</option>
+              </Form.Control>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="taskPriority">
+              <Form.Label>Priority</Form.Label>
+              <Form.Control
+                as="select"
+                name="priority"
+                value={taskDetails.priority}
+                onChange={handleInputChange}
+              >
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </Form.Control>
+            </Form.Group>
+          </Form>
+        </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleClose}>
+          <Button variant="primary" onClick={handleSave}>
             Save changes
           </Button>
         </Modal.Footer>
@@ -262,7 +390,7 @@ const Card = ({ title, id, column, handleDragStart }: CardProps) => {
 
 type DropIndicatorProps = {
   beforeId: string | null;
-  column: string;
+  column: StatusEnum;
 };
 
 const DropIndicator = ({ beforeId, column }: DropIndicatorProps) => {
@@ -291,11 +419,16 @@ const BurnBarrel = ({
     setActive(false);
   };
 
+  const deleteCardBackend = (cardId) => {
+    console.log("api call to delete card with id: ");
+    console.log(cardId);
+  }
+
   const handleDragEnd = (e: DragEvent) => {
     const cardId = e.dataTransfer.getData("cardId");
 
     setCards((pv) => pv.filter((c) => c.id !== cardId));
-
+    deleteCardBackend(cardId);
     setActive(false);
   };
 
@@ -312,28 +445,43 @@ const BurnBarrel = ({
 };
 
 type AddCardProps = {
-  column: ColumnType;
+  column: StatusEnum;
   setCards: Dispatch<SetStateAction<CardType[]>>;
 };
 
+const addCardBackend = (card : CardType) => {
+  console.log("Api call to add card: ");
+  console.log(card);
+}
+
 const AddCard = ({ column, setCards }: AddCardProps) => {
-  const [text, setText] = useState("");
+  const [name, setName] = useState("");
   const [adding, setAdding] = useState(false);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!text.trim().length) return;
+    if (!name.trim().length) return;
 
-    const newCard = {
-      column,
-      title: text.trim(),
+    const newCard: CardType = {
+      status: column,
+      name: name.trim(),
       id: Math.random().toString(),
+      fkCreatedByUserId: "00000000-0000-0000-0000-000000000000", // Placeholder
+      fkWorkspaceId: "00000000-0000-0000-0000-000000000000", // Placeholder
+      fkAssignedToUserId: null,
+      dueDate: null,
+      description: null,
+      estimate: "Small", // Default value
+      type: "Feature", // Default value
+      priority: "Medium", // Default value
     };
-
     setCards((pv) => [...pv, newCard]);
 
+    addCardBackend(newCard);
+
     setAdding(false);
+    setName("");
   };
 
   return (
@@ -341,10 +489,11 @@ const AddCard = ({ column, setCards }: AddCardProps) => {
       {adding ? (
         <motion.form layout onSubmit={handleSubmit} className="add-card-form">
           <textarea
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             autoFocus
-            placeholder="Add new task..."
+            placeholder="Add new task name..."
             className="add-card-textarea"
+            value={name}
           />
           <div className="add-card-actions">
             <button
@@ -376,40 +525,159 @@ const AddCard = ({ column, setCards }: AddCardProps) => {
   );
 };
 
-type ColumnType = "backlog" | "todo" | "doing" | "done";
+type StatusEnum = "Backlog" | "Todo" | "In progress" | "Complete";
+type EstimateEnum = "Small" | "Medium" | "Large";
+type TypeEnum = "Feature" | "Bug" | "Improvement";
+type PriorityEnum = "Low" | "Medium" | "High";
 
 type CardType = {
-  title: string;
+  name: string;
   id: string;
-  column: ColumnType;
+  fkCreatedByUserId: string; // Guid as string
+  fkWorkspaceId: string; // Guid as string
+  fkAssignedToUserId: string | null; // Guid as string or null
+  dueDate: Date | null;
+  description?: string | null;
+  status: StatusEnum;
+  estimate: EstimateEnum;
+  type: TypeEnum;
+  priority: PriorityEnum;
 };
 
 const DEFAULT_CARDS: CardType[] = [
   // BACKLOG
-  { title: "Look into render bug in dashboard", id: "1", column: "backlog" },
-  { title: "SOX compliance checklist", id: "2", column: "backlog" },
-  { title: "[SPIKE] Migrate to Azure", id: "3", column: "backlog" },
-  { title: "Document Notifications service", id: "4", column: "backlog" },
+  {
+    name: "Look into render bug in dashboard",
+    id: "1",
+    status: "Backlog",
+    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+    fkAssignedToUserId: null,
+    dueDate: null,
+    description: "Investigate why the dashboard is not rendering correctly.",
+    estimate: "Medium",
+    type: "Bug",
+    priority: "High",
+  },
+  {
+    name: "SOX compliance checklist",
+    id: "2",
+    status: "Backlog",
+    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+    fkAssignedToUserId: null,
+    dueDate: new Date("2025-04-15"),
+    description: "Review and update the SOX compliance checklist for the upcoming audit.",
+    estimate: "Large",
+    type: "Feature",
+    priority: "Medium",
+  },
+  {
+    name: "[SPIKE] Migrate to Azure",
+    id: "3",
+    status: "Backlog",
+    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+    fkAssignedToUserId: null,
+    dueDate: null,
+    description: "Research and plan the migration of our infrastructure to Azure.",
+    estimate: "Large",
+    type: "Improvement",
+    priority: "Low",
+  },
+  {
+    name: "Document Notifications service",
+    id: "4",
+    status: "Backlog",
+    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+    fkAssignedToUserId: null,
+    dueDate: new Date("2025-04-10"),
+    description: "Create comprehensive documentation for the Notifications service.",
+    estimate: "Medium",
+    type: "Feature",
+    priority: "Medium",
+  },
   // TODO
   {
-    title: "Research DB options for new microservice",
+    name: "Research DB options for new microservice",
     id: "5",
-    column: "todo",
+    status: "Todo",
+    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+    fkAssignedToUserId: null,
+    dueDate: null,
+    description: "Explore different database options suitable for the new microservice.",
+    estimate: "Small",
+    type: "Improvement",
+    priority: "High",
   },
-  { title: "Postmortem for outage", id: "6", column: "todo" },
-  { title: "Sync with product on Q3 roadmap", id: "7", column: "todo" },
+  {
+    name: "Postmortem for outage",
+    id: "6",
+    status: "Todo",
+    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+    fkAssignedToUserId: null,
+    dueDate: new Date("2025-04-05"),
+    description: "Conduct a postmortem analysis for the recent service outage.",
+    estimate: "Medium",
+    type: "Bug",
+    priority: "High",
+  },
+  {
+    name: "Sync with product on Q3 roadmap",
+    id: "7",
+    status: "Todo",
+    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+    fkAssignedToUserId: null,
+    dueDate: new Date("2025-04-04"),
+    description: "Schedule a meeting to align with the product team on the Q3 roadmap.",
+    estimate: "Small",
+    type: "Feature",
+    priority: "Medium",
+  },
 
   // DOING
   {
-    title: "Refactor context providers to use Zustand",
+    name: "Refactor context providers to use Zustand",
     id: "8",
-    column: "doing",
+    status: "In progress",
+    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+    fkAssignedToUserId: null,
+    dueDate: null,
+    description: "Refactor the existing React context providers to use the Zustand library for state management.",
+    estimate: "Large",
+    type: "Improvement",
+    priority: "High",
   },
-  { title: "Add logging to daily CRON", id: "9", column: "doing" },
+  {
+    name: "Add logging to daily CRON",
+    id: "9",
+    status: "In progress",
+    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+    fkAssignedToUserId: null,
+    dueDate: null,
+    description: "Implement logging for the daily CRON job to track its execution and identify potential issues.",
+    estimate: "Small",
+    type: "Feature",
+    priority: "Medium",
+  },
   // DONE
   {
-    title: "Set up DD dashboards for Lambda listener",
+    name: "Set up DD dashboards for Lambda listener",
     id: "10",
-    column: "done",
+    status: "Complete",
+    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
+    fkAssignedToUserId: null,
+    dueDate: null,
+    description: "Configure Datadog dashboards to monitor the performance and health of the Lambda listener function.",
+    estimate: "Medium",
+    type: "Improvement",
+    priority: "Medium",
   },
 ];
