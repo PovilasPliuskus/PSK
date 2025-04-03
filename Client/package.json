@@ -11,13 +11,12 @@
     "start:all": "concurrently \"npm run dev\" \"dotnet run --project ../TaskManager.API/TaskManager.API.csproj\""
   },
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^7.0.1",
-    "@mui/material": "^7.0.1",
-    "@tailwindcss/vite": "^4.1.1",
     "bootstrap": "^5.3.3",
     "framer-motion": "^12.6.3",
+    "@react-keycloak/web": "^3.4.0",
+    "axios": "^1.8.4",
+    "bootstrap": "^5.3.3",
+    "keycloak-js": "^26.1.4",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
     "react-dnd": "^16.0.1",

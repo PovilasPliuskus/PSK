@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useKeycloak } from '@react-keycloak/web';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Container, Navbar, Nav } from 'react-bootstrap';
+import { Container, Navbar, Nav, Button } from 'react-bootstrap';
 import DemoForm from './components/domain/Demo';
+
 import {TaskBoardViewPage} from './components/taskBoard/TaskBoardViewPage';
+import axiosInstance from './components/utils/axiosInstance';
 
 // Home Page Component
 const HomePage: React.FC = () => {
@@ -28,6 +31,17 @@ const NotFoundPage: React.FC = () => {
 };
 
 function App() {
+  const { keycloak } = useKeycloak();
+
+  const fetchProtectedData = async () => {
+    try {
+      const response = await axiosInstance.get('/protected-endpoint');
+      console.log('Protected data:', response.data);
+    } catch (error) {
+      console.error('Error fetching protected data:', error);
+    }
+  };
+
   return (
     <Router>
       <div className="App">
@@ -49,6 +63,16 @@ function App() {
                 <Nav.Link as={Link} to="/task-page">
                   Task page
                 </Nav.Link>
+              </Nav>
+              <Nav>
+                {!keycloak.authenticated ? (
+                  <Button onClick={() => keycloak.login()}>Sign In</Button>
+                ) : (
+                  <Button onClick={() => keycloak.logout()}>Sign Out</Button>
+                )}
+              </Nav>
+              <Nav>
+                <Button onClick={fetchProtectedData} className="m-2">Fetch Protected Data</Button>
               </Nav>
             </Navbar.Collapse>
           </Container>
