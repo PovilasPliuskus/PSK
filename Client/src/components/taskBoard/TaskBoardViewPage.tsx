@@ -8,7 +8,12 @@ import React, {
 import { FiPlus, FiTrash } from "react-icons/fi";
 import { motion } from "framer-motion";
 import { FaFire } from "react-icons/fa";
+import { BsHammer } from "react-icons/bs";
 import './TaskBoardViewPage.css'; // Import the new CSS file
+import { Button, Modal } from "react-bootstrap";
+
+//npm i framer-motion
+//npm install react-icons --save
 
 export const TaskBoardViewPage = () => {
   return (
@@ -204,7 +209,19 @@ type CardProps = CardType & {
   handleDragStart: Function;
 };
 
+
 const Card = ({ title, id, column, handleDragStart }: CardProps) => {
+  const [isOver, setIsOver] = useState(null);
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  const handleEditClick = () => {
+    handleShow();
+    console.log("clicked with id" + id);
+  }
+
   return (
     <>
       <DropIndicator beforeId={id} column={column} />
@@ -213,10 +230,32 @@ const Card = ({ title, id, column, handleDragStart }: CardProps) => {
         layoutId={id}
         draggable="true"
         onDragStart={(e) => handleDragStart(e, { title, id, column })}
+        onHoverStart={() => setIsOver(id)}
+        onHoverEnd={() => setIsOver(null)}
         className="card"
       >
         <p className="card-title">{title}</p>
+        {isOver === id && (
+          <span onClick={handleEditClick} className="edit-button-wrapper">
+            <BsHammer style={{ pointerEvents: 'none' }} />
+          </span>
+        )}
       </motion.div>
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Modal title</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Modal body text goes here.</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleClose}>
+            Save changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };

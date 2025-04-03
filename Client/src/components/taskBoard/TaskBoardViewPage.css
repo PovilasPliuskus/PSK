@@ -1,202 +1,270 @@
 /* KanbanStyles.css */
 .kanban-container {
-    height: 100vh;
-    width: 98%;
-    color: #f5f5f4; /* neutral-50 */
-    padding: 0;
-    margin: 0;
-    font-family: sans-serif; /* Basic font */
-  }
-  
-  .board {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    gap: 12px; /* gap-3 in rem, roughly */
-    overflow-x: auto;
-    padding: 48px; /* p-12 in rem, roughly */
-    
-  }
-  
-  .column {
-    width: 224px; /* w-56 in rem, roughly */
-    flex-shrink: 0;
-  }
-  
-  .column-header {
-    margin-bottom: 12px; /* mb-3 in rem, roughly */
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .column-title {
-    font-weight: 500; /* font-medium */
-  }
-  
-  .column-count {
-    border-radius: 9999px; /* rounded */
-    font-size: 0.875rem; /* text-sm */
-    color: #a1a1aa; /* neutral-400 */
-  }
-  
-  .column-content {
-    height: 100%;
-    width: 100%;
-    transition: background-color 0.2s ease-in-out; /* transition-colors */
-    padding: 8px; /* Add some padding for visual spacing */
-  }
-  
-  .column-content-active {
-    background-color: rgba(108, 108, 185, 0.5); /* neutral-800/50 */
-  }
-  
-  .card {
-    cursor: grab;
-    border-radius: 4px; /* rounded */
-    border: 1px solid #4a4a4d; /* neutral-700 */
-    background-color: #27272a; /* neutral-800 */
-    padding: 12px; /* p-3 in rem, roughly */
-    margin-bottom: 8px; /* Add some margin between cards */
-  }
-  
-  .card:active {
-    cursor: grabbing;
-  }
-  
-  .card-title {
-    font-size: 0.875rem; /* text-sm */
-    color: #f4f4f5; /* neutral-100 */
-    margin: 0;
-  }
-  
-  .drop-indicator {
-    margin-top: 2px;
-    margin-bottom: 2px;
-    height: 2px;
-    width: 100%;
-    background-color: #8b5cf6; /* violet-400 */
-    opacity: 0;
-  }
-  
-  .burn-barrel {
-    margin-top: 40px; /* mt-10 in rem, roughly */
-    display: grid;
-    height: 224px; /* h-56 in rem, roughly */
-    width: 224px; /* w-56 in rem, roughly */
-    flex-shrink: 0;
-    place-content: center;
-    border-radius: 4px; /* rounded */
-    border-width: 1px;
-    font-size: 1.875rem; /* text-3xl */
-  }
-  
-  .burn-barrel-inactive {
-    border-color: #6b7280; /* neutral-500 */
-    background-color: rgba(107, 114, 128, 0.2); /* neutral-500/20 */
-    color: #6b7280; /* neutral-500 */
-  }
-  
-  .burn-barrel-active {
-    border-color: #b91c1c; /* red-800 */
-    background-color: rgba(153, 27, 27, 0.2); /* red-800/20 */
-    color: #f43f5e; /* red-500 */
-  }
-  
-  .add-card-button {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    gap: 6px; /* gap-1.5 in rem, roughly */
-    padding: 6px 12px; /* px-3 py-1.5 in rem, roughly */
-    font-size: 0.75rem; /* text-xs */
-    color: #a1a1aa; /* neutral-400 */
-    transition: color 0.2s ease-in-out; /* transition-colors */
-    background: none;
-    border: none;
-    cursor: pointer;
-    outline: none;
-  }
-  
-  .add-card-button:hover {
-    color: #f5f5f4; /* neutral-50 */
-  }
-  
-  .add-card-form {
-    display: flex;
-    flex-direction: column;
-    gap: 6px; /* mt-1.5 in rem, roughly */
-  }
-  
-  .add-card-textarea {
-    width: 100%;
-    border-radius: 4px; /* rounded */
-    border: 1px solid #8b5cf6; /* violet-400 */
-    background-color: rgba(139, 92, 246, 0.2); /* violet-400/20 */
-    padding: 12px; /* p-3 in rem, roughly */
-    font-size: 0.875rem; /* text-sm */
-    color: #181818; /* neutral-50 */
-    placeholder-color: #d8b4fe; /* placeholder-violet-300 - not a standard CSS property, might need a workaround */
-    outline: none;
-  }
-  
-  .add-card-textarea::placeholder { /* Standard way to style placeholder */
-    color: #d8b4fe;
-  }
-  
-  .add-card-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 6px; /* gap-1.5 in rem, roughly */
-  }
-  
-  .add-card-actions button {
-    padding: 6px 12px; /* px-3 py-1.5 in rem, roughly */
-    font-size: 0.75rem; /* text-xs */
-    border-radius: 4px; /* rounded */
-    cursor: pointer;
-    outline: none;
-  }
-  
-  .add-card-actions .close-button {
-    color: #a1a1aa; /* neutral-400 */
-    transition: color 0.2s ease-in-out; /* transition-colors */
-    background: none;
-    border: none;
-  }
-  
-  .add-card-actions .close-button:hover {
-    color: #f5f5f4; /* neutral-50 */
-  }
-  
-  .add-card-actions .add-button {
-    display: flex;
-    align-items: center;
-    gap: 6px; /* gap-1.5 in rem, roughly */
-    background-color: #f5f5f4; /* neutral-50 */
-    color: #09090b; /* neutral-950 */
-    transition: background-color 0.2s ease-in-out; /* transition-colors */
-    border: none;
-  }
-  
-  .add-card-actions .add-button:hover {
-    background-color: #e5e5e7; /* neutral-300 */
-  }
-  
-  /* Dynamic heading colors */
-  .backlog-color {
-    color: #6b7280;
-  }
-  
-  .todo-color {
-    color: #ffdb28;
-  }
-  
-  .in-progress-color {
-    color: #3aebff;
-  }
-  
-  .complete-color {
-    color: #57ffb0;
-  }
+  height: 100vh;
+  width: 98%;
+  color: #f5f5f4;
+  /* neutral-50 */
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+  /* Basic font */
+}
+
+.board {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  gap: 12px;
+  /* gap-3 in rem, roughly */
+  overflow-x: auto;
+  padding: 48px;
+  /* p-12 in rem, roughly */
+
+}
+
+.column {
+  width: 224px;
+  /* w-56 in rem, roughly */
+  flex-shrink: 0;
+}
+
+.column-header {
+  margin-bottom: 12px;
+  /* mb-3 in rem, roughly */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.column-title {
+  font-weight: 500;
+  /* font-medium */
+}
+
+.column-count {
+  border-radius: 9999px;
+  /* rounded */
+  font-size: 0.875rem;
+  /* text-sm */
+  color: #a1a1aa;
+  /* neutral-400 */
+}
+
+.column-content {
+  height: 100%;
+  width: 100%;
+  transition: background-color 0.2s ease-in-out;
+  /* transition-colors */
+  padding: 8px;
+  /* Add some padding for visual spacing */
+}
+
+.column-content-active {
+  background-color: rgba(108, 108, 185, 0.5);
+  /* neutral-800/50 */
+}
+
+.card {
+  cursor: grab;
+  border-radius: 4px;
+  /* rounded */
+  border: 1px solid #4a4a4d;
+  /* neutral-700 */
+  background-color: #27272a;
+  /* neutral-800 */
+  padding: 12px;
+  /* p-3 in rem, roughly */
+  margin-bottom: 8px;
+  /* Add some margin between cards */
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.card-title {
+  font-size: 0.875rem;
+  /* text-sm */
+  color: #f4f4f5;
+  /* neutral-100 */
+  margin: 0;
+}
+
+.drop-indicator {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  height: 2px;
+  width: 100%;
+  background-color: #8b5cf6;
+  /* violet-400 */
+  opacity: 0;
+}
+
+.burn-barrel {
+  margin-top: 40px;
+  /* mt-10 in rem, roughly */
+  display: grid;
+  height: 224px;
+  /* h-56 in rem, roughly */
+  width: 224px;
+  /* w-56 in rem, roughly */
+  flex-shrink: 0;
+  place-content: center;
+  border-radius: 4px;
+  /* rounded */
+  border-width: 1px;
+  font-size: 1.875rem;
+  /* text-3xl */
+}
+
+.burn-barrel-inactive {
+  border-color: #6b7280;
+  /* neutral-500 */
+  background-color: rgba(107, 114, 128, 0.2);
+  /* neutral-500/20 */
+  color: #6b7280;
+  /* neutral-500 */
+}
+
+.burn-barrel-active {
+  border-color: #b91c1c;
+  /* red-800 */
+  background-color: rgba(153, 27, 27, 0.2);
+  /* red-800/20 */
+  color: #f43f5e;
+  /* red-500 */
+}
+
+.add-card-button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 6px;
+  /* gap-1.5 in rem, roughly */
+  padding: 6px 12px;
+  /* px-3 py-1.5 in rem, roughly */
+  font-size: 0.75rem;
+  /* text-xs */
+  color: #a1a1aa;
+  /* neutral-400 */
+  transition: color 0.2s ease-in-out;
+  /* transition-colors */
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.add-card-button:hover {
+  color: #f5f5f4;
+  /* neutral-50 */
+}
+
+.add-card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  /* mt-1.5 in rem, roughly */
+}
+
+.add-card-textarea {
+  width: 100%;
+  border-radius: 4px;
+  /* rounded */
+  border: 1px solid #8b5cf6;
+  /* violet-400 */
+  background-color: rgba(139, 92, 246, 0.2);
+  /* violet-400/20 */
+  padding: 12px;
+  /* p-3 in rem, roughly */
+  font-size: 0.875rem;
+  /* text-sm */
+  color: #181818;
+  /* neutral-50 */
+  placeholder-color: #d8b4fe;
+  /* placeholder-violet-300 - not a standard CSS property, might need a workaround */
+  outline: none;
+}
+
+.add-card-textarea::placeholder {
+  /* Standard way to style placeholder */
+  color: #d8b4fe;
+}
+
+.add-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  /* gap-1.5 in rem, roughly */
+}
+
+.add-card-actions button {
+  padding: 6px 12px;
+  /* px-3 py-1.5 in rem, roughly */
+  font-size: 0.75rem;
+  /* text-xs */
+  border-radius: 4px;
+  /* rounded */
+  cursor: pointer;
+  outline: none;
+}
+
+.add-card-actions .close-button {
+  color: #a1a1aa;
+  /* neutral-400 */
+  transition: color 0.2s ease-in-out;
+  /* transition-colors */
+  background: none;
+  border: none;
+}
+
+.add-card-actions .close-button:hover {
+  color: #f5f5f4;
+  /* neutral-50 */
+}
+
+.add-card-actions .add-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  /* gap-1.5 in rem, roughly */
+  background-color: #f5f5f4;
+  /* neutral-50 */
+  color: #09090b;
+  /* neutral-950 */
+  transition: background-color 0.2s ease-in-out;
+  /* transition-colors */
+  border: none;
+}
+
+.add-card-actions .add-button:hover {
+  background-color: #e5e5e7;
+  /* neutral-300 */
+}
+
+/* Dynamic heading colors */
+.backlog-color {
+  color: #6b7280;
+}
+
+.todo-color {
+  color: #ffdb28;
+}
+
+.in-progress-color {
+  color: #3aebff;
+}
+
+.complete-color {
+  color: #57ffb0;
+}
+
+.edit-button-wrapper {
+  position: absolute;
+  left: 90%;
+  bottom: 70%;
+  z-index: 100;
+  height: 20px;
+  width: 20px;
+}
