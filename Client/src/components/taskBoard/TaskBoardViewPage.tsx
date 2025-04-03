@@ -44,7 +44,7 @@ const Board = () => {
       />
       <Column
         title="In progress"
-        column="In progress"
+        column="InProgress"
         headingColor="in-progress-color"
         cards={cards}
         setCards={setCards}
@@ -525,7 +525,7 @@ const AddCard = ({ column, setCards }: AddCardProps) => {
   );
 };
 
-type StatusEnum = "Backlog" | "Todo" | "In progress" | "Complete";
+type StatusEnum = "Backlog" | "Todo" | "InProgress" | "Complete";
 type EstimateEnum = "Small" | "Medium" | "Large";
 type TypeEnum = "Feature" | "Bug" | "Improvement";
 type PriorityEnum = "Low" | "Medium" | "High";
@@ -643,7 +643,7 @@ const DEFAULT_CARDS: CardType[] = [
   {
     name: "Refactor context providers to use Zustand",
     id: "8",
-    status: "In progress",
+    status: "InProgress",
     fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
     fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
     fkAssignedToUserId: null,
@@ -656,7 +656,7 @@ const DEFAULT_CARDS: CardType[] = [
   {
     name: "Add logging to daily CRON",
     id: "9",
-    status: "In progress",
+    status: "InProgress",
     fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
     fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
     fkAssignedToUserId: null,
