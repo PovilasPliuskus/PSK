@@ -4,6 +4,8 @@ const ScriptResources = {
     PageGoToHome: 'Go to Home',
     IndexHeader: 'Welcome to Our Application',
     IndexParagraph: 'Navigate to the Demo Form to get started!',
+    TotalItems: 'Total Items:',
+    ItemsPerPage: 'Items per page:',
 }
 
 export default ScriptResources;
