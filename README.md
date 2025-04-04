@@ -25,4 +25,4 @@
    1. `http://localhost:5164/`
    2. `http://localhost:5173`
 9. In `Users` tab you can create new user with your credentials.
-10. If something do not work by now, you can write in PSK chat.
+10. If something does not work yet, you can write in PSK chat.
