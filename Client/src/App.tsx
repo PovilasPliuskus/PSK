@@ -6,13 +6,14 @@ import DemoForm from './components/domain/Demo';
 import { axiosInstance, useAxiosInterceptor } from './utils/axiosInstance';
 import { ErrorProvider } from './components/base/ErrorContext';
 import GlobalAlert from './components/base/GlobalAlert';
+import ScriptResources from './assets/resources/strings';
 
 // Home Page Component
 const HomePage: React.FC = () => {
   return (
     <Container className="mt-5 text-center">
-      <h1>Welcome to Our Application</h1>
-      <p>Navigate to the Demo Form to get started!</p>
+      <h1>{ScriptResources.IndexHeader}</h1>
+      <p>{ScriptResources.IndexParagraph}</p>
     </Container>
   );
 };
@@ -21,10 +22,10 @@ const HomePage: React.FC = () => {
 const NotFoundPage: React.FC = () => {
   return (
     <Container className="mt-5 text-center">
-      <h1>404 - Page Not Found</h1>
-      <p>The page you are looking for does not exist.</p>
+      <h1>{ScriptResources.Page404}</h1>
+      <p>{ScriptResources.PageDoNotExist}</p>
       <Link to="/" className="btn btn-primary">
-        Go to Home
+        {ScriptResources.PageGoToHome}
       </Link>
     </Container>
   );
