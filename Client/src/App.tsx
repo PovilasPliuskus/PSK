@@ -3,7 +3,9 @@ import { useKeycloak } from '@react-keycloak/web';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Container, Navbar, Nav, Button } from 'react-bootstrap';
 import DemoForm from './components/domain/Demo';
-import axiosInstance from './components/utils/axiosInstance';
+import { axiosInstance, useAxiosInterceptor } from './utils/axiosInstance';
+import { ErrorProvider } from './components/base/ErrorContext';
+import GlobalAlert from './components/base/GlobalAlert';
 
 // Home Page Component
 const HomePage: React.FC = () => {
@@ -29,7 +31,17 @@ const NotFoundPage: React.FC = () => {
 };
 
 function App() {
+
+  return (
+    <ErrorProvider>
+      <InnerApp />
+    </ErrorProvider>
+  );
+}
+
+function InnerApp() {
   const { keycloak } = useKeycloak();
+  useAxiosInterceptor();
 
   const fetchProtectedData = async () => {
     try {
@@ -37,6 +49,15 @@ function App() {
       console.log('Protected data:', response.data);
     } catch (error) {
       console.error('Error fetching protected data:', error);
+    }
+  };
+
+  const fetchErrorData = async () => {
+    try {
+      const response = await axiosInstance.get('/error');
+      console.log('Error data:', response.data);
+    } catch (error) {
+      console.error('Error fetching error data:', error);
     }
   };
 
@@ -59,7 +80,7 @@ function App() {
                   Demo Form
                 </Nav.Link>
               </Nav>
-              <Nav>
+              <Nav className="m-2">
                 {!keycloak.authenticated ? (
                   <Button onClick={() => keycloak.login()}>Sign In</Button>
                 ) : (
@@ -68,10 +89,12 @@ function App() {
               </Nav>
               <Nav>
                 <Button onClick={fetchProtectedData} className="m-2">Fetch Protected Data</Button>
+                <Button onClick={fetchErrorData} className="m-2">Error</Button>
               </Nav>
             </Navbar.Collapse>
           </Container>
         </Navbar>
+        <GlobalAlert />
 
         {/* Routes */}
         <Routes>
@@ -81,7 +104,7 @@ function App() {
         </Routes>
       </div>
     </Router>
-  );
+  )
 }
 
 export default App;

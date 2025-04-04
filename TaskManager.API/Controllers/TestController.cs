@@ -11,4 +11,17 @@ public class ProtectedController : ControllerBase
     {
         return Ok(new { message = "This is a protected resource!" });
     }
+
+    [HttpGet("error")]
+    [Authorize]
+    public IActionResult GetError()
+    {
+        var problemDetails = new ProblemDetails
+        {
+            Status = StatusCodes.Status500InternalServerError,
+            Title = "This is a simulated error"
+        };
+
+        return StatusCode(problemDetails.Status.Value, problemDetails);
+    }
 }
