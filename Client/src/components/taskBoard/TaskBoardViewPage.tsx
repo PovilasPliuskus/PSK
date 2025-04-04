@@ -11,7 +11,8 @@ import { FaFire } from "react-icons/fa";
 import { BsHammer } from "react-icons/bs";
 import './TaskBoardViewPage.css';
 import { Button, Modal, Form } from "react-bootstrap";
-import { estimateMapper, priorityMapper, statusMapper, typeMapper } from "../utils/EnumMapper.tsx";
+import { estimateMapper, priorityMapper, statusMapper, typeMapper } from "../utils/enumMapper.tsx";
+import { CardType, StatusEnum } from "../utils/types.ts";
 
 //npm i framer-motion
 //npm install react-icons --save
@@ -529,24 +530,6 @@ const AddCard = ({ column, setCards }: AddCardProps) => {
   );
 };
 
-type StatusEnum = 0 | 1 | 2 | 3;
-type EstimateEnum = 0 | 1 | 2;
-type TypeEnum = 0 | 1 | 2;
-type PriorityEnum = 0 | 1 | 2;
-
-type CardType = {
-  name: string;
-  id: string;
-  fkCreatedByUserId: string; // Guid as string
-  fkWorkspaceId: string; // Guid as string
-  fkAssignedToUserId: string | null; // Guid as string or null
-  dueDate: Date | null;
-  description?: string | null;
-  status: StatusEnum;
-  estimate: EstimateEnum;
-  type: TypeEnum;
-  priority: PriorityEnum;
-};
 
 const DEFAULT_CARDS: CardType[] = [
   // BACKLOG
