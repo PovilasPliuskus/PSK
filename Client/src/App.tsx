@@ -3,11 +3,15 @@ import { useKeycloak } from '@react-keycloak/web';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { Container, Navbar, Nav, Button } from 'react-bootstrap';
 import DemoForm from './components/domain/Demo';
+
+
+import {TaskBoardViewPage} from './components/taskBoard/TaskBoardViewPage';
 import { axiosInstance, useAxiosInterceptor } from './utils/axiosInstance';
 import { ErrorProvider } from './components/base/ErrorContext';
 import GlobalAlert from './components/base/GlobalAlert';
 import ScriptResources from './assets/resources/strings';
 import Workspaces from './components/domain/Workspace/Workspaces';
+
 
 // Home Page Component
 const HomePage: React.FC = () => {
@@ -81,6 +85,9 @@ function InnerApp() {
                 <Nav.Link as={Link} to="/demo-form">
                   Demo Form
                 </Nav.Link>
+                <Nav.Link as={Link} to="/task-page">
+                  Task page
+                </Nav.Link>
                 <Nav.Link as={Link} to="/workspaces">
                   Workspaces
                 </Nav.Link>
@@ -106,6 +113,7 @@ function InnerApp() {
           <Route path="/" element={<HomePage />} />
           <Route path="/workspaces" element={<Workspaces />} />
           <Route path="/demo-form" element={<DemoForm />} />
+          <Route path="/task-page" element={<TaskBoardViewPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
