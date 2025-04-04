@@ -11,6 +11,7 @@ import { FaFire } from "react-icons/fa";
 import { BsHammer } from "react-icons/bs";
 import './TaskBoardViewPage.css';
 import { Button, Modal, Form } from "react-bootstrap";
+import { estimateMapper, priorityMapper, statusMapper, typeMapper } from "../utils/EnumMapper.tsx";
 
 //npm i framer-motion
 //npm install react-icons --save
@@ -29,29 +30,29 @@ const Board = () => {
   return (
     <div className="board">
       <Column
-        title="Backlog"
-        column="Backlog"
+        title={statusMapper[0]}
+        column={0}
         headingColor="backlog-color"
         cards={cards}
         setCards={setCards}
       />
       <Column
-        title="To-Do"
-        column="Todo"
+        title={statusMapper[1]}
+        column={1}
         headingColor="todo-color"
         cards={cards}
         setCards={setCards}
       />
       <Column
-        title="In progress"
-        column="InProgress"
+        title={statusMapper[2]}
+        column={2}
         headingColor="in-progress-color"
         cards={cards}
         setCards={setCards}
       />
       <Column
-        title="Complete"
-        column="Complete"
+        title={statusMapper[3]}
+        column={3}
         headingColor="complete-color"
         cards={cards}
         setCards={setCards}
@@ -254,9 +255,12 @@ const Card = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+
     setTaskDetails((prevDetails) => ({
       ...prevDetails,
-      [name]: value,
+      [name]: name === "status" || name === "estimate" || name === "type" || name === "priority" 
+      ? parseInt(value, 10)
+      : value,
     }));
   };
 
@@ -342,9 +346,9 @@ const Card = ({
                 value={taskDetails.estimate}
                 onChange={handleInputChange}
               >
-                <option value="Small">Small</option>
-                <option value="Medium">Medium</option>
-                <option value="Large">Large</option>
+                <option value={0}>{estimateMapper[0]}</option>
+                <option value={1}>{estimateMapper[1]}</option>
+                <option value={2}>{estimateMapper[2]}</option>
               </Form.Control>
             </Form.Group>
             <Form.Group className="mb-3" controlId="taskType">
@@ -355,9 +359,9 @@ const Card = ({
                 value={taskDetails.type}
                 onChange={handleInputChange}
               >
-                <option value="Feature">Feature</option>
-                <option value="Bug">Bug</option>
-                <option value="Improvement">Improvement</option>
+                <option value={0}>{typeMapper[0]}</option>
+                <option value={1}>{typeMapper[1]}</option>
+                <option value={2}>{typeMapper[2]}</option>
               </Form.Control>
             </Form.Group>
             <Form.Group className="mb-3" controlId="taskPriority">
@@ -368,9 +372,9 @@ const Card = ({
                 value={taskDetails.priority}
                 onChange={handleInputChange}
               >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
+                <option value={0}>{priorityMapper[0]}</option>
+                <option value={1}>{priorityMapper[1]}</option>
+                <option value={2}>{priorityMapper[2]}</option>
               </Form.Control>
             </Form.Group>
           </Form>
@@ -472,9 +476,9 @@ const AddCard = ({ column, setCards }: AddCardProps) => {
       fkAssignedToUserId: null,
       dueDate: null,
       description: null,
-      estimate: "Small", // Default value
-      type: "Feature", // Default value
-      priority: "Medium", // Default value
+      estimate: 1, // Default value
+      type: 2, // Default value
+      priority: 2, // Default value
     };
     setCards((pv) => [...pv, newCard]);
 
@@ -525,10 +529,10 @@ const AddCard = ({ column, setCards }: AddCardProps) => {
   );
 };
 
-type StatusEnum = "Backlog" | "Todo" | "InProgress" | "Complete";
-type EstimateEnum = "Small" | "Medium" | "Large";
-type TypeEnum = "Feature" | "Bug" | "Improvement";
-type PriorityEnum = "Low" | "Medium" | "High";
+type StatusEnum = 0 | 1 | 2 | 3;
+type EstimateEnum = 0 | 1 | 2;
+type TypeEnum = 0 | 1 | 2;
+type PriorityEnum = 0 | 1 | 2;
 
 type CardType = {
   name: string;
@@ -549,135 +553,135 @@ const DEFAULT_CARDS: CardType[] = [
   {
     name: "Look into render bug in dashboard",
     id: "1",
-    status: "Backlog",
+    status: 0,
     fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
     fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
     fkAssignedToUserId: null,
     dueDate: null,
     description: "Investigate why the dashboard is not rendering correctly.",
-    estimate: "Medium",
-    type: "Bug",
-    priority: "High",
+    estimate: 2,
+    type: 2,
+    priority: 2,
   },
   {
     name: "SOX compliance checklist",
     id: "2",
-    status: "Backlog",
+    status: 0,
     fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
     fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
     fkAssignedToUserId: null,
     dueDate: new Date("2025-04-15"),
     description: "Review and update the SOX compliance checklist for the upcoming audit.",
-    estimate: "Large",
-    type: "Feature",
-    priority: "Medium",
+    estimate: 2,
+    type: 2,
+    priority: 2,
   },
   {
     name: "[SPIKE] Migrate to Azure",
     id: "3",
-    status: "Backlog",
+    status: 0,
     fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
     fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
     fkAssignedToUserId: null,
     dueDate: null,
     description: "Research and plan the migration of our infrastructure to Azure.",
-    estimate: "Large",
-    type: "Improvement",
-    priority: "Low",
+    estimate: 2,
+    type: 1,
+    priority: 0,
   },
   {
     name: "Document Notifications service",
     id: "4",
-    status: "Backlog",
+    status: 0,
     fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
     fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
     fkAssignedToUserId: null,
     dueDate: new Date("2025-04-10"),
     description: "Create comprehensive documentation for the Notifications service.",
-    estimate: "Medium",
-    type: "Feature",
-    priority: "Medium",
+    estimate: 1,
+    type: 0,
+    priority: 1,
   },
   // TODO
   {
     name: "Research DB options for new microservice",
     id: "5",
-    status: "Todo",
+    status: 1,
     fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
     fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
     fkAssignedToUserId: null,
     dueDate: null,
     description: "Explore different database options suitable for the new microservice.",
-    estimate: "Small",
-    type: "Improvement",
-    priority: "High",
+    estimate: 0,
+    type: 2,
+    priority: 2,
   },
   {
     name: "Postmortem for outage",
     id: "6",
-    status: "Todo",
+    status: 1,
     fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
     fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
     fkAssignedToUserId: null,
     dueDate: new Date("2025-04-05"),
     description: "Conduct a postmortem analysis for the recent service outage.",
-    estimate: "Medium",
-    type: "Bug",
-    priority: "High",
+    estimate: 1,
+    type: 0,
+    priority: 2,
   },
   {
     name: "Sync with product on Q3 roadmap",
     id: "7",
-    status: "Todo",
+    status: 1,
     fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
     fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
     fkAssignedToUserId: null,
     dueDate: new Date("2025-04-04"),
     description: "Schedule a meeting to align with the product team on the Q3 roadmap.",
-    estimate: "Small",
-    type: "Feature",
-    priority: "Medium",
+    estimate: 0,
+    type: 0,
+    priority: 1,
   },
 
   // DOING
   {
     name: "Refactor context providers to use Zustand",
     id: "8",
-    status: "InProgress",
+    status: 2,
     fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
     fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
     fkAssignedToUserId: null,
     dueDate: null,
     description: "Refactor the existing React context providers to use the Zustand library for state management.",
-    estimate: "Large",
-    type: "Improvement",
-    priority: "High",
+    estimate: 2,
+    type: 0,
+    priority: 2,
   },
   {
     name: "Add logging to daily CRON",
     id: "9",
-    status: "InProgress",
+    status: 2,
     fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
     fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
     fkAssignedToUserId: null,
     dueDate: null,
     description: "Implement logging for the daily CRON job to track its execution and identify potential issues.",
-    estimate: "Small",
-    type: "Feature",
-    priority: "Medium",
+    estimate: 0,
+    type: 1,
+    priority: 1,
   },
   // DONE
   {
     name: "Set up DD dashboards for Lambda listener",
     id: "10",
-    status: "Complete",
+    status: 3,
     fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
     fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
     fkAssignedToUserId: null,
     dueDate: null,
     description: "Configure Datadog dashboards to monitor the performance and health of the Lambda listener function.",
-    estimate: "Medium",
-    type: "Improvement",
-    priority: "Medium",
+    estimate: 1,
+    type: 0,
+    priority: 1,
   },
 ];
