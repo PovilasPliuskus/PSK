@@ -12,7 +12,7 @@
 ## How to setup keycloak
 1. Go to docker folder.
 2. Run `docker compose up`.
-3. Go to `https://localhost:8080/admin/`.
+3. Go to `http://localhost:8080/admin/`.
 4. Login with credentials:
    1. Username: `admin`
    2. Password: `admin_password`
