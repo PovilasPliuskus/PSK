@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useKeycloak } from '@react-keycloak/web';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Container, Navbar, Nav, Button } from 'react-bootstrap';
 import DemoForm from './components/domain/Demo';
 
+
 import {TaskBoardViewPage} from './components/taskBoard/TaskBoardViewPage';
-import axiosInstance from './components/utils/axiosInstance';
+import { axiosInstance, useAxiosInterceptor } from './utils/axiosInstance';
+import { ErrorProvider } from './components/base/ErrorContext';
+import GlobalAlert from './components/base/GlobalAlert';
+import ScriptResources from './assets/resources/strings';
+
 
 // Home Page Component
 const HomePage: React.FC = () => {
   return (
     <Container className="mt-5 text-center">
-      <h1>Welcome to Our Application</h1>
-      <p>Navigate to the Demo Form to get started!</p>
+      <h1>{ScriptResources.IndexHeader}</h1>
+      <p>{ScriptResources.IndexParagraph}</p>
     </Container>
   );
 };
@@ -21,17 +26,27 @@ const HomePage: React.FC = () => {
 const NotFoundPage: React.FC = () => {
   return (
     <Container className="mt-5 text-center">
-      <h1>404 - Page Not Found</h1>
-      <p>The page you are looking for does not exist.</p>
+      <h1>{ScriptResources.Page404}</h1>
+      <p>{ScriptResources.PageDoNotExist}</p>
       <Link to="/" className="btn btn-primary">
-        Go to Home
+        {ScriptResources.PageGoToHome}
       </Link>
     </Container>
   );
 };
 
 function App() {
+
+  return (
+    <ErrorProvider>
+      <InnerApp />
+    </ErrorProvider>
+  );
+}
+
+function InnerApp() {
   const { keycloak } = useKeycloak();
+  useAxiosInterceptor();
 
   const fetchProtectedData = async () => {
     try {
@@ -39,6 +54,15 @@ function App() {
       console.log('Protected data:', response.data);
     } catch (error) {
       console.error('Error fetching protected data:', error);
+    }
+  };
+
+  const fetchErrorData = async () => {
+    try {
+      const response = await axiosInstance.get('/error');
+      console.log('Error data:', response.data);
+    } catch (error) {
+      console.error('Error fetching error data:', error);
     }
   };
 
@@ -64,7 +88,7 @@ function App() {
                   Task page
                 </Nav.Link>
               </Nav>
-              <Nav>
+              <Nav className="m-2">
                 {!keycloak.authenticated ? (
                   <Button onClick={() => keycloak.login()}>Sign In</Button>
                 ) : (
@@ -73,10 +97,12 @@ function App() {
               </Nav>
               <Nav>
                 <Button onClick={fetchProtectedData} className="m-2">Fetch Protected Data</Button>
+                <Button onClick={fetchErrorData} className="m-2">Error</Button>
               </Nav>
             </Navbar.Collapse>
           </Container>
         </Navbar>
+        <GlobalAlert />
 
         {/* Routes */}
         <Routes>
@@ -87,7 +113,7 @@ function App() {
         </Routes>
       </div>
     </Router>
-  );
+  )
 }
 
 export default App;
