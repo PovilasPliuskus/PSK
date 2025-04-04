@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { Container, Navbar, Nav, Button } from 'react-bootstrap';
 import DemoForm from './components/domain/Demo';
 import { axiosInstance, useAxiosInterceptor } from './utils/axiosInstance';
 import { ErrorProvider } from './components/base/ErrorContext';
 import GlobalAlert from './components/base/GlobalAlert';
 import ScriptResources from './assets/resources/strings';
+import Workspaces from './components/domain/Workspace/Workspaces';
 
 // Home Page Component
 const HomePage: React.FC = () => {
@@ -41,7 +42,7 @@ function App() {
 }
 
 function InnerApp() {
-  const { keycloak } = useKeycloak();
+  const { keycloak, initialized } = useKeycloak();
   useAxiosInterceptor();
 
   const fetchProtectedData = async () => {
@@ -80,6 +81,9 @@ function InnerApp() {
                 <Nav.Link as={Link} to="/demo-form">
                   Demo Form
                 </Nav.Link>
+                <Nav.Link as={Link} to="/workspaces">
+                  Workspaces
+                </Nav.Link>
               </Nav>
               <Nav className="m-2">
                 {!keycloak.authenticated ? (
@@ -100,6 +104,7 @@ function InnerApp() {
         {/* Routes */}
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/workspaces" element={<Workspaces />} />
           <Route path="/demo-form" element={<DemoForm />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
