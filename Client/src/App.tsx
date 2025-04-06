@@ -85,7 +85,8 @@ function InnerApp() {
                 <Nav.Link as={Link} to="/demo-form">
                   Demo Form
                 </Nav.Link>
-                <Nav.Link as={Link} to="/task-page">
+                {/* Kolkas tiesiog atidaro pavyzdini task. Pakeisim, kai nuspresim, kaip useris pasiekia task puslapi */}
+                <Nav.Link as={Link} to="/task-page/c2646792-8d3f-444c-8b21-f5120292ef3e">
                   Task page
                 </Nav.Link>
                 <Nav.Link as={Link} to="/workspaces">
@@ -113,7 +114,7 @@ function InnerApp() {
           <Route path="/" element={<HomePage />} />
           <Route path="/workspaces" element={<Workspaces />} />
           <Route path="/demo-form" element={<DemoForm />} />
-          <Route path="/task-page" element={<TaskBoardViewPage />} />
+          <Route path="/task-page/:id" element={<TaskBoardViewPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

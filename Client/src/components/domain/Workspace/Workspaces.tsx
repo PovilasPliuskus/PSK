@@ -54,7 +54,7 @@ const Workspaces: React.FC = () => {
 
     const handleIconClick = (workspaceId: string) => {
         // Turėtų naviguoti į workspace readagavimo puslapį, kuriame bus visi task'ai parodyti. Kosto dalis.
-        navigate(`/workspaces/${workspaceId}`);
+        navigate(`/task-page/${workspaceId}`);
     };
 
     const handleDelete = (workspaceId: string) => {
