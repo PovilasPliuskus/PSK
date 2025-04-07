@@ -14,6 +14,7 @@ public class ProtectedController : ControllerBase
     }
 
     [HttpGet("error")]
+    [Authorize]
     public IActionResult GetError()
     {
         throw new SampleException("This is a simulated error");
