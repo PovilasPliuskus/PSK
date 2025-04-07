@@ -4,6 +4,7 @@ import React, {
   useState,
   DragEvent,
   FormEvent,
+  useEffect,
 } from "react";
 import { FiPlus, FiTrash } from "react-icons/fi";
 import { motion } from "framer-motion";
@@ -13,21 +14,55 @@ import './TaskBoardViewPage.css';
 import { Button, Modal, Form } from "react-bootstrap";
 import { estimateMapper, priorityMapper, statusMapper, typeMapper } from "../utils/enumMapper.tsx";
 import { CardType, StatusEnum } from "../utils/types.ts";
-
-//npm i framer-motion
-//npm install react-icons --save
+import { axiosInstance } from '../../utils/axiosInstance';
+import { useParams } from "react-router-dom";
+import keycloak from '../../keycloak';
 
 export const TaskBoardViewPage = () => {
-  return (
-    <div className="kanban-container">
-      <Board />
+  const { id } = useParams();
+  const [cards, setCards] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchTasks = () => {
+    setError(null);
+    setIsLoading(true);
+    axiosInstance.get(`/task/${id}`)
+    .then(response => {
+      setCards(response.data);
+    })
+    .catch(error => {
+      setError(error);
+      console.log(error);
+    })
+    .finally(() => {
+      setIsLoading(false);
+    })
+  }
+  
+  useEffect(() => {
+    fetchTasks();
+  },[id, keycloak.authenticated])
+
+  if(error !== null){
+    // tas global error dinksta po 5s, gal vertetu tureti bendra komponenta ilgesniam error'o atvaizdavimui?
+    return(
+      <h2>Error: {error.message}</h2>
+    ) 
+  } if(isLoading){
+    return(
+      <h2>Loading... </h2>
+    ) 
+  } else {
+    return (
+      <div className="kanban-container">
+      <Board cards={cards} setCards={setCards}/>
     </div>
-  );
+    )
+  }
 };
 
-const Board = () => {
-  const [cards, setCards] = useState(DEFAULT_CARDS);
-
+const Board = ({cards, setCards}) => {
   return (
     <div className="board">
       <Column
@@ -335,7 +370,7 @@ const Card = ({
               <Form.Control
                 type="date"
                 name="dueDate"
-                value={taskDetails.dueDate ? taskDetails.dueDate.toISOString().split('T')[0] : ""}
+                value={taskDetails.dueDate}
                 onChange={handleInputChange}
               />
             </Form.Group>
