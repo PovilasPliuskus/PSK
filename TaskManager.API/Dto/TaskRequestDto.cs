@@ -2,14 +2,14 @@ using BusinessLogic.Enums;
 
 public class TaskRequestDto
 {
-    public Guid? id { get; set; }
-    public string? name { get; set; }
-    public Guid? assignedToUserId { get; set; }
-    public Guid? createdByUserId { get; set; }
-    public DateTime? dueDateBefore { get; set; }
-    public DateTime? dueDateAfter { get; set; }
-    public StatusEnum? status { get; set; }
-    public PriorityEnum? priority { get; set; }
-    public EstimateEnum? estimate { get; set; }
-    public TypeEnum? type { get; set; }
+    public Guid? Id { get; set; }
+    public string? Name { get; set; }
+    public Guid? AssignedToUserId { get; set; }
+    public Guid? CreatedByUserId { get; set; }
+    public DateTime? DueDateBefore { get; set; }
+    public DateTime? DueDateAfter { get; set; }
+    public StatusEnum? Status { get; set; }
+    public PriorityEnum? Priority { get; set; }
+    public EstimateEnum? Estimate { get; set; }
+    public TypeEnum? Type { get; set; }
 }

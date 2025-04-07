@@ -12,54 +12,54 @@ public class TaskRepository : ITaskRepository
     public IQueryable<TaskEntity> getTasks(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize)
     {
         IQueryable<TaskEntity> query = dbContext.Tasks.Where(t => t.FkWorkspaceId == workspaceId);
-        if (requestDto.id.HasValue)
+        if (requestDto.Id.HasValue)
         {
-            query = query.Where(t => t.Id == requestDto.id.Value);
+            query = query.Where(t => t.Id == requestDto.Id.Value);
         }
 
-        if (!string.IsNullOrEmpty(requestDto.name))
+        if (!string.IsNullOrEmpty(requestDto.Name))
         {
-            query = query.Where(t => t.Name.Contains(requestDto.name));
+            query = query.Where(t => t.Name.Contains(requestDto.Name));
         }
 
-        if (requestDto.assignedToUserId.HasValue)
+        if (requestDto.AssignedToUserId.HasValue)
         {
-            query = query.Where(t => t.FkAssignedToUserId == requestDto.assignedToUserId.Value);
+            query = query.Where(t => t.FkAssignedToUserId == requestDto.AssignedToUserId.Value);
         }
 
-        if (requestDto.createdByUserId.HasValue)
+        if (requestDto.CreatedByUserId.HasValue)
         {
-            query = query.Where(t => t.FkCreatedByUserId == requestDto.createdByUserId.Value);
+            query = query.Where(t => t.FkCreatedByUserId == requestDto.CreatedByUserId.Value);
         }
 
-        if (requestDto.dueDateBefore.HasValue)
+        if (requestDto.DueDateBefore.HasValue)
         {
-            query = query.Where(t => t.DueDate <= requestDto.dueDateBefore.Value);
+            query = query.Where(t => t.DueDate <= requestDto.DueDateBefore.Value);
         }
 
-        if (requestDto.dueDateAfter.HasValue)
+        if (requestDto.DueDateAfter.HasValue)
         {
-            query = query.Where(t => t.DueDate >= requestDto.dueDateAfter.Value);
+            query = query.Where(t => t.DueDate >= requestDto.DueDateAfter.Value);
         }
 
-        if (requestDto.status.HasValue)
+        if (requestDto.Status.HasValue)
         {
-            query = query.Where(t => t.Status == requestDto.status.Value);
+            query = query.Where(t => t.Status == requestDto.Status.Value);
         }
 
-        if (requestDto.priority.HasValue)
+        if (requestDto.Priority.HasValue)
         {
-            query = query.Where(t => t.Priority == requestDto.priority.Value);
+            query = query.Where(t => t.Priority == requestDto.Priority.Value);
         }
 
-        if (requestDto.estimate.HasValue)
+        if (requestDto.Estimate.HasValue)
         {
-            query = query.Where(t => t.Estimate == requestDto.estimate.Value);
+            query = query.Where(t => t.Estimate == requestDto.Estimate.Value);
         }
 
-        if (requestDto.type.HasValue)
+        if (requestDto.Type.HasValue)
         {
-            query = query.Where(t => t.Type == requestDto.type.Value);
+            query = query.Where(t => t.Type == requestDto.Type.Value);
         }
 
         return query
