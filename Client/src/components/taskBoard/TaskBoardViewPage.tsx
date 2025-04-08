@@ -18,6 +18,8 @@ import { axiosInstance } from '../../utils/axiosInstance';
 import { useParams } from "react-router-dom";
 import keycloak from '../../keycloak';
 import SomethingWentWrong from "../base/SomethingWentWrong.tsx";
+import Loading from "../base/Loading.tsx";
+import ScriptResources from "../../assets/resources/strings.ts";
 
 export const TaskBoardViewPage = () => {
   const { id } = useParams();
@@ -51,9 +53,7 @@ export const TaskBoardViewPage = () => {
     // tas global error dinksta po 5s, gal vertetu tureti bendra komponenta ilgesniam error'o atvaizdavimui?
     return <SomethingWentWrong onRetry={() => window.location.reload()} />;
   } if(isLoading){
-    return(
-      <h2>Loading... </h2>
-    ) 
+    return <Loading message={ScriptResources.LoadingOrLogin} />;
   } else {
     return (
       <div className="kanban-container">

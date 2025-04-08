@@ -8,6 +8,7 @@ import ScriptResources from '../../../assets/resources/strings';
 import { axiosInstance } from '../../../utils/axiosInstance';
 import { Workspace } from "../../../Models/Workspace";
 import SomethingWentWrong from '../../base/SomethingWentWrong';
+import Loading from '../../base/Loading';
 
 const Workspaces: React.FC = () => {
     const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
@@ -52,11 +53,7 @@ const Workspaces: React.FC = () => {
     }
 
     if (isLoading && !keycloak.authenticated) {
-        return (
-            <Container className="mt-5">
-                <h1>{ScriptResources.LoadingOrLogin}</h1>
-            </Container>
-        );
+        return <Loading message={ScriptResources.LoadingOrLogin} />;
     }
 
     const handleCreateNew = () => {

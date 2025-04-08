@@ -1,3 +1,4 @@
+import Loading from "../../components/base/Loading";
 import SomethingWentWrong from "../../components/base/SomethingWentWrong";
 
 const ScriptResources = {
@@ -21,6 +22,9 @@ const ScriptResources = {
     SomethingWentWrongRetry: 'Try Again',
     SomethingWentWrongGoHome: 'Go Home',
     SomethingWentWrongContactSupport: 'If the problem persists, please contact support.',
+    Loading: 'Loading...',
+    PleaseWait: 'Please wait while we load the data.',
+    LoadingTakeLonger: 'If this takes longer than expected, please check your internet connection or try refreshing the page.',
 }
 
 export default ScriptResources;
