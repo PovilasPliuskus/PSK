@@ -21,7 +21,7 @@ public class TaskController : ControllerBase
 
         
 
-        List<TaskEntity> tasks = taskservice.getTasksFromWorkspace(workspaceId, requestDto, pageNumber, pageSize);
+        List<TaskEntity> tasks = taskservice.GetTasksFromWorkspace(workspaceId, requestDto, pageNumber, pageSize);
 
         return Ok(tasks);
     }

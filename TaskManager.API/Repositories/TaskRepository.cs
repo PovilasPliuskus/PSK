@@ -1,5 +1,6 @@
 using DataAccess.Context;
 using DataAccess.Entities;
+using Microsoft.EntityFrameworkCore;
 
 public class TaskRepository : ITaskRepository
 {
@@ -9,7 +10,7 @@ public class TaskRepository : ITaskRepository
         dbContext = _dbContext;
     }
 
-    public IQueryable<TaskEntity> getTasks(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize)
+    public IQueryable<TaskEntity> GetTasks(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize)
     {
         IQueryable<TaskEntity> query = dbContext.Tasks.Where(t => t.FkWorkspaceId == workspaceId);
         if (requestDto.Id.HasValue)
@@ -66,13 +67,47 @@ public class TaskRepository : ITaskRepository
             .OrderBy(t => t.Id)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize);
+    }
 
+    public TaskEntity FindTask(Guid Id)
+    {
+        TaskEntity task = dbContext.Tasks.Find(Id);
+
+        if(task == null)
+        {
+            //TODO update exception
+            throw new Exception("Task does not exist");
+        }
+        return task;
+    }
+
+    public int UpdateTask(TaskEntity updatedTask)
+    {
+        dbContext.Entry(updatedTask).State = EntityState.Modified;
+
+        // returns rowsChanged
+        return dbContext.SaveChanges();
+    }
+
+    public int AddTask(TaskEntity task)
+    {
+        dbContext.Tasks.Add(task);
+
+        // returns rowsChanged
+        return dbContext.SaveChanges();
+    }
+
+    public int RemoveTask(TaskEntity task)
+    {
+        TaskEntity taskToBeRemoved = dbContext.Tasks.Find(task.Id);
+        if(taskToBeRemoved == null)
+        {
+            //TODO update exception
+            throw new Exception("Task does not exist");
+        }
+        dbContext.Tasks.Remove(taskToBeRemoved);
+
+        // returns rowsChanged
+        return dbContext.SaveChanges();
     }
 }
-
-// koks request dto
-// koks return dto
-
-// kur saugomi useriai
-// ar tokenas grazina user id
-// registracija - 

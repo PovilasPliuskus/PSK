@@ -9,7 +9,7 @@ public class WorkspaceRepository : IWorkspaceRepository
         dbContext = _dbContext;
     }
 
-    public WorkspaceEntity getWorkspace(Guid workspaceId)
+    public WorkspaceEntity GetWorkspace(Guid workspaceId)
     {
         return dbContext.Workspaces.Where(w => w.Id == workspaceId).FirstOrDefault();
     }

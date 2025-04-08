@@ -2,11 +2,13 @@ using BusinessLogic.Enums;
 
 public class TaskEntityDto
 {
+    public Guid Id { get; set; }
+
     public string Name { get; set; }
 
-    public Guid Workspace { get; set; }
+    public Guid WorkspaceId { get; set; }
 
-    public Guid? FkAssignedToUserId { get; set; }
+    public Guid? AssignedToUserId { get; set; }
 
     public DateTime? DueDate { get; set; }
 
