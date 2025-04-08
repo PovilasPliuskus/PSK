@@ -1,3 +1,5 @@
+import SomethingWentWrong from "../../components/base/SomethingWentWrong";
+
 const ScriptResources = {
     Page404: '404 - Page Not Found',
     PageDoNotExist: 'The page you are looking for does not exist.',
@@ -14,6 +16,11 @@ const ScriptResources = {
     CreatedBy: 'Created By',
     CreatedAt: 'Created At',
     LoadingOrLogin: 'Loading... or please log in to view your data.',
+    SomethingWentWrong: 'Something went wrong',
+    SomethingWentWrongDescription: 'We encountered an unexpected error while processing your request. Please try again or check back later.',
+    SomethingWentWrongRetry: 'Try Again',
+    SomethingWentWrongGoHome: 'Go Home',
+    SomethingWentWrongContactSupport: 'If the problem persists, please contact support.',
 }
 
 export default ScriptResources;
