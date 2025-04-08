@@ -23,6 +23,8 @@ public class TaskMapper
             Estimate = entity.Estimate,
             Type = entity.Type,
             Priority = entity.Priority,
+            CreatedByUserId = entity.FkCreatedByUserId,
+            AssignedToUserId = entity.FkAssignedToUserId,
             // TODO finish this
             // ...
         };

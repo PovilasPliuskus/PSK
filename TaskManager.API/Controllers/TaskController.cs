@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using DataAccess.Entities;
 using BusinessLogic.Enums;
+using BusinessLogic.Models;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -13,16 +14,13 @@ public class TaskController : ControllerBase
     }
 
     [HttpGet("{workspaceId}")]
-    public IActionResult GetTasks(Guid workspaceId, [FromQuery] TaskRequestDto requestDto, [FromQuery] int pageNumber, [FromQuery] int pageSize) {
+    public IActionResult GetTaskSummaries(Guid workspaceId, [FromQuery] TaskRequestDto requestDto, [FromQuery] int pageNumber, [FromQuery] int pageSize) {
         if(!ModelState.IsValid){
             // TODO update exception
             throw new Exception("Invalid request model");
         }
 
-        
-
-        List<TaskEntity> tasks = taskservice.GetTasksFromWorkspace(workspaceId, requestDto, pageNumber, pageSize);
-
+        List<BusinessLogic.Models.TaskSummary> tasks = taskservice.GetTaskSummariesFromWorkspace(workspaceId, requestDto, pageNumber, pageSize);
         return Ok(tasks);
     }
 }

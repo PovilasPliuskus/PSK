@@ -6,6 +6,8 @@ public class Task : BaseModel
 {
     public required string Name { get; set; }
     public DateTime? DueTime { get; set; }
+    public Guid CreatedByUserId { get; set; }
+    public Guid? AssignedToUserId { get; set; }
     public string? Description { get; set; }
     public required StatusEnum Status { get; set; }
     public required EstimateEnum Estimate { get; set; }
