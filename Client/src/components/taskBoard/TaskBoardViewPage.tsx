@@ -17,42 +17,43 @@ import { CardType, StatusEnum } from "../utils/types.ts";
 import { axiosInstance } from '../../utils/axiosInstance';
 import { useParams } from "react-router-dom";
 import keycloak from '../../keycloak';
+import SomethingWentWrong from "../base/SomethingWentWrong.tsx";
+import Loading from "../base/Loading.tsx";
+import ScriptResources from "../../assets/resources/strings.ts";
 
 export const TaskBoardViewPage = () => {
   const { id } = useParams();
   const [cards, setCards] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const fetchTasks = () => {
-    setError(null);
-    setIsLoading(true);
-    axiosInstance.get(`/task/${id}`)
-    .then(response => {
-      setCards(response.data);
-    })
-    .catch(error => {
-      setError(error);
-      console.log(error);
-    })
-    .finally(() => {
-      setIsLoading(false);
-    })
-  }
   
   useEffect(() => {
-    fetchTasks();
+    const fetchTasks = () => {
+      setError(null);
+      setIsLoading(true);
+      axiosInstance.get(`/task/${id}`)
+      .then(response => {
+        setCards(response.data);
+      })
+      .catch(error => {
+        setError(error);
+        console.log(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      })
+    }
+    if (keycloak.authenticated) {
+      fetchTasks();
+    }
+
   },[id, keycloak.authenticated])
 
-  if(error !== null){
+  if(error != null){
     // tas global error dinksta po 5s, gal vertetu tureti bendra komponenta ilgesniam error'o atvaizdavimui?
-    return(
-      <h2>Error: {error.message}</h2>
-    ) 
+    return <SomethingWentWrong onRetry={() => window.location.reload()} />;
   } if(isLoading){
-    return(
-      <h2>Loading... </h2>
-    ) 
+    return <Loading message={ScriptResources.LoadingOrLogin} />;
   } else {
     return (
       <div className="kanban-container">
