@@ -14,7 +14,6 @@ public class TaskService : ITaskService
         workspaceService = _workspaceService;
     }
 
-    // Sito endpoint galimai nereikia, nes tikriausiai nereikes vienu metu fetchint keletos task objektu (vietoj to fetchinam task summary)
     public List<BusinessLogic.Models.Task> GetTasksFromWorkspace(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize)
     {
         if (workspaceService.DoesWorkspaceExist(workspaceId) == false)
@@ -35,24 +34,72 @@ public class TaskService : ITaskService
         
         return _tasks;
     }
-
-    public List<TaskSummary> GetTaskSummariesFromWorkspace(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize)
+    
+    public BusinessLogic.Models.Task UpdateTask(BusinessLogic.Models.Task task)
     {
-        if (workspaceService.DoesWorkspaceExist(workspaceId) == false)
+        TaskEntity retrievedTask = taskRepository.GetTask(task.Id);
+
+        retrievedTask.Name = task.Name;
+        retrievedTask.DueDate = task.DueDate;
+        retrievedTask.FkAssignedToUserId = task.AssignedToUserId;
+        retrievedTask.Description = task.Description;
+        retrievedTask.Status = task.Status;
+        retrievedTask.Estimate = task.Estimate;
+        retrievedTask.Type = task.Type;
+        retrievedTask.Priority = task.Priority;
+        // TODO update updatedAt field
+
+        if(taskRepository.UpdateTask(retrievedTask) == 0)
         {
             //TODO update exception
-            throw new Exception("Workplace does not exist");
+            throw new Exception("Task was not updated");
         }
+        
+        // return updated task
+        TaskEntity updatedTask = taskRepository.GetTask(task.Id);
 
-        // TODO make this injectable
-        TaskSummaryMapper mapper = new TaskSummaryMapper();
+        //TODO make this injectable
+        TaskMapper mapper = new TaskMapper();
+        return mapper.Map(updatedTask);
+    }
 
-        IQueryable<TaskEntity> tasks = taskRepository.GetTasks(workspaceId, requestDto, pageNumber, pageSize);
-        List<TaskSummary> taskSummaries = new List<TaskSummary>();
-        foreach(TaskEntity task in tasks)
+    public BusinessLogic.Models.Task CreateTask(BusinessLogic.Models.Task task, Guid workspaceId)
+    {
+        TaskEntity newtask = new TaskEntity{
+            Id = new Guid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            Name = task.Name,
+            FkCreatedByUserId = new Guid(), // TODO get the user id from the claim
+            FkWorkspaceId = workspaceId,
+            FkAssignedToUserId = task.AssignedToUserId,
+            DueDate = task.DueDate,
+            Description = task.Description,
+            Status = task.Status,
+            Estimate = task.Estimate,
+            Type = task.Type,
+            Priority = task.Priority
+        };
+
+        if(taskRepository.AddTask(newtask) == 0)
         {
-            taskSummaries.Add(mapper.Map(task));
+            //TODO update exception
+            throw new Exception("Task was not created");
         }
-        return taskSummaries;
+
+        TaskEntity retrievedTask = taskRepository.GetTask(newtask.Id);
+
+        TaskMapper mapper = new TaskMapper();
+        return mapper.Map(retrievedTask);
+    }
+
+    public void DeleteTask(Guid taskId)
+    {
+        TaskEntity taskToBeDeleted = taskRepository.GetTask(taskId);
+        if(taskRepository.RemoveTask(taskToBeDeleted) == 0)
+        {
+            //TODO update exception
+            throw new Exception("Task was not deleted");
+        }
     }
 }

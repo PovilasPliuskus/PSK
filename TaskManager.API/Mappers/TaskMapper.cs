@@ -17,7 +17,7 @@ public class TaskMapper
             CreatedAt = entity.CreatedAt,
             UpdatedAt = entity.UpdatedAt,
             Name = entity.Name,
-            DueTime = entity.DueDate,
+            DueDate = entity.DueDate,
             Description = entity.Description,
             Status = entity.Status,
             Estimate = entity.Estimate,

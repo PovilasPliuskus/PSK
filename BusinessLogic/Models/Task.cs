@@ -5,7 +5,7 @@ namespace BusinessLogic.Models;
 public class Task : BaseModel
 {
     public required string Name { get; set; }
-    public DateTime? DueTime { get; set; }
+    public DateTime? DueDate { get; set; }
     public Guid CreatedByUserId { get; set; }
     public Guid? AssignedToUserId { get; set; }
     public string? Description { get; set; }

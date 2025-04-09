@@ -69,7 +69,7 @@ public class TaskRepository : ITaskRepository
             .Take(pageSize);
     }
 
-    public TaskEntity FindTask(Guid Id)
+    public TaskEntity GetTask(Guid Id)
     {
         TaskEntity task = dbContext.Tasks.Find(Id);
 

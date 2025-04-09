@@ -11,7 +11,7 @@ public class WorkspaceService : IWorkspaceService
 
     public bool DoesWorkspaceExist(Guid workspaceId)
     {
-        if (workspaceRepository.getWorkspace(workspaceId) == null)
+        if (workspaceRepository.GetWorkspace(workspaceId) == null)
         {
             return false;
         }
