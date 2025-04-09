@@ -2,13 +2,7 @@
 
 public enum EstimateEnum
 {
-    None = 0,
-    Zero = 1,
-    One = 2,
-    Two = 3,
-    Three = 4,
-    Five = 5,
-    Eight = 6,
-    Thirteen = 7,
-    TwentyOne = 8
+    Small = 0,
+    Medium = 1,
+    Large = 2,
 }

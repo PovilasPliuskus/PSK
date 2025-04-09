@@ -1,35 +1,125 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect } from 'react';
+import { useKeycloak } from '@react-keycloak/web';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { Container, Navbar, Nav, Button } from 'react-bootstrap';
+import DemoForm from './components/domain/Demo';
+
+
+import {TaskBoardViewPage} from './components/taskBoard/TaskBoardViewPage';
+import { axiosInstance, useAxiosInterceptor } from './utils/axiosInstance';
+import { ErrorProvider } from './components/base/ErrorContext';
+import GlobalAlert from './components/base/GlobalAlert';
+import ScriptResources from './assets/resources/strings';
+import Workspaces from './components/domain/Workspace/Workspaces';
+
+
+// Home Page Component
+const HomePage: React.FC = () => {
+  return (
+    <Container className="mt-5 text-center">
+      <h1>{ScriptResources.IndexHeader}</h1>
+      <p>{ScriptResources.IndexParagraph}</p>
+    </Container>
+  );
+};
+
+// Not Found Page Component
+const NotFoundPage: React.FC = () => {
+  return (
+    <Container className="mt-5 text-center">
+      <h1>{ScriptResources.Page404}</h1>
+      <p>{ScriptResources.PageDoNotExist}</p>
+      <Link to="/" className="btn btn-primary">
+        {ScriptResources.PageGoToHome}
+      </Link>
+    </Container>
+  );
+};
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <ErrorProvider>
+      <InnerApp />
+    </ErrorProvider>
+  );
+}
+
+function InnerApp() {
+  const { keycloak, initialized } = useKeycloak();
+  useAxiosInterceptor();
+
+  const fetchProtectedData = async () => {
+    try {
+      const response = await axiosInstance.get('/protected-endpoint');
+      console.log('Protected data:', response.data);
+    } catch (error) {
+      console.error('Error fetching protected data:', error);
+    }
+  };
+
+  const fetchErrorData = async () => {
+    try {
+      const response = await axiosInstance.get('/error');
+      console.log('Error data:', response.data);
+    } catch (error) {
+      console.error('Error fetching error data:', error);
+    }
+  };
+
+  return (
+    <Router>
+      <div className="App">
+        {/* Navigation */}
+        <Navbar bg="light" expand="lg">
+          <Container>
+            <Navbar.Brand as={Link} to="/">
+              My App
+            </Navbar.Brand>
+            <Navbar.Toggle aria-controls="basic-navbar-nav" />
+            <Navbar.Collapse id="basic-navbar-nav">
+              <Nav className="me-auto">
+                <Nav.Link as={Link} to="/">
+                  Home
+                </Nav.Link>
+                <Nav.Link as={Link} to="/demo-form">
+                  Demo Form
+                </Nav.Link>
+                {/* Kolkas tiesiog atidaro pavyzdini task. Pakeisim, kai nuspresim, kaip useris pasiekia task puslapi */}
+                <Nav.Link as={Link} to="/task-page/c2646792-8d3f-444c-8b21-f5120292ef3e">
+                  Task page
+                </Nav.Link>
+                <Nav.Link as={Link} to="/workspaces">
+                  Workspaces
+                </Nav.Link>
+              </Nav>
+              <Nav className="m-2">
+                {!keycloak.authenticated ? (
+                  <Button onClick={() => keycloak.login()}>Sign In</Button>
+                ) : (
+                  <Button onClick={() => keycloak.logout()}>Sign Out</Button>
+                )}
+              </Nav>
+              <Nav>
+                <Button onClick={fetchProtectedData} className="m-2">Fetch Protected Data</Button>
+                <Button onClick={fetchErrorData} className="m-2">Error</Button>
+              </Nav>
+            </Navbar.Collapse>
+          </Container>
+        </Navbar>
+        <GlobalAlert />
+
+        {/* Routes */}
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/workspaces" element={<Workspaces />} />
+          <Route path="/demo-form" element={<DemoForm />} />
+          <Route path="/task-page/:id" element={<TaskBoardViewPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </Router>
   )
 }
 
-export default App
+export default App;
