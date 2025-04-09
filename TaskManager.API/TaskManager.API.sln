@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "..\DataAccess
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogic", "..\BusinessLogic\BusinessLogic.csproj", "{9C628D3D-237E-418F-B411-278EFC91DE79}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManager.API.Tests", "..\TaskManager.API.Tests\TaskManager.API.Tests.csproj", "{AC1699BA-DE3C-457E-997B-CD9ED5767BE5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{9C628D3D-237E-418F-B411-278EFC91DE79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C628D3D-237E-418F-B411-278EFC91DE79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C628D3D-237E-418F-B411-278EFC91DE79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC1699BA-DE3C-457E-997B-CD9ED5767BE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC1699BA-DE3C-457E-997B-CD9ED5767BE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC1699BA-DE3C-457E-997B-CD9ED5767BE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC1699BA-DE3C-457E-997B-CD9ED5767BE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
