@@ -303,8 +303,29 @@ const Card = ({
   };
 
   const handleSave = () => {
-    // make api patch call
-    console.log("Saving changes:", taskDetails);
+    const updatedCard = {
+      Name : taskDetails.name,
+      Status : taskDetails.status,
+      Estimate : taskDetails.estimate,
+      Type : taskDetails.type,
+      Priority : taskDetails.priority
+    }
+
+    console.log("Saving changes:", updatedCard);
+    // using pre-set workspace id while workspaces are not implemented
+    const cardPatchRequest = (updatedCard) => {
+      axiosInstance.patch(`/task/${taskDetails.id}`, updatedCard)
+      .then(response => {
+        console.log(response);
+        const returnedCard = response.data;
+        // TODO update cards once response is received.
+      })
+      .catch(error => {
+        console.log(error);
+      })
+    }
+
+    cardPatchRequest(updatedCard);
     setShow(false);
   };
 
@@ -461,16 +482,23 @@ const BurnBarrel = ({
     setActive(false);
   };
 
-  const deleteCardBackend = (cardId) => {
-    console.log("api call to delete card with id: ");
-    console.log(cardId);
-  }
-
   const handleDragEnd = (e: DragEvent) => {
     const cardId = e.dataTransfer.getData("cardId");
 
-    setCards((pv) => pv.filter((c) => c.id !== cardId));
-    deleteCardBackend(cardId);
+    const cardDeletionRequest = (cardId) => {
+      axiosInstance.delete(`/task/${cardId}`)
+      .then(response => {
+        console.log(response);
+        if (response.status === 200){
+          setCards((pv) => pv.filter((c) => c.id !== cardId));
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      })
+    }
+
+    cardDeletionRequest(cardId);
     setActive(false);
   };
 
@@ -491,11 +519,6 @@ type AddCardProps = {
   setCards: Dispatch<SetStateAction<CardType[]>>;
 };
 
-const addCardBackend = (card : CardType) => {
-  console.log("Api call to add card: ");
-  console.log(card);
-}
-
 const AddCard = ({ column, setCards }: AddCardProps) => {
   const [name, setName] = useState("");
   const [adding, setAdding] = useState(false);
@@ -506,21 +529,28 @@ const AddCard = ({ column, setCards }: AddCardProps) => {
     if (!name.trim().length) return;
 
     const newCard: CardType = {
-      status: column,
-      name: name.trim(),
-      id: Math.random().toString(),
-      fkCreatedByUserId: "00000000-0000-0000-0000-000000000000", // Placeholder
-      fkWorkspaceId: "00000000-0000-0000-0000-000000000000", // Placeholder
-      fkAssignedToUserId: null,
-      dueDate: null,
-      description: null,
-      estimate: 1, // Default value
-      type: 2, // Default value
-      priority: 2, // Default value
+      Status: column,
+      Name: name.trim(),
+      Estimate: 1, // Default value
+      Type: 2, // Default value
+      Priority: 2, // Default value
     };
-    setCards((pv) => [...pv, newCard]);
 
-    addCardBackend(newCard);
+    // using pre-set workspace id while workspaces are not implemented
+    const cardCreationRequest = () => {
+      axiosInstance.post(`/task/0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c`, newCard)
+      .then(response => {
+        console.log(response);
+        const returnedCard = response.data;
+        setCards((pv) => [...pv, returnedCard]);
+      })
+      .catch(error => {
+        console.log(error);
+      })
+    }
+    
+    
+    cardCreationRequest();
 
     setAdding(false);
     setName("");
