@@ -22,14 +22,11 @@ public class TaskService : ITaskService
             throw new Exception("Workplace does not exist");
         }
         
-        //TODO make this injectable
-        TaskMapper mapper = new TaskMapper();
-
         IQueryable<TaskEntity> tasks = taskRepository.GetTasks(workspaceId, requestDto, pageNumber, pageSize);
         List<BusinessLogic.Models.Task> _tasks = new List<BusinessLogic.Models.Task>();
         foreach(TaskEntity task in tasks)
         {
-            _tasks.Add(mapper.Map(task));
+            _tasks.Add(CreateTaskModelFromEntity(task));
         }
         
         return _tasks;
@@ -47,7 +44,7 @@ public class TaskService : ITaskService
         retrievedTask.Estimate = task.Estimate;
         retrievedTask.Type = task.Type;
         retrievedTask.Priority = task.Priority;
-        // TODO update updatedAt field
+        retrievedTask.UpdatedAt = DateTime.UtcNow;
 
         if(taskRepository.UpdateTask(retrievedTask) == 0)
         {
@@ -57,40 +54,22 @@ public class TaskService : ITaskService
         
         // return updated task
         TaskEntity updatedTask = taskRepository.GetTask(task.Id);
-
-        //TODO make this injectable
-        TaskMapper mapper = new TaskMapper();
-        return mapper.Map(updatedTask);
+        return CreateTaskModelFromEntity(updatedTask);
     }
 
-    public BusinessLogic.Models.Task CreateTask(BusinessLogic.Models.Task task, Guid workspaceId)
+    public BusinessLogic.Models.Task CreateTask(TaskCreateDto dto, Guid workspaceId)
     {
-        TaskEntity newtask = new TaskEntity{
-            Id = new Guid(),
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
-            Name = task.Name,
-            FkCreatedByUserId = new Guid(), // TODO get the user id from the claim
-            FkWorkspaceId = workspaceId,
-            FkAssignedToUserId = task.AssignedToUserId,
-            DueDate = task.DueDate,
-            Description = task.Description,
-            Status = task.Status,
-            Estimate = task.Estimate,
-            Type = task.Type,
-            Priority = task.Priority
-        };
+        BusinessLogic.Models.Task newtaskModel = CreateTaskModelFromDto(dto, workspaceId);
+        TaskEntity newTaskEntity = CreateTaskEntityFromModel(newtaskModel);
 
-        if(taskRepository.AddTask(newtask) == 0)
+        if(taskRepository.AddTask(newTaskEntity) == 0)
         {
             //TODO update exception
             throw new Exception("Task was not created");
         }
 
-        TaskEntity retrievedTask = taskRepository.GetTask(newtask.Id);
-
-        TaskMapper mapper = new TaskMapper();
-        return mapper.Map(retrievedTask);
+        TaskEntity retrievedTask = taskRepository.GetTask(newTaskEntity.Id);
+        return CreateTaskModelFromEntity(retrievedTask);
     }
 
     public void DeleteTask(Guid taskId)
@@ -101,5 +80,63 @@ public class TaskService : ITaskService
             //TODO update exception
             throw new Exception("Task was not deleted");
         }
+    }
+
+    private BusinessLogic.Models.Task CreateTaskModelFromDto(TaskCreateDto dto, Guid workspaceId)
+    {
+        return new BusinessLogic.Models.Task{
+            Id = new Guid(),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            Name = dto.Name,
+            DueDate = dto.DueDate,
+            Description = dto.Description,
+            Status = dto.Status,
+            Estimate = dto.Estimate,
+            Type = dto.Type,
+            Priority = dto.Priority,
+            CreatedByUserId = new Guid(), // TODO: get user id from claims
+            AssignedToUserId = dto.AssignedToUserId,
+            WorkspaceId = workspaceId
+        };
+    }
+
+    private BusinessLogic.Models.Task CreateTaskModelFromEntity(TaskEntity entity)
+    {
+        return new BusinessLogic.Models.Task
+        {
+            Id = entity.Id,
+            CreatedAt = entity.CreatedAt,
+            UpdatedAt = entity.UpdatedAt,
+            Name = entity.Name,
+            DueDate = entity.DueDate,
+            Description = entity.Description,
+            Status = entity.Status,
+            Estimate = entity.Estimate,
+            Type = entity.Type,
+            Priority = entity.Priority,
+            CreatedByUserId = entity.FkCreatedByUserId,
+            AssignedToUserId = entity.FkAssignedToUserId,
+            WorkspaceId = entity.FkWorkspaceId
+        };
+    }
+
+    private TaskEntity CreateTaskEntityFromModel(BusinessLogic.Models.Task model)
+    {
+        return new TaskEntity{
+            Id = model.Id,
+            CreatedAt = model.CreatedAt,
+            UpdatedAt = model.UpdatedAt,
+            Name = model.Name,
+            DueDate = model.DueDate,
+            Description = model.Description,
+            Status = model.Status,
+            Estimate = model.Estimate,
+            Type = model.Type,
+            Priority = model.Priority,
+            FkCreatedByUserId = model.CreatedByUserId,
+            FkAssignedToUserId = model.AssignedToUserId,
+            FkWorkspaceId = model.WorkspaceId
+        };
     }
 }

@@ -38,14 +38,14 @@ public class TaskController : ControllerBase
     }
 
     [HttpPost("{workspaceId}")]
-    public IActionResult CreateTask(Guid workspaceId, [FromBody] BusinessLogic.Models.Task task)
+    public IActionResult CreateTask(Guid workspaceId, [FromBody] TaskCreateDto taskDto)
     {
         if(!ModelState.IsValid){
             // TODO update exception
             throw new Exception("Invalid request model");
         }
 
-        BusinessLogic.Models.Task createdTask = taskservice.CreateTask(task, workspaceId);
+        BusinessLogic.Models.Task createdTask = taskservice.CreateTask(taskDto, workspaceId);
         return Ok(createdTask);
     }
 
