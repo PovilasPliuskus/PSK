@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using DataAccess.Entities;
 using BusinessLogic.Enums;
 using BusinessLogic.Models;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -13,8 +14,8 @@ public class TaskController : ControllerBase
      taskservice = _taskService;
     }
 
-    // TODO decide between workspaceId being path or body parramater
     [HttpGet("{workspaceId}")]
+    [Authorize]
     public IActionResult GetTasks(Guid workspaceId, [FromQuery] TaskRequestDto requestDto, [FromQuery] int pageNumber, [FromQuery] int pageSize) {
         if(!ModelState.IsValid){
             // TODO update exception
@@ -26,6 +27,7 @@ public class TaskController : ControllerBase
     }
 
     [HttpPatch("{taskId}")]
+    [Authorize]
     public IActionResult UpdateTask(Guid taskId, [FromBody] TaskDto taskDto)
     {
         if(!ModelState.IsValid){
@@ -38,6 +40,7 @@ public class TaskController : ControllerBase
     }
 
     [HttpPost("{workspaceId}")]
+    [Authorize]
     public IActionResult CreateTask(Guid workspaceId, [FromBody] TaskDto taskDto)
     {
         if(!ModelState.IsValid){
@@ -49,7 +52,8 @@ public class TaskController : ControllerBase
         return Ok(createdTask);
     }
 
-    [HttpDelete]
+    [HttpDelete("{taskId}")]
+    [Authorize]
     public IActionResult DeleteTask(Guid taskId)
     {
         if(!ModelState.IsValid){

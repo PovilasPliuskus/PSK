@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BusinessLogic.Models;
 using DataAccess.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -7,11 +8,13 @@ public class TaskService : ITaskService
 {
     private ITaskRepository taskRepository;
     private IWorkspaceService workspaceService;
+    private IHttpContextAccessor httpContextAccessor;
 
-    public TaskService(ITaskRepository _taskRepository, IWorkspaceService _workspaceService)
+    public TaskService(ITaskRepository _taskRepository, IWorkspaceService _workspaceService, IHttpContextAccessor _httpContextAccessor)
     {
         taskRepository = _taskRepository;
         workspaceService = _workspaceService;
+        httpContextAccessor = _httpContextAccessor;
     }
 
     public List<BusinessLogic.Models.Task> GetTasksFromWorkspace(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize)
@@ -59,7 +62,15 @@ public class TaskService : ITaskService
 
     public BusinessLogic.Models.Task CreateTask(TaskDto dto, Guid workspaceId)
     {
-        BusinessLogic.Models.Task newtaskModel = CreateTaskModelFromDto(dto, workspaceId);
+        // get user id from claims
+        var userIdClaim = httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
+        if(userIdClaim == null)
+        {
+            //TODO update exception
+            throw new Exception("Failed to get user id from claims");
+        }
+        
+        BusinessLogic.Models.Task newtaskModel = CreateTaskModelFromDto(dto, workspaceId, Guid.Parse(userIdClaim.Value));
         TaskEntity newTaskEntity = CreateTaskEntityFromModel(newtaskModel);
 
         if(taskRepository.AddTask(newTaskEntity) == 0)
@@ -82,8 +93,9 @@ public class TaskService : ITaskService
         }
     }
 
-    private BusinessLogic.Models.Task CreateTaskModelFromDto(TaskDto dto, Guid workspaceId)
+    private BusinessLogic.Models.Task CreateTaskModelFromDto(TaskDto dto, Guid workspaceId, Guid userId)
     {
+
         return new BusinessLogic.Models.Task{
             Id = new Guid(),
             CreatedAt = DateTime.UtcNow,
@@ -95,7 +107,8 @@ public class TaskService : ITaskService
             Estimate = dto.Estimate,
             Type = dto.Type,
             Priority = dto.Priority,
-            CreatedByUserId = Guid.Parse("24a9c3f9-9971-4a3a-a7a7-4c0f45fb162b"), // TODO: get user id from claims
+            //CreatedByUserId = userId,
+            CreatedByUserId = Guid.Parse("8388f8cb-760b-4e42-8f2e-d0f01ece0757"), // temporarly use this while user is not saved to db.
             AssignedToUserId = dto.AssignedToUserId,
             WorkspaceId = workspaceId
         };
