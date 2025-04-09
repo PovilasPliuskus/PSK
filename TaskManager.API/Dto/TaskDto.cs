@@ -1,6 +1,6 @@
 using BusinessLogic.Enums;
 
-public class TaskCreateDto
+public class TaskDto
 {
     public required string Name { get; set; }
     public DateTime? DueDate { get; set; }

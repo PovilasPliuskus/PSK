@@ -25,20 +25,20 @@ public class TaskController : ControllerBase
         return Ok(tasks);
     }
 
-    [HttpPatch]
-    public IActionResult UpdateTask([FromBody] BusinessLogic.Models.Task task)
+    [HttpPatch("{taskId}")]
+    public IActionResult UpdateTask(Guid taskId, [FromBody] TaskDto taskDto)
     {
         if(!ModelState.IsValid){
             // TODO update exception
             throw new Exception("Invalid request model");
         }
 
-        BusinessLogic.Models.Task updatedTask = taskservice.UpdateTask(task);
+        BusinessLogic.Models.Task updatedTask = taskservice.UpdateTask(taskId, taskDto);
         return Ok(updatedTask);
     }
 
     [HttpPost("{workspaceId}")]
-    public IActionResult CreateTask(Guid workspaceId, [FromBody] TaskCreateDto taskDto)
+    public IActionResult CreateTask(Guid workspaceId, [FromBody] TaskDto taskDto)
     {
         if(!ModelState.IsValid){
             // TODO update exception

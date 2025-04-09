@@ -32,18 +32,18 @@ public class TaskService : ITaskService
         return _tasks;
     }
     
-    public BusinessLogic.Models.Task UpdateTask(BusinessLogic.Models.Task task)
+    public BusinessLogic.Models.Task UpdateTask(Guid taskId, TaskDto taskDto)
     {
-        TaskEntity retrievedTask = taskRepository.GetTask(task.Id);
+        TaskEntity retrievedTask = taskRepository.GetTask(taskId);
 
-        retrievedTask.Name = task.Name;
-        retrievedTask.DueDate = task.DueDate;
-        retrievedTask.FkAssignedToUserId = task.AssignedToUserId;
-        retrievedTask.Description = task.Description;
-        retrievedTask.Status = task.Status;
-        retrievedTask.Estimate = task.Estimate;
-        retrievedTask.Type = task.Type;
-        retrievedTask.Priority = task.Priority;
+        retrievedTask.Name = taskDto.Name;
+        retrievedTask.DueDate = taskDto.DueDate;
+        retrievedTask.FkAssignedToUserId = taskDto.AssignedToUserId;
+        retrievedTask.Description = taskDto.Description;
+        retrievedTask.Status = taskDto.Status;
+        retrievedTask.Estimate = taskDto.Estimate;
+        retrievedTask.Type = taskDto.Type;
+        retrievedTask.Priority = taskDto.Priority;
         retrievedTask.UpdatedAt = DateTime.UtcNow;
 
         if(taskRepository.UpdateTask(retrievedTask) == 0)
@@ -53,11 +53,11 @@ public class TaskService : ITaskService
         }
         
         // return updated task
-        TaskEntity updatedTask = taskRepository.GetTask(task.Id);
+        TaskEntity updatedTask = taskRepository.GetTask(taskId);
         return CreateTaskModelFromEntity(updatedTask);
     }
 
-    public BusinessLogic.Models.Task CreateTask(TaskCreateDto dto, Guid workspaceId)
+    public BusinessLogic.Models.Task CreateTask(TaskDto dto, Guid workspaceId)
     {
         BusinessLogic.Models.Task newtaskModel = CreateTaskModelFromDto(dto, workspaceId);
         TaskEntity newTaskEntity = CreateTaskEntityFromModel(newtaskModel);
@@ -82,7 +82,7 @@ public class TaskService : ITaskService
         }
     }
 
-    private BusinessLogic.Models.Task CreateTaskModelFromDto(TaskCreateDto dto, Guid workspaceId)
+    private BusinessLogic.Models.Task CreateTaskModelFromDto(TaskDto dto, Guid workspaceId)
     {
         return new BusinessLogic.Models.Task{
             Id = new Guid(),
@@ -95,7 +95,7 @@ public class TaskService : ITaskService
             Estimate = dto.Estimate,
             Type = dto.Type,
             Priority = dto.Priority,
-            CreatedByUserId = new Guid(), // TODO: get user id from claims
+            CreatedByUserId = Guid.Parse("24a9c3f9-9971-4a3a-a7a7-4c0f45fb162b"), // TODO: get user id from claims
             AssignedToUserId = dto.AssignedToUserId,
             WorkspaceId = workspaceId
         };
