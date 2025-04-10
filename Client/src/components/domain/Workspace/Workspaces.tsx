@@ -7,6 +7,8 @@ import keycloak from '../../../keycloak';
 import ScriptResources from '../../../assets/resources/strings';
 import { axiosInstance } from '../../../utils/axiosInstance';
 import { Workspace } from "../../../Models/Workspace";
+import SomethingWentWrong from '../../base/SomethingWentWrong';
+import Loading from '../../base/Loading';
 
 const Workspaces: React.FC = () => {
     const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
@@ -15,37 +17,43 @@ const Workspaces: React.FC = () => {
     const [totalItems, setTotalItems] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchItems = async () => {
+        const fetchItems = () => {
+            setError(null);
             setIsLoading(true);
-            try {
-                const response = await axiosInstance.get(`/workspaces`, {
-                    params: { pageNumber: currentPage, pageSize: pageSize },
-                });
+            axiosInstance.get(`/workspaces`, {
+                params: { pageNumber: currentPage, pageSize: pageSize },
+            })
+            .then(response => {
                 setWorkspaces(response.data.data || []);
                 setTotalPages(response.data.totalPages || 0);
                 setTotalItems(response.data.totalItems || 0);
-            } catch (error) {
+            })
+            .catch(error => {
+                setError(error);
                 console.error(ScriptResources.ErrorFetchingWorkspaces, error);
                 setWorkspaces([]);
-            } finally {
+            })
+            .finally(() => {
                 setIsLoading(false);
-            }
-        };
+            });
+        }
 
         if (keycloak.authenticated) {
             fetchItems();
         }
     }, [currentPage, pageSize, keycloak.authenticated]);
 
+    if (error !== null)
+    {
+        return <SomethingWentWrong onRetry={() => window.location.reload()} />;
+    }
+
     if (isLoading && !keycloak.authenticated) {
-        return (
-            <Container className="mt-5">
-                <h1>{ScriptResources.LoadingOrLogin}</h1>
-            </Container>
-        );
+        return <Loading message={ScriptResources.LoadingOrLogin} />;
     }
 
     const handleCreateNew = () => {

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TaskManager.API.Exceptions;
 
 [Route("api")]
 [ApiController]
@@ -16,12 +17,6 @@ public class ProtectedController : ControllerBase
     [Authorize]
     public IActionResult GetError()
     {
-        var problemDetails = new ProblemDetails
-        {
-            Status = StatusCodes.Status500InternalServerError,
-            Title = "This is a simulated error"
-        };
-
-        return StatusCode(problemDetails.Status.Value, problemDetails);
+        throw new SampleException("This is a simulated error");
     }
 }
