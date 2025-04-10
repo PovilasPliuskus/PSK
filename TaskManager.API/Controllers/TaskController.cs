@@ -1,65 +1,90 @@
 using Microsoft.AspNetCore.Mvc;
 using DataAccess.Entities;
 using BusinessLogic.Enums;
+using BusinessLogic.Models;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]
 public class TaskController : ControllerBase
 {
-    [HttpGet("{workspaceId}")]
-    public IActionResult GetTasks(Guid workspaceId)
+    private ITaskService taskservice;
+    public TaskController(ITaskService _taskService)
     {
-        // Create some dummy TaskEntity data
-        var tasks = new List<TaskEntity>
-            {
-                new TaskEntity
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Implement User Authentication",
-                    FkCreatedByUserId = Guid.NewGuid(),
-                    FkWorkspaceId = workspaceId,
-                    FkAssignedToUserId = Guid.NewGuid(),
-                    DueDate = DateTime.Now.AddDays(7),
-                    Description = "Implement user login and registration functionality.",
-                    Status = StatusEnum.InProgress,
-                    Estimate = EstimateEnum.Medium,
-                    Type = TypeEnum.Feature,
-                    Priority = PriorityEnum.High
-                },
-                new TaskEntity
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Design Task List UI",
-                    FkCreatedByUserId = Guid.NewGuid(),
-                    FkWorkspaceId = workspaceId,
-                    FkAssignedToUserId = null, // Not assigned yet
-                    DueDate = DateTime.Now.AddDays(3),
-                    Description = "Design the user interface for displaying the list of tasks.",
-                    Status = StatusEnum.InProgress,
-                    Estimate = EstimateEnum.Small,
-                    Type = TypeEnum.Bug,
-                    Priority = PriorityEnum.Medium
-                },
-                new TaskEntity
-                {
-                    Id = Guid.NewGuid(),
-                    Name = "Fix Bug in Task Editing",
-                    FkCreatedByUserId = Guid.NewGuid(),
-                    FkWorkspaceId = workspaceId,
-                    FkAssignedToUserId = Guid.NewGuid(),
-                    DueDate = DateTime.Now.AddDays(1),
-                    Description = "Investigate and fix the bug where task editing is not saving correctly.",
-                    Status = StatusEnum.InProgress,
-                    Estimate = EstimateEnum.Small,
-                    Type = TypeEnum.Bug,
-                    Priority = PriorityEnum.High
-                }
-            };
+     taskservice = _taskService;
+    }
 
-        // Filter the dummy data by the provided workspaceId
-        var tasksForWorkspace = tasks.Where(t => t.FkWorkspaceId == workspaceId).ToList();
+    [HttpGet("{workspaceId}")]
+    [Authorize]
+    public async Task<IActionResult> GetTasksAsync(Guid workspaceId, [FromQuery] TaskQueryObject queryObject, [FromQuery] int pageNumber, [FromQuery] int pageSize) {
+        if(!ModelState.IsValid){
+            // TODO update exception
+            throw new Exception("Invalid request model");
+        }
 
-        // Return the dummy data as an Ok result
-        return Ok(tasksForWorkspace);
+        List<BusinessLogic.Models.Task> tasks = await taskservice.GetTasksFromWorkspaceAsync(workspaceId, queryObject, pageNumber, pageSize);
+        return Ok(tasks);
+    }
+
+    [HttpPatch("{taskId}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateTaskAsync(Guid taskId, [FromBody] TaskRequestObject requestObject)
+    {
+        if(!ModelState.IsValid){
+            // TODO update exception
+            throw new Exception("Invalid request model");
+        }
+
+        BusinessLogic.Models.Task updatedTask = await taskservice.UpdateTaskAsync(taskId, requestObject);
+        TaskResponseObject response = CreateResponseObjectFromTaskModel(updatedTask);
+        return Ok(response);
+    }
+
+    [HttpPost("{workspaceId}")]
+    [Authorize]
+    public async Task<IActionResult> CreateTaskAsync(Guid workspaceId, [FromBody] TaskRequestObject requestObject)
+    {
+        if(!ModelState.IsValid){
+            // TODO update exception
+            throw new Exception("Invalid request model");
+        }
+
+        BusinessLogic.Models.Task createdTask = await taskservice.CreateTaskAsync(requestObject, workspaceId);
+        TaskResponseObject response = CreateResponseObjectFromTaskModel(createdTask);
+        return Ok(response);
+    }
+
+    [HttpDelete("{taskId}")]
+    [Authorize]
+    public async Task<IActionResult> DeleteTaskAsync(Guid taskId)
+    {
+        if(!ModelState.IsValid){
+            // TODO update exception
+            throw new Exception("Invalid request model");
+        }
+
+        await taskservice.DeleteTaskAsync(taskId);
+
+        return Ok();
+    }
+
+    private TaskResponseObject CreateResponseObjectFromTaskModel(BusinessLogic.Models.Task model)
+    {
+
+        return new TaskResponseObject{
+            Id = model.Id,
+            CreatedAt = model.CreatedAt,
+            UpdatedAt = model.UpdatedAt,
+            Name = model.Name,
+            DueDate = model.DueDate,
+            Description = model.Description,
+            Status = model.Status,
+            Estimate = model.Estimate,
+            Type = model.Type,
+            Priority = model.Priority,
+            CreatedByUserId = model.CreatedByUserId,
+            AssignedToUserId = model.AssignedToUserId,
+            WorkspaceId = model.WorkspaceId
+        };
     }
 }

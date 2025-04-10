@@ -1,12 +1,14 @@
-﻿using BusinessLogic.Enums;
+using BusinessLogic.Enums;
 
-namespace BusinessLogic.Models;
-
-public class Task : BaseModel
+public class TaskResponseObject
 {
+    public required Guid Id { get; set; }
+    public required DateTime CreatedAt { get; set; }
+    public required DateTime UpdatedAt { get; set; }
+
     public required string Name { get; set; }
     public DateTime? DueDate { get; set; }
-    public Guid CreatedByUserId { get; set; }
+    public required Guid CreatedByUserId { get; set; }
     public Guid? AssignedToUserId { get; set; }
     public required Guid WorkspaceId { get; set; }
     public string? Description { get; set; }
@@ -14,7 +16,4 @@ public class Task : BaseModel
     public required EstimateEnum Estimate { get; set; }
     public required TypeEnum Type { get; set; }
     public required PriorityEnum Priority { get; set; }
-    public ICollection<SubTask>? SubTasks { get; set; }
-    public ICollection<Comment>? Comments { get; set; }
-    public ICollection<Attachment>? Attachments { get; set; }
 }

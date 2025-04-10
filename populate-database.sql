@@ -43,9 +43,9 @@ VALUES
     ('a7e4c789-8d92-4101-81b8-8bb38576cc90', 'Database bug fix', '24a9c3f9-9971-4a3a-a7a7-4c0f45fb162b', '1', '622da59d-82fb-4d9f-9b10-be4221de1911', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP, 'd8649a44-fa49-47db-8203-3c1dd4e00d35', CURRENT_TIMESTAMP, 'Fix the issue so that there would not be duplicate values in the Shop table',
         '3', '2', '3'),
-    ('6b2f6e80-35f2-4272-9553-c4b8556bde90', 'Test analysis', '8388f8cb-760b-4e42-8f2e-d0f01ece0757', '4', '0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c', CURRENT_TIMESTAMP,
+    ('6b2f6e80-35f2-4272-9553-c4b8556bde90', 'Test analysis', '8388f8cb-760b-4e42-8f2e-d0f01ece0757', '1', '0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c', CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP, 'c2646792-8d3f-444c-8b21-f5120292ef3e', CURRENT_TIMESTAMP, 'Find out which test framework to use and its pros and cons',
-        '2', '4', '1');
+        '2', '2', '1');
 
 INSERT INTO public."SubTask" ("Id", "Name", "FkCreatedByUserId", "Status", "FkTaskId", "CreatedAt",
     "UpdatedAt", "FkAssignedToUserId", "DueDate", "Description", "Estimate", "Type", "Priority")
