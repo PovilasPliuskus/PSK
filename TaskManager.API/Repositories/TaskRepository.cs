@@ -10,57 +10,57 @@ public class TaskRepository : ITaskRepository
         dbContext = _dbContext;
     }
 
-    public async Task<List<TaskEntity>> GetTasksAsync(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize)
+    public async Task<List<TaskEntity>> GetTasksAsync(Guid workspaceId, TaskQueryObject queryObject, int pageNumber, int pageSize)
     {
         IQueryable<TaskEntity> query = dbContext.Tasks.Where(t => t.FkWorkspaceId == workspaceId);
-        if (requestDto.Id.HasValue)
+        if (queryObject.Id.HasValue)
         {
-            query = query.Where(t => t.Id == requestDto.Id.Value);
+            query = query.Where(t => t.Id == queryObject.Id.Value);
         }
 
-        if (!string.IsNullOrEmpty(requestDto.Name))
+        if (!string.IsNullOrEmpty(queryObject.Name))
         {
-            query = query.Where(t => t.Name.Contains(requestDto.Name));
+            query = query.Where(t => t.Name.Contains(queryObject.Name));
         }
 
-        if (requestDto.AssignedToUserId.HasValue)
+        if (queryObject.AssignedToUserId.HasValue)
         {
-            query = query.Where(t => t.FkAssignedToUserId == requestDto.AssignedToUserId.Value);
+            query = query.Where(t => t.FkAssignedToUserId == queryObject.AssignedToUserId.Value);
         }
 
-        if (requestDto.CreatedByUserId.HasValue)
+        if (queryObject.CreatedByUserId.HasValue)
         {
-            query = query.Where(t => t.FkCreatedByUserId == requestDto.CreatedByUserId.Value);
+            query = query.Where(t => t.FkCreatedByUserId == queryObject.CreatedByUserId.Value);
         }
 
-        if (requestDto.DueDateBefore.HasValue)
+        if (queryObject.DueDateBefore.HasValue)
         {
-            query = query.Where(t => t.DueDate <= requestDto.DueDateBefore.Value);
+            query = query.Where(t => t.DueDate <= queryObject.DueDateBefore.Value);
         }
 
-        if (requestDto.DueDateAfter.HasValue)
+        if (queryObject.DueDateAfter.HasValue)
         {
-            query = query.Where(t => t.DueDate >= requestDto.DueDateAfter.Value);
+            query = query.Where(t => t.DueDate >= queryObject.DueDateAfter.Value);
         }
 
-        if (requestDto.Status.HasValue)
+        if (queryObject.Status.HasValue)
         {
-            query = query.Where(t => t.Status == requestDto.Status.Value);
+            query = query.Where(t => t.Status == queryObject.Status.Value);
         }
 
-        if (requestDto.Priority.HasValue)
+        if (queryObject.Priority.HasValue)
         {
-            query = query.Where(t => t.Priority == requestDto.Priority.Value);
+            query = query.Where(t => t.Priority == queryObject.Priority.Value);
         }
 
-        if (requestDto.Estimate.HasValue)
+        if (queryObject.Estimate.HasValue)
         {
-            query = query.Where(t => t.Estimate == requestDto.Estimate.Value);
+            query = query.Where(t => t.Estimate == queryObject.Estimate.Value);
         }
 
-        if (requestDto.Type.HasValue)
+        if (queryObject.Type.HasValue)
         {
-            query = query.Where(t => t.Type == requestDto.Type.Value);
+            query = query.Where(t => t.Type == queryObject.Type.Value);
         }
 
         return await query

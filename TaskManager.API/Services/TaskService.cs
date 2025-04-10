@@ -17,7 +17,7 @@ public class TaskService : ITaskService
         httpContextAccessor = _httpContextAccessor;
     }
 
-    public async Task<List<BusinessLogic.Models.Task>> GetTasksFromWorkspaceAsync(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize)
+    public async Task<List<BusinessLogic.Models.Task>> GetTasksFromWorkspaceAsync(Guid workspaceId, TaskQueryObject queryObject, int pageNumber, int pageSize)
     {
         if (await workspaceService.DoesWorkspaceExistAsync(workspaceId) == false)
         {
@@ -25,7 +25,7 @@ public class TaskService : ITaskService
             throw new Exception("Workplace does not exist");
         }
         
-        List<TaskEntity> tasks = await taskRepository.GetTasksAsync(workspaceId, requestDto, pageNumber, pageSize);
+        List<TaskEntity> tasks = await taskRepository.GetTasksAsync(workspaceId, queryObject, pageNumber, pageSize);
         List<BusinessLogic.Models.Task> _tasks = new List<BusinessLogic.Models.Task>();
         foreach(TaskEntity task in tasks)
         {
@@ -35,18 +35,18 @@ public class TaskService : ITaskService
         return _tasks;
     }
     
-    public async Task<BusinessLogic.Models.Task> UpdateTaskAsync(Guid taskId, TaskDto taskDto)
+    public async Task<BusinessLogic.Models.Task> UpdateTaskAsync(Guid taskId, TaskRequestObject requestObject)
     {
         TaskEntity retrievedTask = await taskRepository.GetTaskAsync(taskId);
 
-        retrievedTask.Name = taskDto.Name;
-        retrievedTask.DueDate = taskDto.DueDate;
-        retrievedTask.FkAssignedToUserId = taskDto.AssignedToUserId;
-        retrievedTask.Description = taskDto.Description;
-        retrievedTask.Status = taskDto.Status;
-        retrievedTask.Estimate = taskDto.Estimate;
-        retrievedTask.Type = taskDto.Type;
-        retrievedTask.Priority = taskDto.Priority;
+        retrievedTask.Name = requestObject.Name;
+        retrievedTask.DueDate = requestObject.DueDate;
+        retrievedTask.FkAssignedToUserId = requestObject.AssignedToUserId;
+        retrievedTask.Description = requestObject.Description;
+        retrievedTask.Status = requestObject.Status;
+        retrievedTask.Estimate = requestObject.Estimate;
+        retrievedTask.Type = requestObject.Type;
+        retrievedTask.Priority = requestObject.Priority;
         retrievedTask.UpdatedAt = DateTime.UtcNow;
 
         if(await taskRepository.UpdateTaskAsync(retrievedTask) == 0)
@@ -60,7 +60,7 @@ public class TaskService : ITaskService
         return CreateTaskModelFromEntity(updatedTask);
     }
 
-    public async Task<BusinessLogic.Models.Task> CreateTaskAsync(TaskDto dto, Guid workspaceId)
+    public async Task<BusinessLogic.Models.Task> CreateTaskAsync(TaskRequestObject requestObject, Guid workspaceId)
     {
         // get user id from claims
         var userIdClaim = httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
@@ -70,7 +70,7 @@ public class TaskService : ITaskService
             throw new Exception("Failed to get user id from claims");
         }
         
-        BusinessLogic.Models.Task newtaskModel = CreateTaskModelFromDto(dto, workspaceId, Guid.Parse(userIdClaim.Value));
+        BusinessLogic.Models.Task newtaskModel = CreateTaskModelFromRequestObject(requestObject, workspaceId, Guid.Parse(userIdClaim.Value));
         TaskEntity newTaskEntity = CreateTaskEntityFromModel(newtaskModel);
 
         if(await taskRepository.AddTaskAsync(newTaskEntity) == 0)
@@ -80,6 +80,7 @@ public class TaskService : ITaskService
         }
 
         TaskEntity retrievedTask = await taskRepository.GetTaskAsync(newTaskEntity.Id);
+        
         return CreateTaskModelFromEntity(retrievedTask);
     }
 
@@ -93,23 +94,23 @@ public class TaskService : ITaskService
         }
     }
 
-    private BusinessLogic.Models.Task CreateTaskModelFromDto(TaskDto dto, Guid workspaceId, Guid userId)
+    private BusinessLogic.Models.Task CreateTaskModelFromRequestObject(TaskRequestObject requestObject, Guid workspaceId, Guid userId)
     {
 
         return new BusinessLogic.Models.Task{
             Id = new Guid(),
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
-            Name = dto.Name,
-            DueDate = dto.DueDate,
-            Description = dto.Description,
-            Status = dto.Status,
-            Estimate = dto.Estimate,
-            Type = dto.Type,
-            Priority = dto.Priority,
+            Name = requestObject.Name,
+            DueDate = requestObject.DueDate,
+            Description = requestObject.Description,
+            Status = requestObject.Status,
+            Estimate = requestObject.Estimate,
+            Type = requestObject.Type,
+            Priority = requestObject.Priority,
             //CreatedByUserId = userId,
             CreatedByUserId = Guid.Parse("8388f8cb-760b-4e42-8f2e-d0f01ece0757"), // temporarly use this while user is not saved to db.
-            AssignedToUserId = dto.AssignedToUserId,
+            AssignedToUserId = requestObject.AssignedToUserId,
             WorkspaceId = workspaceId
         };
     }

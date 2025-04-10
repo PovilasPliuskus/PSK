@@ -16,40 +16,42 @@ public class TaskController : ControllerBase
 
     [HttpGet("{workspaceId}")]
     [Authorize]
-    public async Task<IActionResult> GetTasksAsync(Guid workspaceId, [FromQuery] TaskRequestDto requestDto, [FromQuery] int pageNumber, [FromQuery] int pageSize) {
+    public async Task<IActionResult> GetTasksAsync(Guid workspaceId, [FromQuery] TaskQueryObject queryObject, [FromQuery] int pageNumber, [FromQuery] int pageSize) {
         if(!ModelState.IsValid){
             // TODO update exception
             throw new Exception("Invalid request model");
         }
 
-        List<BusinessLogic.Models.Task> tasks = await taskservice.GetTasksFromWorkspaceAsync(workspaceId, requestDto, pageNumber, pageSize);
+        List<BusinessLogic.Models.Task> tasks = await taskservice.GetTasksFromWorkspaceAsync(workspaceId, queryObject, pageNumber, pageSize);
         return Ok(tasks);
     }
 
     [HttpPatch("{taskId}")]
     [Authorize]
-    public async Task<IActionResult> UpdateTaskAsync(Guid taskId, [FromBody] TaskDto taskDto)
+    public async Task<IActionResult> UpdateTaskAsync(Guid taskId, [FromBody] TaskRequestObject requestObject)
     {
         if(!ModelState.IsValid){
             // TODO update exception
             throw new Exception("Invalid request model");
         }
 
-        BusinessLogic.Models.Task updatedTask = await taskservice.UpdateTaskAsync(taskId, taskDto);
-        return Ok(updatedTask);
+        BusinessLogic.Models.Task updatedTask = await taskservice.UpdateTaskAsync(taskId, requestObject);
+        TaskResponseObject response = CreateResponseObjectFromTaskModel(updatedTask);
+        return Ok(response);
     }
 
     [HttpPost("{workspaceId}")]
     [Authorize]
-    public async Task<IActionResult> CreateTaskAsync(Guid workspaceId, [FromBody] TaskDto taskDto)
+    public async Task<IActionResult> CreateTaskAsync(Guid workspaceId, [FromBody] TaskRequestObject requestObject)
     {
         if(!ModelState.IsValid){
             // TODO update exception
             throw new Exception("Invalid request model");
         }
 
-        BusinessLogic.Models.Task createdTask = await taskservice.CreateTaskAsync(taskDto, workspaceId);
-        return Ok(createdTask);
+        BusinessLogic.Models.Task createdTask = await taskservice.CreateTaskAsync(requestObject, workspaceId);
+        TaskResponseObject response = CreateResponseObjectFromTaskModel(createdTask);
+        return Ok(response);
     }
 
     [HttpDelete("{taskId}")]
@@ -64,5 +66,25 @@ public class TaskController : ControllerBase
         await taskservice.DeleteTaskAsync(taskId);
 
         return Ok();
+    }
+
+    private TaskResponseObject CreateResponseObjectFromTaskModel(BusinessLogic.Models.Task model)
+    {
+
+        return new TaskResponseObject{
+            Id = model.Id,
+            CreatedAt = model.CreatedAt,
+            UpdatedAt = model.UpdatedAt,
+            Name = model.Name,
+            DueDate = model.DueDate,
+            Description = model.Description,
+            Status = model.Status,
+            Estimate = model.Estimate,
+            Type = model.Type,
+            Priority = model.Priority,
+            CreatedByUserId = model.CreatedByUserId,
+            AssignedToUserId = model.AssignedToUserId,
+            WorkspaceId = model.WorkspaceId
+        };
     }
 }

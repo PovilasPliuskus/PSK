@@ -1,6 +1,6 @@
 using BusinessLogic.Enums;
 
-public class TaskRequestDto
+public class TaskQueryObject
 {
     public Guid? Id { get; set; }
     public string? Name { get; set; }
