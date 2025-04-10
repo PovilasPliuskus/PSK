@@ -9,9 +9,9 @@ public class WorkspaceService : IWorkspaceService
         workspaceRepository = _workspaceRepository;
     }
 
-    public bool DoesWorkspaceExist(Guid workspaceId)
+    public async Task<bool> DoesWorkspaceExistAsync(Guid workspaceId)
     {
-        if (workspaceRepository.GetWorkspace(workspaceId) == null)
+        if (await workspaceRepository.GetWorkspaceAsync(workspaceId) == null)
         {
             return false;
         }

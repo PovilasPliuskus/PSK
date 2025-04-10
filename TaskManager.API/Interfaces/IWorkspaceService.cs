@@ -1,4 +1,4 @@
 public interface IWorkspaceService
 {
-    bool DoesWorkspaceExist(Guid workspaceId);
+    Task<bool> DoesWorkspaceExistAsync(Guid workspaceId);
 }

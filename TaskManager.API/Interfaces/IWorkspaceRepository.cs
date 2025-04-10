@@ -2,5 +2,5 @@ using DataAccess.Entities;
 
 public interface IWorkspaceRepository
 {
-    WorkspaceEntity GetWorkspace(Guid workspaceId);
+    Task<WorkspaceEntity> GetWorkspaceAsync(Guid workspaceId);
 }

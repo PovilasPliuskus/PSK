@@ -19,7 +19,7 @@ public class TaskService : ITaskService
 
     public async Task<List<BusinessLogic.Models.Task>> GetTasksFromWorkspaceAsync(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize)
     {
-        if (workspaceService.DoesWorkspaceExist(workspaceId) == false)
+        if (await workspaceService.DoesWorkspaceExistAsync(workspaceId) == false)
         {
             //TODO update exception
             throw new Exception("Workplace does not exist");

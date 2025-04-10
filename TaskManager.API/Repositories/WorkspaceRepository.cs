@@ -1,5 +1,6 @@
 using DataAccess.Context;
 using DataAccess.Entities;
+using Microsoft.EntityFrameworkCore;
 
 public class WorkspaceRepository : IWorkspaceRepository
 {
@@ -9,8 +10,8 @@ public class WorkspaceRepository : IWorkspaceRepository
         dbContext = _dbContext;
     }
 
-    public WorkspaceEntity GetWorkspace(Guid workspaceId)
+    public async Task<WorkspaceEntity> GetWorkspaceAsync(Guid workspaceId)
     {
-        return dbContext.Workspaces.Where(w => w.Id == workspaceId).FirstOrDefault();
+        return await dbContext.Workspaces.Where(w => w.Id == workspaceId).FirstOrDefaultAsync();
     }
 }
