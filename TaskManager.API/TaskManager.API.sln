@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogic", "..\Busines
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManager.API.Tests", "..\TaskManager.API.Tests\TaskManager.API.Tests.csproj", "{AC1699BA-DE3C-457E-997B-CD9ED5767BE5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSupport", "..\TestSupport\TestSupport.csproj", "{672A006E-5CB1-4E59-84D4-28D9661D76F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{AC1699BA-DE3C-457E-997B-CD9ED5767BE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC1699BA-DE3C-457E-997B-CD9ED5767BE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC1699BA-DE3C-457E-997B-CD9ED5767BE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{672A006E-5CB1-4E59-84D4-28D9661D76F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{672A006E-5CB1-4E59-84D4-28D9661D76F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{672A006E-5CB1-4E59-84D4-28D9661D76F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{672A006E-5CB1-4E59-84D4-28D9661D76F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
