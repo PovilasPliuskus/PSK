@@ -73,7 +73,7 @@ public class TaskRepository : ITaskRepository
     public async Task<TaskEntity> GetTaskAsync(Guid Id)
     {
         TaskEntity task = await dbContext.Tasks.FindAsync(Id);
-
+        
         if(task == null)
         {
             //TODO update exception
