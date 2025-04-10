@@ -17,7 +17,7 @@ public class TaskService : ITaskService
         httpContextAccessor = _httpContextAccessor;
     }
 
-    public List<BusinessLogic.Models.Task> GetTasksFromWorkspace(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize)
+    public async Task<List<BusinessLogic.Models.Task>> GetTasksFromWorkspaceAsync(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize)
     {
         if (workspaceService.DoesWorkspaceExist(workspaceId) == false)
         {
@@ -25,7 +25,7 @@ public class TaskService : ITaskService
             throw new Exception("Workplace does not exist");
         }
         
-        IQueryable<TaskEntity> tasks = taskRepository.GetTasks(workspaceId, requestDto, pageNumber, pageSize);
+        List<TaskEntity> tasks = await taskRepository.GetTasksAsync(workspaceId, requestDto, pageNumber, pageSize);
         List<BusinessLogic.Models.Task> _tasks = new List<BusinessLogic.Models.Task>();
         foreach(TaskEntity task in tasks)
         {
@@ -35,9 +35,9 @@ public class TaskService : ITaskService
         return _tasks;
     }
     
-    public BusinessLogic.Models.Task UpdateTask(Guid taskId, TaskDto taskDto)
+    public async Task<BusinessLogic.Models.Task> UpdateTaskAsync(Guid taskId, TaskDto taskDto)
     {
-        TaskEntity retrievedTask = taskRepository.GetTask(taskId);
+        TaskEntity retrievedTask = await taskRepository.GetTaskAsync(taskId);
 
         retrievedTask.Name = taskDto.Name;
         retrievedTask.DueDate = taskDto.DueDate;
@@ -49,18 +49,18 @@ public class TaskService : ITaskService
         retrievedTask.Priority = taskDto.Priority;
         retrievedTask.UpdatedAt = DateTime.UtcNow;
 
-        if(taskRepository.UpdateTask(retrievedTask) == 0)
+        if(await taskRepository.UpdateTaskAsync(retrievedTask) == 0)
         {
             //TODO update exception
             throw new Exception("Task was not updated");
         }
         
         // return updated task
-        TaskEntity updatedTask = taskRepository.GetTask(taskId);
+        TaskEntity updatedTask = await taskRepository.GetTaskAsync(taskId);
         return CreateTaskModelFromEntity(updatedTask);
     }
 
-    public BusinessLogic.Models.Task CreateTask(TaskDto dto, Guid workspaceId)
+    public async Task<BusinessLogic.Models.Task> CreateTaskAsync(TaskDto dto, Guid workspaceId)
     {
         // get user id from claims
         var userIdClaim = httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
@@ -73,20 +73,20 @@ public class TaskService : ITaskService
         BusinessLogic.Models.Task newtaskModel = CreateTaskModelFromDto(dto, workspaceId, Guid.Parse(userIdClaim.Value));
         TaskEntity newTaskEntity = CreateTaskEntityFromModel(newtaskModel);
 
-        if(taskRepository.AddTask(newTaskEntity) == 0)
+        if(await taskRepository.AddTaskAsync(newTaskEntity) == 0)
         {
             //TODO update exception
             throw new Exception("Task was not created");
         }
 
-        TaskEntity retrievedTask = taskRepository.GetTask(newTaskEntity.Id);
+        TaskEntity retrievedTask = await taskRepository.GetTaskAsync(newTaskEntity.Id);
         return CreateTaskModelFromEntity(retrievedTask);
     }
 
-    public void DeleteTask(Guid taskId)
+    public async System.Threading.Tasks.Task DeleteTaskAsync(Guid taskId)
     {
-        TaskEntity taskToBeDeleted = taskRepository.GetTask(taskId);
-        if(taskRepository.RemoveTask(taskToBeDeleted) == 0)
+        TaskEntity taskToBeDeleted = await taskRepository.GetTaskAsync(taskId);
+        if(await taskRepository.RemoveTaskAsync(taskToBeDeleted) == 0)
         {
             //TODO update exception
             throw new Exception("Task was not deleted");

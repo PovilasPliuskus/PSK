@@ -16,52 +16,52 @@ public class TaskController : ControllerBase
 
     [HttpGet("{workspaceId}")]
     [Authorize]
-    public IActionResult GetTasks(Guid workspaceId, [FromQuery] TaskRequestDto requestDto, [FromQuery] int pageNumber, [FromQuery] int pageSize) {
+    public async Task<IActionResult> GetTasksAsync(Guid workspaceId, [FromQuery] TaskRequestDto requestDto, [FromQuery] int pageNumber, [FromQuery] int pageSize) {
         if(!ModelState.IsValid){
             // TODO update exception
             throw new Exception("Invalid request model");
         }
 
-        List<BusinessLogic.Models.Task> tasks = taskservice.GetTasksFromWorkspace(workspaceId, requestDto, pageNumber, pageSize);
+        List<BusinessLogic.Models.Task> tasks = await taskservice.GetTasksFromWorkspaceAsync(workspaceId, requestDto, pageNumber, pageSize);
         return Ok(tasks);
     }
 
     [HttpPatch("{taskId}")]
     [Authorize]
-    public IActionResult UpdateTask(Guid taskId, [FromBody] TaskDto taskDto)
+    public async Task<IActionResult> UpdateTaskAsync(Guid taskId, [FromBody] TaskDto taskDto)
     {
         if(!ModelState.IsValid){
             // TODO update exception
             throw new Exception("Invalid request model");
         }
 
-        BusinessLogic.Models.Task updatedTask = taskservice.UpdateTask(taskId, taskDto);
+        BusinessLogic.Models.Task updatedTask = await taskservice.UpdateTaskAsync(taskId, taskDto);
         return Ok(updatedTask);
     }
 
     [HttpPost("{workspaceId}")]
     [Authorize]
-    public IActionResult CreateTask(Guid workspaceId, [FromBody] TaskDto taskDto)
+    public async Task<IActionResult> CreateTaskAsync(Guid workspaceId, [FromBody] TaskDto taskDto)
     {
         if(!ModelState.IsValid){
             // TODO update exception
             throw new Exception("Invalid request model");
         }
 
-        BusinessLogic.Models.Task createdTask = taskservice.CreateTask(taskDto, workspaceId);
+        BusinessLogic.Models.Task createdTask = await taskservice.CreateTaskAsync(taskDto, workspaceId);
         return Ok(createdTask);
     }
 
     [HttpDelete("{taskId}")]
     [Authorize]
-    public IActionResult DeleteTask(Guid taskId)
+    public async Task<IActionResult> DeleteTaskAsync(Guid taskId)
     {
         if(!ModelState.IsValid){
             // TODO update exception
             throw new Exception("Invalid request model");
         }
 
-        taskservice.DeleteTask(taskId);
+        await taskservice.DeleteTaskAsync(taskId);
 
         return Ok();
     }

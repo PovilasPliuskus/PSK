@@ -10,7 +10,7 @@ public class TaskRepository : ITaskRepository
         dbContext = _dbContext;
     }
 
-    public IQueryable<TaskEntity> GetTasks(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize)
+    public async Task<List<TaskEntity>> GetTasksAsync(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize)
     {
         IQueryable<TaskEntity> query = dbContext.Tasks.Where(t => t.FkWorkspaceId == workspaceId);
         if (requestDto.Id.HasValue)
@@ -63,15 +63,16 @@ public class TaskRepository : ITaskRepository
             query = query.Where(t => t.Type == requestDto.Type.Value);
         }
 
-        return query
+        return await query
             .OrderBy(t => t.Id)
             .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize);
+            .Take(pageSize)
+            .ToListAsync();
     }
 
-    public TaskEntity GetTask(Guid Id)
+    public async Task<TaskEntity> GetTaskAsync(Guid Id)
     {
-        TaskEntity task = dbContext.Tasks.Find(Id);
+        TaskEntity task = await dbContext.Tasks.FindAsync(Id);
 
         if(task == null)
         {
@@ -81,25 +82,25 @@ public class TaskRepository : ITaskRepository
         return task;
     }
 
-    public int UpdateTask(TaskEntity updatedTask)
+    public async Task<int> UpdateTaskAsync(TaskEntity updatedTask)
     {
         dbContext.Entry(updatedTask).State = EntityState.Modified;
 
         // returns rowsChanged
-        return dbContext.SaveChanges();
+        return await dbContext.SaveChangesAsync();
     }
 
-    public int AddTask(TaskEntity task)
+    public async Task<int> AddTaskAsync(TaskEntity task)
     {
-        dbContext.Tasks.Add(task);
+        await dbContext.Tasks.AddAsync(task);
 
         // returns rowsChanged
-        return dbContext.SaveChanges();
+        return await dbContext.SaveChangesAsync();
     }
 
-    public int RemoveTask(TaskEntity task)
+    public async Task<int> RemoveTaskAsync(TaskEntity task)
     {
-        TaskEntity taskToBeRemoved = dbContext.Tasks.Find(task.Id);
+        TaskEntity taskToBeRemoved = await dbContext.Tasks.FindAsync(task.Id);
         if(taskToBeRemoved == null)
         {
             //TODO update exception
@@ -108,6 +109,6 @@ public class TaskRepository : ITaskRepository
         dbContext.Tasks.Remove(taskToBeRemoved);
 
         // returns rowsChanged
-        return dbContext.SaveChanges();
+        return await dbContext.SaveChangesAsync();
     }
 }

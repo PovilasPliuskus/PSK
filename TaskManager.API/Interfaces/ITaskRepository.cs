@@ -2,9 +2,9 @@ using DataAccess.Entities;
 
 public interface ITaskRepository
 {
-    IQueryable<TaskEntity> GetTasks(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize);
-    TaskEntity GetTask(Guid Id);
-    int UpdateTask(TaskEntity updatedTask);
-    int AddTask(TaskEntity task);
-    int RemoveTask(TaskEntity task);
+    Task<List<TaskEntity>> GetTasksAsync(Guid workspaceId, TaskRequestDto requestDto, int pageNumber, int pageSize);
+    Task<TaskEntity> GetTaskAsync(Guid Id);
+    Task<int> UpdateTaskAsync(TaskEntity updatedTask);
+    Task<int> AddTaskAsync(TaskEntity task);
+    Task<int> RemoveTaskAsync(TaskEntity task);
 }
