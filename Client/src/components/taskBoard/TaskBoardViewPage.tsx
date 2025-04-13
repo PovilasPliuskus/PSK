@@ -31,7 +31,9 @@ export const TaskBoardViewPage = () => {
     const fetchTasks = () => {
       setError(null);
       setIsLoading(true);
-      axiosInstance.get(`/task/${id}`)
+      axiosInstance.get(`/task/${id}`, {
+        params: { pageNumber: 1, pageSize: 10 },
+      })
       .then(response => {
         setCards(response.data);
       })
@@ -302,8 +304,29 @@ const Card = ({
   };
 
   const handleSave = () => {
-    // make api patch call
-    console.log("Saving changes:", taskDetails);
+    const updatedCard = {
+      Name : taskDetails.name,
+      Status : taskDetails.status,
+      Estimate : taskDetails.estimate,
+      Type : taskDetails.type,
+      Priority : taskDetails.priority
+    }
+
+    console.log("Saving changes:", updatedCard);
+    // using pre-set workspace id while workspaces are not implemented
+    const cardPatchRequest = (updatedCard) => {
+      axiosInstance.patch(`/task/${taskDetails.id}`, updatedCard)
+      .then(response => {
+        console.log(response);
+        const returnedCard = response.data;
+        // TODO update cards once response is received.
+      })
+      .catch(error => {
+        console.log(error);
+      })
+    }
+
+    cardPatchRequest(updatedCard);
     setShow(false);
   };
 
@@ -460,16 +483,23 @@ const BurnBarrel = ({
     setActive(false);
   };
 
-  const deleteCardBackend = (cardId) => {
-    console.log("api call to delete card with id: ");
-    console.log(cardId);
-  }
-
   const handleDragEnd = (e: DragEvent) => {
     const cardId = e.dataTransfer.getData("cardId");
 
-    setCards((pv) => pv.filter((c) => c.id !== cardId));
-    deleteCardBackend(cardId);
+    const cardDeletionRequest = (cardId) => {
+      axiosInstance.delete(`/task/${cardId}`)
+      .then(response => {
+        console.log(response);
+        if (response.status === 200){
+          setCards((pv) => pv.filter((c) => c.id !== cardId));
+        }
+      })
+      .catch(error => {
+        console.log(error);
+      })
+    }
+
+    cardDeletionRequest(cardId);
     setActive(false);
   };
 
@@ -490,11 +520,6 @@ type AddCardProps = {
   setCards: Dispatch<SetStateAction<CardType[]>>;
 };
 
-const addCardBackend = (card : CardType) => {
-  console.log("Api call to add card: ");
-  console.log(card);
-}
-
 const AddCard = ({ column, setCards }: AddCardProps) => {
   const [name, setName] = useState("");
   const [adding, setAdding] = useState(false);
@@ -505,21 +530,28 @@ const AddCard = ({ column, setCards }: AddCardProps) => {
     if (!name.trim().length) return;
 
     const newCard: CardType = {
-      status: column,
-      name: name.trim(),
-      id: Math.random().toString(),
-      fkCreatedByUserId: "00000000-0000-0000-0000-000000000000", // Placeholder
-      fkWorkspaceId: "00000000-0000-0000-0000-000000000000", // Placeholder
-      fkAssignedToUserId: null,
-      dueDate: null,
-      description: null,
-      estimate: 1, // Default value
-      type: 2, // Default value
-      priority: 2, // Default value
+      Status: column,
+      Name: name.trim(),
+      Estimate: 1, // Default value
+      Type: 2, // Default value
+      Priority: 2, // Default value
     };
-    setCards((pv) => [...pv, newCard]);
 
-    addCardBackend(newCard);
+    // using pre-set workspace id while workspaces are not implemented
+    const cardCreationRequest = () => {
+      axiosInstance.post(`/task/0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c`, newCard)
+      .then(response => {
+        console.log(response);
+        const returnedCard = response.data;
+        setCards((pv) => [...pv, returnedCard]);
+      })
+      .catch(error => {
+        console.log(error);
+      })
+    }
+    
+    
+    cardCreationRequest();
 
     setAdding(false);
     setName("");
@@ -565,142 +597,3 @@ const AddCard = ({ column, setCards }: AddCardProps) => {
     </>
   );
 };
-
-
-const DEFAULT_CARDS: CardType[] = [
-  // BACKLOG
-  {
-    name: "Look into render bug in dashboard",
-    id: "1",
-    status: 0,
-    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
-    fkAssignedToUserId: null,
-    dueDate: null,
-    description: "Investigate why the dashboard is not rendering correctly.",
-    estimate: 2,
-    type: 2,
-    priority: 2,
-  },
-  {
-    name: "SOX compliance checklist",
-    id: "2",
-    status: 0,
-    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
-    fkAssignedToUserId: null,
-    dueDate: new Date("2025-04-15"),
-    description: "Review and update the SOX compliance checklist for the upcoming audit.",
-    estimate: 2,
-    type: 2,
-    priority: 2,
-  },
-  {
-    name: "[SPIKE] Migrate to Azure",
-    id: "3",
-    status: 0,
-    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
-    fkAssignedToUserId: null,
-    dueDate: null,
-    description: "Research and plan the migration of our infrastructure to Azure.",
-    estimate: 2,
-    type: 1,
-    priority: 0,
-  },
-  {
-    name: "Document Notifications service",
-    id: "4",
-    status: 0,
-    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
-    fkAssignedToUserId: null,
-    dueDate: new Date("2025-04-10"),
-    description: "Create comprehensive documentation for the Notifications service.",
-    estimate: 1,
-    type: 0,
-    priority: 1,
-  },
-  // TODO
-  {
-    name: "Research DB options for new microservice",
-    id: "5",
-    status: 1,
-    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
-    fkAssignedToUserId: null,
-    dueDate: null,
-    description: "Explore different database options suitable for the new microservice.",
-    estimate: 0,
-    type: 2,
-    priority: 2,
-  },
-  {
-    name: "Postmortem for outage",
-    id: "6",
-    status: 1,
-    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
-    fkAssignedToUserId: null,
-    dueDate: new Date("2025-04-05"),
-    description: "Conduct a postmortem analysis for the recent service outage.",
-    estimate: 1,
-    type: 0,
-    priority: 2,
-  },
-  {
-    name: "Sync with product on Q3 roadmap",
-    id: "7",
-    status: 1,
-    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
-    fkAssignedToUserId: null,
-    dueDate: new Date("2025-04-04"),
-    description: "Schedule a meeting to align with the product team on the Q3 roadmap.",
-    estimate: 0,
-    type: 0,
-    priority: 1,
-  },
-
-  // DOING
-  {
-    name: "Refactor context providers to use Zustand",
-    id: "8",
-    status: 2,
-    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
-    fkAssignedToUserId: null,
-    dueDate: null,
-    description: "Refactor the existing React context providers to use the Zustand library for state management.",
-    estimate: 2,
-    type: 0,
-    priority: 2,
-  },
-  {
-    name: "Add logging to daily CRON",
-    id: "9",
-    status: 2,
-    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
-    fkAssignedToUserId: null,
-    dueDate: null,
-    description: "Implement logging for the daily CRON job to track its execution and identify potential issues.",
-    estimate: 0,
-    type: 1,
-    priority: 1,
-  },
-  // DONE
-  {
-    name: "Set up DD dashboards for Lambda listener",
-    id: "10",
-    status: 3,
-    fkCreatedByUserId: "a1b2c3d4-e5f6-7890-1234-567890abcdef",
-    fkWorkspaceId: "f9e8d7c6-b5a4-3210-fedc-ba9876543210",
-    fkAssignedToUserId: null,
-    dueDate: null,
-    description: "Configure Datadog dashboards to monitor the performance and health of the Lambda listener function.",
-    estimate: 1,
-    type: 0,
-    priority: 1,
-  },
-];

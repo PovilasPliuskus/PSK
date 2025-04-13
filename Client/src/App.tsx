@@ -86,7 +86,7 @@ function InnerApp() {
                   Demo Form
                 </Nav.Link>
                 {/* Kolkas tiesiog atidaro pavyzdini task. Pakeisim, kai nuspresim, kaip useris pasiekia task puslapi */}
-                <Nav.Link as={Link} to="/task-page/c2646792-8d3f-444c-8b21-f5120292ef3e">
+                <Nav.Link as={Link} to="/task-page/0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c">
                   Task page
                 </Nav.Link>
                 <Nav.Link as={Link} to="/workspaces">
