@@ -13,12 +13,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<TaskManagerContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddTransient<ITaskService, TaskService>();
-builder.Services.AddScoped<ITaskRepository, TaskRepository>();
-
-builder.Services.AddTransient<IWorkspaceService, WorkspaceService>();
-builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
-
 builder.Services.AddCors(options =>
 {
     var allowedCorsOrigins = builder.Configuration.GetSection("AllowedCors:Origins").Get<string[]>();

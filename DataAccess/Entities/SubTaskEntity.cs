@@ -18,15 +18,13 @@ public class SubTaskEntity : BaseModelEntity
     public TaskEntity? Task { get; set; }
 
     [Required]
-    public required Guid FkCreatedByUserId { get; set; }
+    [EmailAddress]
+    [StringLength(255)]
+    public required string FkCreatedByUserEmail { get; set; }
 
-    [ForeignKey(nameof(FkCreatedByUserId))]
-    public UserEntity? CreatedByUserId { get; set; }
-
-    public Guid? FkAssignedToUserId { get; set; }
-
-    [ForeignKey(nameof(FkAssignedToUserId))]
-    public UserEntity? AssignedToUserId { get; set; }
+    [EmailAddress]
+    [StringLength(255)]
+    public string? FkAssignedToUserEmail { get; set; }
 
     public DateTime? DueDate { get; set; }
 
