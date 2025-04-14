@@ -1,6 +1,6 @@
-﻿using BusinessLogic.Enums;
+﻿using Contracts.Enums;
 
-namespace BusinessLogic.Models;
+namespace Contracts.Models;
 
 public class SubTask : BaseModel
 {

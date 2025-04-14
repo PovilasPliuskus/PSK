@@ -1,4 +1,4 @@
-﻿namespace BusinessLogic.Models;
+﻿namespace Contracts.Models;
 
 public abstract class BaseModel
 {
