@@ -42,4 +42,7 @@ public class SubTaskEntity : BaseModelEntity
 
     [Required]
     public required PriorityEnum Priority { get; set; }
+
+    public ICollection<CommentEntity>? Comments { get; set; }
+    public ICollection<AttachmentEntity>? Attachments { get; set; }
 }

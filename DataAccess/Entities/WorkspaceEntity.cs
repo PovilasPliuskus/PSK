@@ -14,4 +14,6 @@ public class WorkspaceEntity : BaseModelEntity
     [EmailAddress]
     [StringLength(255)]
     public required string FkCreatedByUserEmail { get; set; }
+
+    public ICollection<TaskEntity>? Tasks { get; set; }
 }
