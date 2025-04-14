@@ -3,17 +3,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Context;
 
-public class TaskManagerContext : DbContext
+public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : DbContext(options)
 {
-    public TaskManagerContext(DbContextOptions<TaskManagerContext> options) : base(options) { }
-
-    public DbSet<AttachmentEntity> Attachments { get; set; } = null!;
-    public DbSet<CommentEntity> Comments { get; set; } = null!;
-    public DbSet<SubTaskEntity> SubTasks { get; set; } = null!;
-    public DbSet<TaskEntity> Tasks { get; set; } = null!;
-    public DbSet<UserEntity> Users { get; set; } = null!;
-    public DbSet<WorkspaceEntity> Workspaces { get; set; } = null!;
-    public DbSet<WorkspaceUsersEntity> WorkspaceUsers { get; set; } = null!;
+    public DbSet<AttachmentEntity>? Attachments { get; set; }
+    public DbSet<CommentEntity>? Comments { get; set; }
+    public DbSet<SubTaskEntity>? SubTasks { get; set; }
+    public DbSet<TaskEntity>? Tasks { get; set; }
+    public DbSet<UserEntity>? Users { get; set; }
+    public DbSet<WorkspaceEntity>? Workspaces { get; set; }
+    public DbSet<WorkspaceUsersEntity>? WorkspaceUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
