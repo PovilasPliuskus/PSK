@@ -23,7 +23,9 @@ const useAxiosInterceptor = () => {
           } else {
             // Handle other server errors
             const message =
+              error.response.data?.Title ||
               error.response.data?.title ||
+              error.response.data?.Message ||
               error.response.data?.message ||
               "An error occurred."; // Default message if none is found
             setError(message);
