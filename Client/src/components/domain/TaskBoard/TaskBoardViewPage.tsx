@@ -12,14 +12,15 @@ import { FaFire } from "react-icons/fa";
 import { BsHammer } from "react-icons/bs";
 import './TaskBoardViewPage.css';
 import { Button, Modal, Form } from "react-bootstrap";
-import { estimateMapper, priorityMapper, statusMapper, typeMapper } from "../utils/enumMapper.tsx";
-import { CardType, StatusEnum } from "../utils/types.ts";
-import { axiosInstance } from '../../utils/axiosInstance';
+import { estimateMapper, priorityMapper, statusMapper, typeMapper } from "../../utility/enumMapper.tsx";
+import { TaskSummary } from "../../../Models/TaskSummary.ts";
+import { StatusEnum } from "../../../Models/TaskEnums.ts";
+import { axiosInstance } from '../../../utils/axiosInstance';
 import { useParams } from "react-router-dom";
-import keycloak from '../../keycloak';
-import SomethingWentWrong from "../base/SomethingWentWrong.tsx";
-import Loading from "../base/Loading.tsx";
-import ScriptResources from "../../assets/resources/strings.ts";
+import keycloak from '../../../keycloak';
+import SomethingWentWrong from "../../base/SomethingWentWrong.tsx";
+import Loading from "../../base/Loading.tsx";
+import ScriptResources from "../../../assets/resources/strings.ts";
 
 export const TaskBoardViewPage = () => {
   const { id } = useParams();
@@ -104,9 +105,9 @@ const Board = ({cards, setCards}) => {
 type ColumnProps = {
   title: string;
   headingColor: string;
-  cards: CardType[];
+  cards: TaskSummary[];
   column: StatusEnum;
-  setCards: Dispatch<SetStateAction<CardType[]>>;
+  setCards: Dispatch<SetStateAction<TaskSummary[]>>;
 };
 
 const Column = ({
@@ -118,11 +119,11 @@ const Column = ({
 }: ColumnProps) => {
   const [active, setActive] = useState(false);
 
-  const handleDragStart = (e: DragEvent, card: CardType) => {
+  const handleDragStart = (e: DragEvent, card: TaskSummary) => {
     e.dataTransfer.setData("cardId", card.id);
   };
 
-  const changeCardStatusInBackend = (card : CardType) => {
+  const changeCardStatusInBackend = (card : TaskSummary) => {
     // make patch api call
     console.log("api call to change task status: ");
     console.log(card);
@@ -252,7 +253,7 @@ const Column = ({
   );
 };
 
-type CardProps = CardType & {
+type CardProps = TaskSummary & {
   handleDragStart: Function;
 };
 
@@ -270,7 +271,7 @@ const Card = ({
 }: CardProps) => {
   const [isOver, setIsOver] = useState(null);
   const [show, setShow] = useState(false);
-  const [taskDetails, setTaskDetails] = useState<CardType>({
+  const [taskDetails, setTaskDetails] = useState<TaskSummary>({
     name,
     id,
     status,
@@ -470,7 +471,7 @@ const DropIndicator = ({ beforeId, column }: DropIndicatorProps) => {
 const BurnBarrel = ({
   setCards,
 }: {
-  setCards: Dispatch<SetStateAction<CardType[]>>;
+  setCards: Dispatch<SetStateAction<TaskSummary[]>>;
 }) => {
   const [active, setActive] = useState(false);
 
@@ -517,7 +518,7 @@ const BurnBarrel = ({
 
 type AddCardProps = {
   column: StatusEnum;
-  setCards: Dispatch<SetStateAction<CardType[]>>;
+  setCards: Dispatch<SetStateAction<TaskSummary[]>>;
 };
 
 const AddCard = ({ column, setCards }: AddCardProps) => {
@@ -529,7 +530,7 @@ const AddCard = ({ column, setCards }: AddCardProps) => {
 
     if (!name.trim().length) return;
 
-    const newCard: CardType = {
+    const newCard: TaskSummary = {
       Status: column,
       Name: name.trim(),
       Estimate: 1, // Default value
