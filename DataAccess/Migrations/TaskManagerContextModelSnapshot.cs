@@ -47,6 +47,12 @@ namespace DataAccess.Migrations
                     b.Property<Guid?>("FkTaskId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("SubTaskEntityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("TaskEntityId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -55,6 +61,10 @@ namespace DataAccess.Migrations
                     b.HasIndex("FkSubTaskId");
 
                     b.HasIndex("FkTaskId");
+
+                    b.HasIndex("SubTaskEntityId");
+
+                    b.HasIndex("TaskEntityId");
 
                     b.ToTable("Attachment");
                 });
@@ -82,6 +92,12 @@ namespace DataAccess.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<Guid?>("SubTaskEntityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("TaskEntityId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Text")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
@@ -94,6 +110,10 @@ namespace DataAccess.Migrations
                     b.HasIndex("FkSubTaskId");
 
                     b.HasIndex("FkTaskId");
+
+                    b.HasIndex("SubTaskEntityId");
+
+                    b.HasIndex("TaskEntityId");
 
                     b.ToTable("Comment");
                 });
@@ -140,6 +160,9 @@ namespace DataAccess.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<Guid?>("TaskEntityId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
@@ -149,6 +172,8 @@ namespace DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FkTaskId");
+
+                    b.HasIndex("TaskEntityId");
 
                     b.ToTable("SubTask");
                 });
@@ -201,9 +226,14 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid?>("WorkspaceEntityId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("FkWorkspaceId");
+
+                    b.HasIndex("WorkspaceEntityId");
 
                     b.ToTable("Task");
                 });
@@ -263,6 +293,14 @@ namespace DataAccess.Migrations
                         .HasForeignKey("FkTaskId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("DataAccess.Entities.SubTaskEntity", null)
+                        .WithMany("Attachments")
+                        .HasForeignKey("SubTaskEntityId");
+
+                    b.HasOne("DataAccess.Entities.TaskEntity", null)
+                        .WithMany("Attachments")
+                        .HasForeignKey("TaskEntityId");
+
                     b.Navigation("SubTask");
 
                     b.Navigation("Task");
@@ -280,6 +318,14 @@ namespace DataAccess.Migrations
                         .HasForeignKey("FkTaskId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("DataAccess.Entities.SubTaskEntity", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("SubTaskEntityId");
+
+                    b.HasOne("DataAccess.Entities.TaskEntity", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("TaskEntityId");
+
                     b.Navigation("SubTask");
 
                     b.Navigation("Task");
@@ -293,6 +339,10 @@ namespace DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DataAccess.Entities.TaskEntity", null)
+                        .WithMany("SubTasks")
+                        .HasForeignKey("TaskEntityId");
+
                     b.Navigation("Task");
                 });
 
@@ -304,6 +354,10 @@ namespace DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DataAccess.Entities.WorkspaceEntity", null)
+                        .WithMany("Tasks")
+                        .HasForeignKey("WorkspaceEntityId");
+
                     b.Navigation("Workspace");
                 });
 
@@ -314,6 +368,27 @@ namespace DataAccess.Migrations
                         .HasForeignKey("FkWorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.SubTaskEntity", b =>
+                {
+                    b.Navigation("Attachments");
+
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.TaskEntity", b =>
+                {
+                    b.Navigation("Attachments");
+
+                    b.Navigation("Comments");
+
+                    b.Navigation("SubTasks");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.WorkspaceEntity", b =>
+                {
+                    b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
         }

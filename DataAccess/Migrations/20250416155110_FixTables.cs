@@ -41,6 +41,7 @@ namespace DataAccess.Migrations
                     Estimate = table.Column<int>(type: "integer", nullable: false),
                     Type = table.Column<int>(type: "integer", nullable: false),
                     Priority = table.Column<int>(type: "integer", nullable: false),
+                    WorkspaceEntityId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -53,6 +54,11 @@ namespace DataAccess.Migrations
                         principalTable: "Workspace",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Task_Workspace_WorkspaceEntityId",
+                        column: x => x.WorkspaceEntityId,
+                        principalTable: "Workspace",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -88,6 +94,7 @@ namespace DataAccess.Migrations
                     Estimate = table.Column<int>(type: "integer", nullable: false),
                     Type = table.Column<int>(type: "integer", nullable: false),
                     Priority = table.Column<int>(type: "integer", nullable: false),
+                    TaskEntityId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -100,6 +107,11 @@ namespace DataAccess.Migrations
                         principalTable: "Task",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SubTask_Task_TaskEntityId",
+                        column: x => x.TaskEntityId,
+                        principalTable: "Task",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -111,6 +123,8 @@ namespace DataAccess.Migrations
                     FkCreatedByUserEmail = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     FkTaskId = table.Column<Guid>(type: "uuid", nullable: true),
                     FkSubTaskId = table.Column<Guid>(type: "uuid", nullable: true),
+                    SubTaskEntityId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TaskEntityId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -124,11 +138,21 @@ namespace DataAccess.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Attachment_SubTask_SubTaskEntityId",
+                        column: x => x.SubTaskEntityId,
+                        principalTable: "SubTask",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Attachment_Task_FkTaskId",
                         column: x => x.FkTaskId,
                         principalTable: "Task",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Attachment_Task_TaskEntityId",
+                        column: x => x.TaskEntityId,
+                        principalTable: "Task",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -141,6 +165,8 @@ namespace DataAccess.Migrations
                     FkWrittenByUserEmail = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Edited = table.Column<bool>(type: "boolean", nullable: false),
                     Text = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+                    SubTaskEntityId = table.Column<Guid>(type: "uuid", nullable: true),
+                    TaskEntityId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -154,11 +180,21 @@ namespace DataAccess.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_Comment_SubTask_SubTaskEntityId",
+                        column: x => x.SubTaskEntityId,
+                        principalTable: "SubTask",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Comment_Task_FkTaskId",
                         column: x => x.FkTaskId,
                         principalTable: "Task",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Comment_Task_TaskEntityId",
+                        column: x => x.TaskEntityId,
+                        principalTable: "Task",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -172,6 +208,16 @@ namespace DataAccess.Migrations
                 column: "FkTaskId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Attachment_SubTaskEntityId",
+                table: "Attachment",
+                column: "SubTaskEntityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Attachment_TaskEntityId",
+                table: "Attachment",
+                column: "TaskEntityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Comment_FkSubTaskId",
                 table: "Comment",
                 column: "FkSubTaskId");
@@ -182,14 +228,34 @@ namespace DataAccess.Migrations
                 column: "FkTaskId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Comment_SubTaskEntityId",
+                table: "Comment",
+                column: "SubTaskEntityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comment_TaskEntityId",
+                table: "Comment",
+                column: "TaskEntityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SubTask_FkTaskId",
                 table: "SubTask",
                 column: "FkTaskId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SubTask_TaskEntityId",
+                table: "SubTask",
+                column: "TaskEntityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Task_FkWorkspaceId",
                 table: "Task",
                 column: "FkWorkspaceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Task_WorkspaceEntityId",
+                table: "Task",
+                column: "WorkspaceEntityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WorkspaceUsers_FkWorkspaceId",
