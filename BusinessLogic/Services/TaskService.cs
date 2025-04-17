@@ -24,4 +24,9 @@ public class TaskService : ITaskService
 
         await _taskRepository.AddAsync(task);
     }
+
+    public async Task DeleteTaskAsync(Guid id)
+    {
+        await _taskRepository.RemoveAsync(id);
+    }
 }

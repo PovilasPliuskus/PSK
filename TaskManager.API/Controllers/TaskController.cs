@@ -22,4 +22,12 @@ public class TaskController : ControllerBase
 
         return Ok();
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteTaskAsync(Guid id)
+    {
+        await _taskService.DeleteTaskAsync(id);
+
+        return Ok();
+    }
 }
