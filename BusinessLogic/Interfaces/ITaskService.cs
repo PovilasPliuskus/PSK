@@ -7,6 +7,7 @@ namespace BusinessLogic.Interfaces
     {
         Task CreateTaskAsync(CreateTaskRequest request);
         Task DeleteTaskAsync(Guid id);
-        Task<GetWorkspaceTasksResponse> GetWorkspaceTasks(Guid workspaceId);
+        Task<GetWorkspaceTasksResponse> GetWorkspaceTasksAsync(Guid workspaceId);
+        Task UpdateTaskAsync(UpdateTaskRequest request);
     }
 }

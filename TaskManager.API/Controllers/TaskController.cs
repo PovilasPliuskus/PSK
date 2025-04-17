@@ -35,8 +35,16 @@ public class TaskController : ControllerBase
     [HttpGet("{workspaceId}")]
     public async Task<IActionResult> GetWorkspaceTasksAsync(Guid workspaceId)
     {
-        GetWorkspaceTasksResponse response = await _taskService.GetWorkspaceTasks(workspaceId);
+        GetWorkspaceTasksResponse response = await _taskService.GetWorkspaceTasksAsync(workspaceId);
 
         return Ok(response);
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateTaskAsync([FromBody] UpdateTaskRequest request)
+    {
+        await _taskService.UpdateTaskAsync(request);
+
+        return Ok();
     }
 }

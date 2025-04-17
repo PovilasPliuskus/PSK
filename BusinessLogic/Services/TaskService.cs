@@ -31,10 +31,17 @@ public class TaskService : ITaskService
         await _taskRepository.RemoveAsync(id);
     }
 
-    public async Task<GetWorkspaceTasksResponse> GetWorkspaceTasks(Guid workspaceId)
+    public async Task<GetWorkspaceTasksResponse> GetWorkspaceTasksAsync(Guid workspaceId)
     {
         List<Model.Task> tasks = await _taskRepository.GetAllFromWorkspaceAsync(workspaceId);
 
         return _mapper.Map<GetWorkspaceTasksResponse>(tasks);
+    }
+
+    public async Task UpdateTaskAsync(UpdateTaskRequest request)
+    {
+        Model.Task task = _mapper.Map<Model.Task>(request);
+
+        await _taskRepository.UpdateAsync(task);
     }
 }

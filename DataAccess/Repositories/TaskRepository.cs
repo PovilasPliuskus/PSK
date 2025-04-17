@@ -78,4 +78,23 @@ public class TaskRepository : ITaskRepository
 
         await _context.SaveChangesAsync();
     }
+
+    public async Threading.Task UpdateAsync(Model.Task task)
+    {
+        TaskEntity existingEntity = await _context.Tasks
+            .FirstAsync(t => t.Id == task.Id);
+
+        existingEntity.Name = task.Name;
+        existingEntity.DueDate = task.DueDate;
+        existingEntity.FkAssignedToUserEmail = task.AssignedToUserEmail;
+        existingEntity.Description = task.Description;
+        existingEntity.Status = task.Status;
+        existingEntity.Estimate = task.Estimate;
+        existingEntity.Type = task.Type;
+        existingEntity.Priority = task.Priority;
+
+        _context.Tasks.Update(existingEntity);
+
+        await _context.SaveChangesAsync();
+    }
 }
