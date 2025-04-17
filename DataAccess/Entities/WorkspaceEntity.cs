@@ -11,8 +11,9 @@ public class WorkspaceEntity : BaseModelEntity
     public required string Name { get; set; }
 
     [Required]
-    public required Guid FkCreatedByUserId { get; set; }
+    [EmailAddress]
+    [StringLength(255)]
+    public required string FkCreatedByUserEmail { get; set; }
 
-    [ForeignKey(nameof(FkCreatedByUserId))]
-    public UserEntity? CreatedByUserId { get; set; }
+    public ICollection<TaskEntity>? Tasks { get; set; }
 }

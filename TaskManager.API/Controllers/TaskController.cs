@@ -1,90 +1,50 @@
+﻿using BusinessLogic.Interfaces;
+using Contracts.RequestBodies;
+using Contracts.ResponseBodies;
 using Microsoft.AspNetCore.Mvc;
-using DataAccess.Entities;
-using BusinessLogic.Enums;
-using BusinessLogic.Models;
-using Microsoft.AspNetCore.Authorization;
+
+namespace TaskManager.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class TaskController : ControllerBase
 {
-    private ITaskService taskservice;
-    public TaskController(ITaskService _taskService)
+    private readonly ITaskService _taskService;
+
+    public TaskController(ITaskService taskService)
     {
-     taskservice = _taskService;
+        _taskService = taskService;
     }
 
-    [HttpGet("{workspaceId}")]
-    [Authorize]
-    public async Task<IActionResult> GetTasksAsync(Guid workspaceId, [FromQuery] TaskQueryObject queryObject, [FromQuery] int pageNumber, [FromQuery] int pageSize) {
-        if(!ModelState.IsValid){
-            // TODO update exception
-            throw new Exception("Invalid request model");
-        }
-
-        List<BusinessLogic.Models.Task> tasks = await taskservice.GetTasksFromWorkspaceAsync(workspaceId, queryObject, pageNumber, pageSize);
-        return Ok(tasks);
-    }
-
-    [HttpPatch("{taskId}")]
-    [Authorize]
-    public async Task<IActionResult> UpdateTaskAsync(Guid taskId, [FromBody] TaskRequestObject requestObject)
+    [HttpPost]
+    public async Task<IActionResult> CreateTaskAsync([FromBody] CreateTaskRequest request)
     {
-        if(!ModelState.IsValid){
-            // TODO update exception
-            throw new Exception("Invalid request model");
-        }
-
-        BusinessLogic.Models.Task updatedTask = await taskservice.UpdateTaskAsync(taskId, requestObject);
-        TaskResponseObject response = CreateResponseObjectFromTaskModel(updatedTask);
-        return Ok(response);
-    }
-
-    [HttpPost("{workspaceId}")]
-    [Authorize]
-    public async Task<IActionResult> CreateTaskAsync(Guid workspaceId, [FromBody] TaskRequestObject requestObject)
-    {
-        if(!ModelState.IsValid){
-            // TODO update exception
-            throw new Exception("Invalid request model");
-        }
-
-        BusinessLogic.Models.Task createdTask = await taskservice.CreateTaskAsync(requestObject, workspaceId);
-        TaskResponseObject response = CreateResponseObjectFromTaskModel(createdTask);
-        return Ok(response);
-    }
-
-    [HttpDelete("{taskId}")]
-    [Authorize]
-    public async Task<IActionResult> DeleteTaskAsync(Guid taskId)
-    {
-        if(!ModelState.IsValid){
-            // TODO update exception
-            throw new Exception("Invalid request model");
-        }
-
-        await taskservice.DeleteTaskAsync(taskId);
+        await _taskService.CreateTaskAsync(request);
 
         return Ok();
     }
 
-    private TaskResponseObject CreateResponseObjectFromTaskModel(BusinessLogic.Models.Task model)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteTaskAsync(Guid id)
     {
+        await _taskService.DeleteTaskAsync(id);
 
-        return new TaskResponseObject{
-            Id = model.Id,
-            CreatedAt = model.CreatedAt,
-            UpdatedAt = model.UpdatedAt,
-            Name = model.Name,
-            DueDate = model.DueDate,
-            Description = model.Description,
-            Status = model.Status,
-            Estimate = model.Estimate,
-            Type = model.Type,
-            Priority = model.Priority,
-            CreatedByUserId = model.CreatedByUserId,
-            AssignedToUserId = model.AssignedToUserId,
-            WorkspaceId = model.WorkspaceId
-        };
+        return Ok();
+    }
+
+    [HttpGet("{workspaceId}")]
+    public async Task<IActionResult> GetWorkspaceTasksAsync(Guid workspaceId)
+    {
+        GetWorkspaceTasksResponse response = await _taskService.GetWorkspaceTasksAsync(workspaceId);
+
+        return Ok(response);
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateTaskAsync([FromBody] UpdateTaskRequest request)
+    {
+        await _taskService.UpdateTaskAsync(request);
+
+        return Ok();
     }
 }

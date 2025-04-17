@@ -7,7 +7,9 @@ namespace DataAccess.Entities;
 public class WorkspaceUsersEntity
 {
     [Key]
-    public required Guid FkUserId { get; set; }
+    [EmailAddress]
+    [StringLength(255)]
+    public required string FkUserEmail { get; set; }
 
     [Key]
     public required Guid FkWorkspaceId { get; set; }

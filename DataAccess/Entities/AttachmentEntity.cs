@@ -11,10 +11,9 @@ public class AttachmentEntity : BaseModelEntity
     public required string FileName { get; set; }
 
     [Required]
-    public required Guid FkCreatedByUserId { get; set; }
-
-    [ForeignKey(nameof(FkCreatedByUserId))]
-    public UserEntity? CreatedByUserId { get; set; }
+    [EmailAddress]
+    [StringLength(255)]
+    public required string FkCreatedByUserEmail { get; set; }
 
     public Guid? FkTaskId { get; set; }
 

@@ -2,7 +2,8 @@
 
 public enum TypeEnum
 {
-    Feature = 0,
-    Bug = 1,
-    Improvement = 2,
+    None = 0,
+    Feature = 1,
+    Bug = 2,
+    Improvement = 3,
 }
