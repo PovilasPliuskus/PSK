@@ -47,7 +47,8 @@ public class ModelHelper
     }
 
     public static Contracts.Models.Task GetDefaultTaskModel(Guid id, Guid workspaceId,
-        SubTask? subTask = null, Comment? comment = null, Attachment? attachment = null)
+        string createdByUserEmail, SubTask? subTask = null, Comment? comment = null,
+        Attachment? attachment = null)
     {
         return new Contracts.Models.Task
         {
@@ -55,7 +56,11 @@ public class ModelHelper
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
             Name = "Task name",
+            DueDate = DateTime.UtcNow,
+            CreatedByUserEmail = createdByUserEmail,
+            AssignedToUserEmail = "JohnDoe@mail.com",
             WorkspaceId = workspaceId,
+            Description = "Some task description",
             Status = StatusEnum.Todo,
             Estimate = EstimateEnum.Medium,
             Type = TypeEnum.Feature,
