@@ -1,5 +1,6 @@
 ﻿using BusinessLogic.Interfaces;
 using Contracts.RequestBodies;
+using Contracts.ResponseBodies;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TaskManager.API.Controllers;
@@ -29,5 +30,13 @@ public class TaskController : ControllerBase
         await _taskService.DeleteTaskAsync(id);
 
         return Ok();
+    }
+
+    [HttpGet("{workspaceId}")]
+    public async Task<IActionResult> GetWorkspaceTasksAsync(Guid workspaceId)
+    {
+        GetWorkspaceTasksResponse response = await _taskService.GetWorkspaceTasks(workspaceId);
+
+        return Ok(response);
     }
 }

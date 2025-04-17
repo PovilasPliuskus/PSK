@@ -1,4 +1,5 @@
 ﻿using Contracts.RequestBodies;
+using Contracts.ResponseBodies;
 
 namespace BusinessLogic.Interfaces
 {
@@ -6,5 +7,6 @@ namespace BusinessLogic.Interfaces
     {
         Task CreateTaskAsync(CreateTaskRequest request);
         Task DeleteTaskAsync(Guid id);
+        Task<GetWorkspaceTasksResponse> GetWorkspaceTasks(Guid workspaceId);
     }
 }

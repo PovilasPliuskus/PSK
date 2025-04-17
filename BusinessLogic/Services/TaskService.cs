@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogic.Interfaces;
 using Contracts.RequestBodies;
+using Contracts.ResponseBodies;
 using DataAccess.Repositories.Interfaces;
 using Model = Contracts.Models;
 
@@ -28,5 +29,12 @@ public class TaskService : ITaskService
     public async Task DeleteTaskAsync(Guid id)
     {
         await _taskRepository.RemoveAsync(id);
+    }
+
+    public async Task<GetWorkspaceTasksResponse> GetWorkspaceTasks(Guid workspaceId)
+    {
+        List<Model.Task> tasks = await _taskRepository.GetAllFromWorkspaceAsync(workspaceId);
+
+        return _mapper.Map<GetWorkspaceTasksResponse>(tasks);
     }
 }

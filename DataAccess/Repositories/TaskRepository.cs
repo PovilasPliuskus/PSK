@@ -33,6 +33,10 @@ public class TaskRepository : ITaskRepository
             .Include(t => t.Attachments)
             .ToListAsync();
 
+        /* TO-DO: this query doesn't fetch the child elements (SubTasks, Comments and Attachments).
+         * Not completely sure, but maybe mappers for them are needed to work correctly.
+         */
+
         return _mapper.Map<List<Model.Task>>(taskEntities);
     }
 
