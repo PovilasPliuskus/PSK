@@ -2,6 +2,7 @@
 using DataAccess.Entities;
 using DataAccess.Profiles;
 using DataAccess.Repositories;
+using Microsoft.EntityFrameworkCore;
 using TestSupport.Helpers;
 using Model = Contracts.Models;
 
@@ -21,6 +22,27 @@ public class TaskRepositoryTests
         });
 
         _mapper = config.CreateMapper();
+    }
+
+    [TestMethod]
+    public async Task AddAsync_GivenValidTask_AddsToDatabase()
+    {
+        await TransactionHelper.WrapInTransactionAndRollbackAsync(async context =>
+        {
+            //Arrange
+            Guid id = Guid.NewGuid();
+            Guid workspaceId = Guid.NewGuid();
+            string createdByUserEmail = "test@test.mail";
+            Model.Task task = ModelHelper.GetDefaultTaskModel(id, workspaceId, createdByUserEmail);
+
+            TaskRepository repository = new(context, _mapper);
+
+            //Act
+            await repository.AddAsync(task);
+
+            //Assert
+            Assert.IsNotNull(await context.Tasks.FindAsync(id));
+        });
     }
 
     [TestMethod]
@@ -57,6 +79,81 @@ public class TaskRepositoryTests
             Assert.AreEqual(retrievedTask.Estimate, task.Estimate);
             Assert.AreEqual(retrievedTask.Type, task.Type);
             Assert.AreEqual(retrievedTask.Priority, task.Priority);
+        });
+    }
+
+    [TestMethod]
+    public async Task RemoveAsync_GivenExistingTask_RemovesFromDatabase()
+    {
+        await TransactionHelper.WrapInTransactionAndRollbackAsync(async context =>
+        {
+            //Arrange
+            Guid workspaceId = Guid.NewGuid();
+            string createdByUserEmail = "test@test.mail";
+            TaskEntity taskEntity = EntityHelper.GetDefaultTaskEntity(workspaceId, createdByUserEmail);
+            Guid id = taskEntity.Id;
+
+            await context.Tasks.AddAsync(taskEntity);
+            await context.SaveChangesAsync();
+
+            context.Entry(taskEntity).State = EntityState.Detached;
+
+            TaskRepository repository = new(context, _mapper);
+
+            //Act
+            await repository.RemoveAsync(id);
+
+            //Act & Assert
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () =>
+            {
+                await repository.GetAsync(id);
+            });
+        });
+    }
+
+    [TestMethod]
+    public async Task GetAllFromWorkspaceAsync()
+    {
+        await TransactionHelper.WrapInTransactionAndRollbackAsync(async context =>
+        {
+            //Arrange
+            int firstWorkspaceTaskCount = 5;
+            int secondWorkspaceTaskCount = 3;
+            Guid firstWorkspaceId = Guid.NewGuid();
+            Guid secondWorkspaceId = Guid.NewGuid();
+            List<Model.Task> firstWorkspaceTasks = [];
+            List<Model.Task> secondWorkspaceTasks = [];
+            string createdByUserEmail = "test@test.mail";
+
+            for (int i = 0; i < firstWorkspaceTaskCount; i++)
+            {
+                Model.Task task = ModelHelper.GetDefaultTaskModel(Guid.NewGuid(), firstWorkspaceId, createdByUserEmail);
+                firstWorkspaceTasks.Add(task);
+
+                TaskEntity taskEntity = _mapper.Map<TaskEntity>(task);
+                await context.Tasks.AddAsync(taskEntity);
+            }
+
+            for (int i = 0; i < secondWorkspaceTaskCount; i++)
+            {
+                Model.Task task = ModelHelper.GetDefaultTaskModel(Guid.NewGuid(), secondWorkspaceId, createdByUserEmail);
+                secondWorkspaceTasks.Add(task);
+
+                TaskEntity taskEntity = _mapper.Map<TaskEntity>(task);
+                await context.Tasks.AddAsync(taskEntity);
+            }
+
+            await context.SaveChangesAsync();
+
+            TaskRepository repository = new(context, _mapper);
+
+            //Act
+            List<Model.Task> firstRetrievedTasks = await repository.GetAllFromWorkspaceAsync(firstWorkspaceId);
+            List<Model.Task> secondRetrievedTasks = await repository.GetAllFromWorkspaceAsync(secondWorkspaceId);
+
+            //Assert
+            Assert.AreEqual(firstWorkspaceTaskCount, firstRetrievedTasks.Count);
+            Assert.AreEqual(secondWorkspaceTaskCount, secondRetrievedTasks.Count);
         });
     }
 }
