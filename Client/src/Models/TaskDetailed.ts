@@ -1,4 +1,5 @@
 import { SubTask } from "./SubTask";
+import { Comment } from "./Comment";
 import { EstimateEnum, PriorityEnum, StatusEnum, TypeEnum } from "./TaskEnums";
 
 export interface TaskDetailed {
