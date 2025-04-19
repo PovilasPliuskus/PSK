@@ -17,13 +17,14 @@ import SomethingWentWrong from "../../base/SomethingWentWrong.tsx";
 import Loading from "../../base/Loading.tsx";
 import ScriptResources from "../../../assets/resources/strings.ts";
 import Column from "./Column.tsx";
+import { dummyTasks } from "../dummyData.ts";
 
 export const TaskBoardViewPage = () => {
   const { id } = useParams();
   const [cards, setCards] = useState<TaskSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   useEffect(() => {
     const fetchTasks = () => {
       setError(null);
@@ -31,31 +32,34 @@ export const TaskBoardViewPage = () => {
       axiosInstance.get(`/task/${id}`, {
         params: { pageNumber: 1, pageSize: 10 },
       })
-      .then(response => {
-        setCards(response.data);
-      })
-      .catch(error => {
-        setError(error);
-        console.log(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      })
+        .then(response => {
+          setCards(response.data);
+        })
+        .catch(error => {
+          setError(error);
+          console.log(error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        })
     }
     if (keycloak.authenticated) {
-      fetchTasks();
+      //fetchTasks();
+      // TODO kolkas naudojam dummy data
+      setCards(dummyTasks);
+      setIsLoading(false);
     }
-  },[id, keycloak.authenticated])
+  }, [id, keycloak.authenticated])
 
-  if(error != null){
+  if (error != null) {
     return <SomethingWentWrong onRetry={() => window.location.reload()} />;
-  } if(isLoading){
+  } if (isLoading) {
     return <Loading message={ScriptResources.LoadingOrLogin} />;
   } else {
     return (
       <div className="kanban-container">
-      <Board cards={cards} setCards={setCards}/>
-    </div>
+        <Board cards={cards} setCards={setCards} />
+      </div>
     )
   }
 };
@@ -65,7 +69,7 @@ type BoardProps = {
   setCards: Dispatch<React.SetStateAction<TaskSummary[]>>
 }
 
-const Board: React.FC<BoardProps> = ({cards, setCards}) => {
+const Board: React.FC<BoardProps> = ({ cards, setCards }) => {
   return (
     <div className="board">
       <Column
@@ -105,7 +109,7 @@ type BurnBarrelProps = {
   setCards: Dispatch<SetStateAction<TaskSummary[]>>
 };
 
-const BurnBarrel : React.FC<BurnBarrelProps> = ({setCards}) => {
+const BurnBarrel: React.FC<BurnBarrelProps> = ({ setCards }) => {
   const [active, setActive] = useState(false);
 
   const handleDragOver = (e: DragEvent) => {
@@ -120,17 +124,17 @@ const BurnBarrel : React.FC<BurnBarrelProps> = ({setCards}) => {
   const handleDragEnd = (e: DragEvent) => {
     const cardId = e.dataTransfer.getData("cardId");
 
-    const cardDeletionRequest = (cardId : string) => {
+    const cardDeletionRequest = (cardId: string) => {
       axiosInstance.delete(`/task/${cardId}`)
-      .then(response => {
-        console.log(response);
-        if (response.status === 200){
-          setCards((pv) => pv.filter((c) => c.id !== cardId));
-        }
-      })
-      .catch(error => {
-        console.log(error);
-      })
+        .then(response => {
+          console.log(response);
+          if (response.status === 200) {
+            setCards((pv) => pv.filter((c) => c.id !== cardId));
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        })
     }
 
     cardDeletionRequest(cardId);

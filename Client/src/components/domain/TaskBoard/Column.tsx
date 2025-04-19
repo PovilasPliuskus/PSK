@@ -29,19 +29,19 @@ const Column: React.FC<ColumnProps> = ({
   };
 
   const changeCardStatusInBackend = (card: TaskSummary) => {
-    const cardPatchRequest = (taskSummary : TaskSummary) => {
-        axiosInstance.patch(`/task/${taskSummary.id}`, taskSummary)
-            .then(response => {
-                console.log(response);
-                const returnedCard = response.data;
-                // TODO update cards once response is received.
-            })
-            .catch(error => {
-                console.log(error);
-            })
+    const cardPatchRequest = (taskSummary: TaskSummary) => {
+      axiosInstance.patch(`/task/${taskSummary.id}`, taskSummary)
+        .then(response => {
+          console.log(response);
+          const returnedCard = response.data;
+          // TODO update cards once response is received.
+        })
+        .catch(error => {
+          console.log(error);
+        })
     }
-    if(card != null){
-        cardPatchRequest(card);
+    if (card != null) {
+      cardPatchRequest(card);
     }
   }
 
@@ -196,23 +196,23 @@ const AddCard = ({ column, setCards }: AddCardProps) => {
       name: name.trim(),
       estimate: 1,
       type: 2,
-      priority: 2, 
+      priority: 2,
     };
 
     // using pre-set workspace id while workspaces are not implemented
     const cardCreationRequest = () => {
       axiosInstance.post(`/task/0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c`, newCard)
-      .then(response => {
-        console.log(response);
-        const returnedCard = response.data;
-        setCards((pv) => [...pv, returnedCard]);
-      })
-      .catch(error => {
-        console.log(error);
-      })
+        .then(response => {
+          console.log(response);
+          const returnedCard = response.data;
+          setCards((pv) => [...pv, returnedCard]);
+        })
+        .catch(error => {
+          console.log(error);
+        })
     }
-    
-    
+
+
     cardCreationRequest();
 
     setAdding(false);
