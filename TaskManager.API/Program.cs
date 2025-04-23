@@ -3,6 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using TaskManager.API.Middlewares;
 using TaskManager.API.Settings;
+using BusinessLogic.Interfaces;
+using BusinessLogic.Services;
+using DataAccess.Repositories.Interfaces;
+using DataAccess.Repositories;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +21,13 @@ builder.Services.AddDbContext<TaskManagerContext>(options =>
 builder.Services.AddTransient<ITaskService, TaskService>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 
-builder.Services.AddTransient<IWorkspaceService, WorkspaceService>();
-builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
+var mapperConfig = new MapperConfiguration(cfg =>
+{
+    cfg.AddProfile<BusinessLogic.Profiles.TaskProfile>();
+    cfg.AddProfile<DataAccess.Profiles.TaskProfile>();
+});
+
+builder.Services.AddSingleton(mapperConfig.CreateMapper());
 
 builder.Services.AddCors(options =>
 {
