@@ -1,4 +1,5 @@
 using BusinessLogic.Interfaces;
+using Contracts.RequestBodies;
 using Contracts.ResponseBodies;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,5 +31,13 @@ public class WorkspaceController : ControllerBase
         GetWorkspaceResponse response = await _workspaceService.GetWorkspaceByIdAsync(id);
         
         return Ok(response);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateWorkspaceAsync(CreateWorkspaceRequest request)
+    {
+        await _workspaceService.CreateWorkspaceAsync(request);
+
+        return Ok();
     }
 }

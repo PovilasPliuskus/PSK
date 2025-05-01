@@ -1,5 +1,6 @@
 using AutoMapper;
 using Contracts.Models;
+using Contracts.RequestBodies;
 using Contracts.ResponseBodies;
 
 namespace BusinessLogic.Profiles;
@@ -18,5 +19,9 @@ public class WorkspaceProfile : Profile
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.CreatedByUserEmail, opt => opt.MapFrom(src => src.CreatedByUserEmail))
             .ForMember(dest => dest.Tasks, opt => opt.MapFrom(src => src.Tasks));
+
+        CreateMap<CreateWorkspaceRequest, WorkspaceWithoutTasks>()
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.CreatedByUserEmail, opt => opt.MapFrom(src => src.CreatedByUserEmail));
     }
 }

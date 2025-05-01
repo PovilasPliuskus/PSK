@@ -1,7 +1,10 @@
 using AutoMapper;
 using BusinessLogic.Interfaces;
+using Contracts.Models;
+using Contracts.RequestBodies;
 using Contracts.ResponseBodies;
 using DataAccess.Repositories.Interfaces;
+using Task = System.Threading.Tasks.Task;
 
 namespace BusinessLogic.Services;
 
@@ -30,12 +33,14 @@ public class WorkspaceService : IWorkspaceService
         return _mapper.Map<GetWorkspaceResponse>(workspace);
     }
 
-    /*public Task CreateWorkspaceAsync(CreateWorkspaceRequest request)
+    public async Task CreateWorkspaceAsync(CreateWorkspaceRequest request)
     {
-        throw new NotImplementedException();
+        var workspace = _mapper.Map<WorkspaceWithoutTasks>(request);
+
+        await _workspaceRepository.AddAsync(workspace);
     }
 
-    public Task UpdateWorkspaceAsync(UpdateWorkspaceRequest request)
+    /*public Task UpdateWorkspaceAsync(UpdateWorkspaceRequest request)
     {
         throw new NotImplementedException();
     }

@@ -4,6 +4,7 @@ using DataAccess.Context;
 using DataAccess.Entities;
 using DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Task = System.Threading.Tasks.Task;
 
 namespace DataAccess.Repositories;
 
@@ -35,7 +36,7 @@ public class WorkspaceRepository : IWorkspaceRepository
         return _mapper.Map<Workspace>(workspaceEntity);
     }
 
-    /*public async Task AddAsync(WorkspaceWithoutTasks workspace)
+    public async Task AddAsync(WorkspaceWithoutTasks workspace)
     {
         WorkspaceEntity workspaceEntity = _mapper.Map<WorkspaceEntity>(workspace);
         
@@ -44,7 +45,7 @@ public class WorkspaceRepository : IWorkspaceRepository
         await _context.SaveChangesAsync();
     }
     
-    public async Task RemoveAsync(Guid id)
+    /*public async Task RemoveAsync(Guid id)
     {
         WorkspaceEntity workspaceEntity = await _context.Workspaces
             .Include(w => w.Tasks)
