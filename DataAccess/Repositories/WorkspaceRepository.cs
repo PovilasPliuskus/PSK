@@ -44,6 +44,7 @@ public class WorkspaceRepository : IWorkspaceRepository
         
         await _context.SaveChangesAsync();
     }
+    
     public async Task UpdateAsync(WorkspaceWithoutTasks workspace)
     {
         WorkspaceEntity existingEntity = await _context.Workspaces
