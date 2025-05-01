@@ -57,7 +57,7 @@ public class WorkspaceRepository : IWorkspaceRepository
         await _context.SaveChangesAsync();
     }
     
-    /*public async Task RemoveAsync(Guid id)
+    public async Task RemoveAsync(Guid id)
     {
         WorkspaceEntity workspaceEntity = await _context.Workspaces
             .Include(w => w.Tasks)
@@ -66,5 +66,5 @@ public class WorkspaceRepository : IWorkspaceRepository
         _context.Workspaces.Remove(workspaceEntity);
 
         await _context.SaveChangesAsync();
-    }*/
+    }
 }

@@ -9,5 +9,5 @@ public interface IWorkspaceRepository
     Task<Workspace> GetSingleAsync(Guid id);
     Task AddAsync(WorkspaceWithoutTasks workspace);
     Task UpdateAsync(WorkspaceWithoutTasks workspace);
-    /*Task RemoveAsync(Guid id);*/
+    Task RemoveAsync(Guid id);
 }

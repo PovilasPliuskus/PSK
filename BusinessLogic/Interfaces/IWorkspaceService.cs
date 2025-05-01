@@ -9,5 +9,5 @@ public interface IWorkspaceService
     Task<GetWorkspaceResponse> GetWorkspaceByIdAsync(Guid workspaceId);
     Task CreateWorkspaceAsync(CreateWorkspaceRequest request);
     Task UpdateWorkspaceAsync(UpdateWorkspaceRequest request);
-    /*Task DeleteWorkspaceAsync(Guid id);*/
+    Task DeleteWorkspaceAsync(Guid id);
 }

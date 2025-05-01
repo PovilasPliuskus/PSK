@@ -48,4 +48,12 @@ public class WorkspaceController : ControllerBase
 
         return Ok();
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteWorkspaceAsync(Guid id)
+    {
+        await _workspaceService.DeleteWorkspaceAsync(id);
+
+        return Ok();
+    }
 }

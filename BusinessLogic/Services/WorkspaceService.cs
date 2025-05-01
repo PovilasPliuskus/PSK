@@ -47,8 +47,8 @@ public class WorkspaceService : IWorkspaceService
         await _workspaceRepository.UpdateAsync(workspace);
     }
 
-    /*public Task DeleteWorkspaceAsync(Guid id)
+    public async Task DeleteWorkspaceAsync(Guid id)
     {
-        throw new NotImplementedException();
-    }*/
+        await _workspaceRepository.RemoveAsync(id);
+    }
 }
