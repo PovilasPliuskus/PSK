@@ -34,9 +34,17 @@ public class WorkspaceController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateWorkspaceAsync(CreateWorkspaceRequest request)
+    public async Task<IActionResult> CreateWorkspaceAsync([FromBody] CreateWorkspaceRequest request)
     {
         await _workspaceService.CreateWorkspaceAsync(request);
+
+        return Ok();
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateWorkspaceAsync([FromBody] UpdateWorkspaceRequest request)
+    {
+        await _workspaceService.UpdateWorkspaceAsync(request);
 
         return Ok();
     }

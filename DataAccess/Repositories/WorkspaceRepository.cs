@@ -44,18 +44,6 @@ public class WorkspaceRepository : IWorkspaceRepository
         
         await _context.SaveChangesAsync();
     }
-    
-    /*public async Task RemoveAsync(Guid id)
-    {
-        WorkspaceEntity workspaceEntity = await _context.Workspaces
-            .Include(w => w.Tasks)
-            .FirstAsync(w => w.Id == id);
-
-        _context.Workspaces.Remove(workspaceEntity);
-
-        await _context.SaveChangesAsync();
-    }
-    
     public async Task UpdateAsync(WorkspaceWithoutTasks workspace)
     {
         WorkspaceEntity existingEntity = await _context.Workspaces
@@ -65,6 +53,17 @@ public class WorkspaceRepository : IWorkspaceRepository
         existingEntity.FkCreatedByUserEmail = workspace.CreatedByUserEmail;
         
         _context.Workspaces.Update(existingEntity);
+
+        await _context.SaveChangesAsync();
+    }
+    
+    /*public async Task RemoveAsync(Guid id)
+    {
+        WorkspaceEntity workspaceEntity = await _context.Workspaces
+            .Include(w => w.Tasks)
+            .FirstAsync(w => w.Id == id);
+
+        _context.Workspaces.Remove(workspaceEntity);
 
         await _context.SaveChangesAsync();
     }*/

@@ -23,5 +23,10 @@ public class WorkspaceProfile : Profile
         CreateMap<CreateWorkspaceRequest, WorkspaceWithoutTasks>()
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.CreatedByUserEmail, opt => opt.MapFrom(src => src.CreatedByUserEmail));
+        
+        CreateMap<UpdateWorkspaceRequest, WorkspaceWithoutTasks>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.CreatedByUserEmail, opt => opt.MapFrom(src => src.CreatedByUserEmail));
     }
 }

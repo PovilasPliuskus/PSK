@@ -8,6 +8,6 @@ public interface IWorkspaceService
     Task<GetWorkspacesResponse> GetAllWorkspacesAsync();
     Task<GetWorkspaceResponse> GetWorkspaceByIdAsync(Guid workspaceId);
     Task CreateWorkspaceAsync(CreateWorkspaceRequest request);
-    /*Task UpdateWorkspaceAsync(UpdateWorkspaceRequest request);
-    Task DeleteWorkspaceAsync(Guid id);*/
+    Task UpdateWorkspaceAsync(UpdateWorkspaceRequest request);
+    /*Task DeleteWorkspaceAsync(Guid id);*/
 }

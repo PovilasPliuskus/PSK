@@ -40,12 +40,14 @@ public class WorkspaceService : IWorkspaceService
         await _workspaceRepository.AddAsync(workspace);
     }
 
-    /*public Task UpdateWorkspaceAsync(UpdateWorkspaceRequest request)
+    public async Task UpdateWorkspaceAsync(UpdateWorkspaceRequest request)
     {
-        throw new NotImplementedException();
+        var workspace = _mapper.Map<WorkspaceWithoutTasks>(request);
+        
+        await _workspaceRepository.UpdateAsync(workspace);
     }
 
-    public Task DeleteWorkspaceAsync(Guid id)
+    /*public Task DeleteWorkspaceAsync(Guid id)
     {
         throw new NotImplementedException();
     }*/
