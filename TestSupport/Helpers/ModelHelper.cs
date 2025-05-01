@@ -80,7 +80,9 @@ public class ModelHelper
             UpdatedAt = DateTime.UtcNow,
             Name = "Workspace name",
             CreatedByUserEmail = "example@mail.com",
-            Tasks = task as ICollection<Contracts.Models.Task>
+            Tasks = task is not null
+                ? [task]
+                : null
         };
     }
     
