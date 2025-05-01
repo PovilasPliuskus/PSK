@@ -2,5 +2,5 @@
 
 public class GetWorkspaceTasksResponse
 {
-    public List<GetTaskResponse>? Tasks { get; set; }
+    public List<GetTaskResponse>? Tasks { get; init; }
 }
