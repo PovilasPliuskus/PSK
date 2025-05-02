@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useKeycloak } from '@react-keycloak/web';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Container, Navbar, Nav, Button } from 'react-bootstrap';
 import DemoForm from './components/domain/Demo';
 
@@ -46,7 +46,7 @@ function App() {
 }
 
 function InnerApp() {
-  const { keycloak, initialized } = useKeycloak();
+  const { keycloak } = useKeycloak();
   useAxiosInterceptor();
 
   const fetchProtectedData = async () => {

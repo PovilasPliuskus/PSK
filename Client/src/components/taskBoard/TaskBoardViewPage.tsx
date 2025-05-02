@@ -20,8 +20,6 @@ import keycloak from '../../keycloak';
 import SomethingWentWrong from "../base/SomethingWentWrong.tsx";
 import Loading from "../base/Loading.tsx";
 import ScriptResources from "../../assets/resources/strings.ts";
-import { desc } from "framer-motion/client";
-import { Update } from "vite/types/hmrPayload.js";
 
 export const TaskBoardViewPage = () => {
   const { id } = useParams();
@@ -516,7 +514,7 @@ const BurnBarrel = ({
   const handleDragEnd = (e: DragEvent) => {
     const cardId = e.dataTransfer.getData("cardId");
 
-    const cardDeletionRequest = (cardId) => {
+    const cardDeletionRequest = (cardId : string) => {
       axiosInstance.delete(`/task/${cardId}`)
       .then(response => {
         console.log(response);
