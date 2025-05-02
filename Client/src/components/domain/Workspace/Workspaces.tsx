@@ -144,6 +144,10 @@ const Workspaces: React.FC = () => {
         setShowModal(false);
         setNewWorkspaceName('');
     };
+
+    const handleNaivgationToWorkspace = (workspaceId: string) => {
+        navigate(`/task-page/${workspaceId}`);
+    };
     
     return (
         <div className="m-5">
@@ -152,6 +156,7 @@ const Workspaces: React.FC = () => {
                     {alertMessage}
                 </div>
             )}
+            <p>Double click on workspace to see all tasks.</p>
             <button className="btn btn-primary mb-3" onClick={handleModalShow}>
                 <span className="material-icons me-2" style={{verticalAlign: 'middle'}}>add</span>
                 {ScriptResources.CreateNew}
@@ -170,7 +175,7 @@ const Workspaces: React.FC = () => {
                 <tbody>
                 {workspaces.map((workspace) => (
                     <tr key={workspace.id}
-                        onDoubleClick={() => handleEditClick(workspace.id)}>
+                        onDoubleClick={() => handleNaivgationToWorkspace(workspace.id)}>
                         <td>{workspace.id}</td>
                         <td>{workspace.name}</td>
                         <td>{workspace.createdByUserEmail}</td>
@@ -181,7 +186,7 @@ const Workspaces: React.FC = () => {
                                     style={{cursor: 'pointer'}}
                                     onClick={() => handleEditClick(workspace.id)}
                                 >
-                                    open_in_new
+                                    edit
                                 </span>
                                 <span
                                     className="material-icons"
@@ -205,6 +210,7 @@ const Workspaces: React.FC = () => {
                 onPageSizeChange={(size) => setPageSize(size)}
             />
 
+            {/* Create new modal */}
             <Modal show={showModal} onHide={handleModalClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>{ScriptResources.CreateNew}</Modal.Title>
@@ -232,7 +238,7 @@ const Workspaces: React.FC = () => {
                 </Modal.Footer>
             </Modal>
 
-            // Edit modal
+            {/* Edit modal */}
             <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>{ScriptResources.EditWorkspace}</Modal.Title>

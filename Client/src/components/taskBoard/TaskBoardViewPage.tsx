@@ -35,7 +35,7 @@ export const TaskBoardViewPage = () => {
         params: { pageNumber: 1, pageSize: 10 },
       })
       .then(response => {
-        setCards(response.data);
+        setCards(response.data.tasks);
       })
       .catch(error => {
         setError(error);
