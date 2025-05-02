@@ -20,17 +20,17 @@ public class WorkspaceRepository : IWorkspaceRepository
         _context = context;
         _mapper = mapper;
     }
-    
+
     public async Task<PaginatedResult<WorkspaceWithoutTasks>> GetRangeAsync(int pageNumber, int pageSize)
     {
         List<WorkspaceEntity> workspaceEntities = await _context.Workspaces
             .Paginate(pageNumber, pageSize)
             .ToListAsync();
-        
+
         int workspaceCount = await _context.Workspaces.CountAsync();
-        
+
         var workspaces = _mapper.Map<List<WorkspaceWithoutTasks>>(workspaceEntities);
-        
+
         return new PaginatedResult<WorkspaceWithoutTasks>(workspaces, workspaceCount, pageNumber, pageSize);
     }
 
@@ -39,19 +39,19 @@ public class WorkspaceRepository : IWorkspaceRepository
         WorkspaceEntity workspaceEntity = await _context.Workspaces
             .Include(w => w.Tasks)
             .FirstAsync(w => w.Id == id);
-        
+
         return _mapper.Map<Workspace>(workspaceEntity);
     }
 
     public async Task AddAsync(WorkspaceWithoutTasks workspace)
     {
         WorkspaceEntity workspaceEntity = _mapper.Map<WorkspaceEntity>(workspace);
-        
+
         await _context.Workspaces.AddAsync(workspaceEntity);
-        
+
         await _context.SaveChangesAsync();
     }
-    
+
     public async Task UpdateAsync(WorkspaceWithoutTasks workspace)
     {
         WorkspaceEntity existingEntity = await _context.Workspaces
@@ -59,12 +59,12 @@ public class WorkspaceRepository : IWorkspaceRepository
 
         existingEntity.Name = workspace.Name;
         existingEntity.FkCreatedByUserEmail = workspace.CreatedByUserEmail;
-        
+
         _context.Workspaces.Update(existingEntity);
 
         await _context.SaveChangesAsync();
     }
-    
+
     public async Task RemoveAsync(Guid id)
     {
         WorkspaceEntity workspaceEntity = await _context.Workspaces
