@@ -19,12 +19,16 @@ builder.Services.AddDbContext<TaskManagerContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddTransient<ITaskService, TaskService>();
+builder.Services.AddTransient<IWorkspaceService, WorkspaceService>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
 
 var mapperConfig = new MapperConfiguration(cfg =>
 {
     cfg.AddProfile<BusinessLogic.Profiles.TaskProfile>();
     cfg.AddProfile<DataAccess.Profiles.TaskProfile>();
+    cfg.AddProfile<BusinessLogic.Profiles.WorkspaceProfile>();
+    cfg.AddProfile<DataAccess.Profiles.WorkspaceProfile>();
 });
 
 builder.Services.AddSingleton(mapperConfig.CreateMapper());

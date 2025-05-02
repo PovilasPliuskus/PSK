@@ -79,7 +79,22 @@ public class ModelHelper
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow,
             Name = "Workspace name",
-            Tasks = task as ICollection<Contracts.Models.Task>
+            CreatedByUserEmail = "example@mail.com",
+            Tasks = task is not null
+                ? [task]
+                : null
+        };
+    }
+    
+    public static WorkspaceWithoutTasks GetDefaultWorkspaceWithoutTasksModel(Guid id)
+    {
+        return new WorkspaceWithoutTasks
+        {
+            Id = id,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow,
+            Name = "Workspace name",
+            CreatedByUserEmail = "example@mail.com",
         };
     }
 }

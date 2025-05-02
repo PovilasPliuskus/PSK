@@ -21,4 +21,19 @@ public class EntityHelper
             Priority = PriorityEnum.High,
         };
     }
+
+    public static WorkspaceEntity GetDefaultWorkspaceEntity(Guid workspaceId, string createdByUserEmail)
+    {
+        var taskEntity = GetDefaultTaskEntity(workspaceId, createdByUserEmail);
+
+        return new WorkspaceEntity
+        {
+            Name = "Workspace name",
+            FkCreatedByUserEmail = createdByUserEmail,
+            Tasks = new List<TaskEntity>
+            {
+                taskEntity
+            }
+        };
+    }
 }
