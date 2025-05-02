@@ -26,3 +26,15 @@ export type CreateCardType = {
   type: TypeEnum;
   priority: PriorityEnum;
 }
+
+export type UpdateCardType = {
+  id: string;
+  name: string;
+  dueDate?: Date | null;
+  assignedToUserEmail?: string | null;
+  description?: string | null;
+  status: StatusEnum;
+  estimate: EstimateEnum;
+  type: TypeEnum;
+  priority: PriorityEnum;
+}

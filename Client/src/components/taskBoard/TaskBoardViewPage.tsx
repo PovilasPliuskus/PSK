@@ -13,13 +13,15 @@ import { BsHammer } from "react-icons/bs";
 import './TaskBoardViewPage.css';
 import { Button, Modal, Form } from "react-bootstrap";
 import { estimateMapper, priorityMapper, statusMapper, typeMapper } from "../utils/enumMapper.tsx";
-import { CardType, CreateCardType, StatusEnum } from "../utils/types.ts";
+import { CardType, CreateCardType, StatusEnum, UpdateCardType } from "../utils/types.ts";
 import { axiosInstance } from '../../utils/axiosInstance';
 import { useParams } from "react-router-dom";
 import keycloak from '../../keycloak';
 import SomethingWentWrong from "../base/SomethingWentWrong.tsx";
 import Loading from "../base/Loading.tsx";
 import ScriptResources from "../../assets/resources/strings.ts";
+import { desc } from "framer-motion/client";
+import { Update } from "vite/types/hmrPayload.js";
 
 export const TaskBoardViewPage = () => {
   const { id } = useParams();
@@ -139,6 +141,18 @@ const Column = ({
     // make patch api call
     console.log("api call to change task status: ");
     console.log(card);
+    
+    const cardPutRequest = (card : CardType) => {
+      axiosInstance.put(`/task`, card)
+      .then(response => {
+        console.log(response);
+        const returnedCard = response.data;
+      })
+      .catch(error => {
+        console.log(error);
+      })
+    }
+    cardPutRequest(card);
   }
 
   const handleDragEnd = (e: DragEvent) => {
@@ -283,18 +297,16 @@ const Card = ({
 }: CardProps) => {
   const [isOver, setIsOver] = useState(null);
   const [show, setShow] = useState(false);
-  const [taskDetails, setTaskDetails] = useState<CardType>({
-    name,
-    id,
-    status,
-    fkCreatedByUserId: "00000000-0000-0000-0000-000000000000", 
-    fkWorkspaceId: "00000000-0000-0000-0000-000000000000", 
-    fkAssignedToUserId: null,
-    dueDate,
-    description,
-    estimate,
-    type,
-    priority,
+  const [taskDetails, setTaskDetails] = useState<UpdateCardType>({
+      id,
+      name,
+      dueDate: dueDate ? new Date(dueDate) : null,
+      assignedToUserEmail: null,
+      description,
+      status,
+      estimate,
+      type,
+      priority,
   });
 
   const handleClose = () => setShow(false);
@@ -303,6 +315,7 @@ const Card = ({
   const handleEditClick = () => {
     handleShow();
     console.log("clicked with id" + id);
+    console.log("Clicked with dueDate" + dueDate);
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -310,36 +323,40 @@ const Card = ({
 
     setTaskDetails((prevDetails) => ({
       ...prevDetails,
-      [name]: name === "status" || name === "estimate" || name === "type" || name === "priority" 
-      ? parseInt(value, 10)
-      : value,
+      [name]: name === "status" || name === "estimate" || name === "type" || name === "priority"
+        ? parseInt(value, 10)  // Ensure parsing for integer fields
+        : name === "dueDate"
+        ? new Date(value) // Parse dueDate field as a Date object
+        : value,
     }));
   };
 
   const handleSave = () => {
     const updatedCard = {
-      Name : taskDetails.name,
-      Status : taskDetails.status,
-      Estimate : taskDetails.estimate,
-      Type : taskDetails.type,
-      Priority : taskDetails.priority
+      id: taskDetails.id,
+      name : taskDetails.name,
+      dueDate: taskDetails.dueDate,
+      assignedToUserEmail: taskDetails.assignedToUserEmail,
+      description: taskDetails.description,
+      status : taskDetails.status,
+      estimate : taskDetails.estimate,
+      type : taskDetails.type,
+      priority : taskDetails.priority
     }
 
     console.log("Saving changes:", updatedCard);
-    // using pre-set workspace id while workspaces are not implemented
-    const cardPatchRequest = (updatedCard) => {
-      axiosInstance.put(`/task/${taskDetails.id}`, updatedCard)
+    const cardPutRequest = (updatedCard : UpdateCardType) => {
+      axiosInstance.put(`/task`, updatedCard)
       .then(response => {
         console.log(response);
         const returnedCard = response.data;
-        // TODO update cards once response is received.
       })
       .catch(error => {
         console.log(error);
       })
     }
 
-    cardPatchRequest(updatedCard);
+    cardPutRequest(updatedCard);
     setShow(false);
   };
 
@@ -407,7 +424,7 @@ const Card = ({
               <Form.Control
                 type="date"
                 name="dueDate"
-                value={taskDetails.dueDate}
+                value={taskDetails.dueDate ? taskDetails.dueDate.toISOString().split("T")[0] : ""}
                 onChange={handleInputChange}
               />
             </Form.Group>
