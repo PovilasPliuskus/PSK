@@ -24,13 +24,13 @@ const Workspaces: React.FC = () => {
         const fetchItems = () => {
             setError(null);
             setIsLoading(true);
-            axiosInstance.get(`/workspaces`, {
+            axiosInstance.get(`/workspace`, {
                 params: { pageNumber: currentPage, pageSize: pageSize },
             })
             .then(response => {
-                setWorkspaces(response.data.data || []);
-                setTotalPages(response.data.totalPages || 0);
-                setTotalItems(response.data.totalItems || 0);
+                setWorkspaces(response.data.workspaces.items || []);
+                setTotalPages(response.data.workspaces.totalPages || 0);
+                setTotalItems(response.data.workspaces.totalItems || 0);
             })
             .catch(error => {
                 setError(error);
@@ -92,7 +92,7 @@ const Workspaces: React.FC = () => {
                         onDoubleClick={() => handleIconClick(workspace.id)}>
                         <td>{workspace.id}</td>
                         <td>{workspace.name}</td>
-                        <td>{workspace.createdBy}</td>
+                        <td>{workspace.createdByUserEmail}</td>
                         <td>{new Date(workspace.createdAt).toLocaleString()}</td>
                         <td>
                                 <span
