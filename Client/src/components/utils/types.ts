@@ -16,3 +16,13 @@ export type CardType = {
   type: TypeEnum;
   priority: PriorityEnum;
 };
+
+export type CreateCardType = {
+  name: string;
+  createdByUserEmail: string;
+  workspaceId: string;
+  status: StatusEnum;
+  estimate: EstimateEnum;
+  type: TypeEnum;
+  priority: PriorityEnum;
+}
