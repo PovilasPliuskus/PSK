@@ -1,3 +1,4 @@
+import { BiSave } from "react-icons/bi";
 import Loading from "../../components/base/Loading";
 import SomethingWentWrong from "../../components/base/SomethingWentWrong";
 
@@ -30,6 +31,9 @@ const ScriptResources = {
     DeleteConfirmation: 'Are you sure you want to delete this item?',
     WorkspaceDeleted: 'Workspace deleted successfully.',
     ErrorDeletingWorkspace: 'Error deleting workspace',
+    EditWorkspace: 'Edit Workspace',
+    Save: 'Save',
+    ErrorUpdatingWorkspace: 'Error updating workspace',
 }
 
 export default ScriptResources;

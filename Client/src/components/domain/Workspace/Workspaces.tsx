@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
-import { Table, Container, Modal, Button, Form } from 'react-bootstrap';
+import { Table, Modal, Button, Form } from 'react-bootstrap';
 import Pagination from '../../base/Pagination';
 import keycloak from '../../../keycloak';
 import ScriptResources from '../../../assets/resources/strings';
@@ -23,6 +23,10 @@ const Workspaces: React.FC = () => {
     const [newWorkspaceName, setNewWorkspaceName] = useState('');
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
     const [alertVariant, setAlertVariant] = useState<'success' | 'danger' | null>(null);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [workspaceToEdit, setWorkspaceToEdit] = useState<Workspace | null>(null);
+    const [editedName, setEditedName] = useState('');
+
 
     const fetchItems = () => {
         setError(null);
@@ -46,27 +50,6 @@ const Workspaces: React.FC = () => {
     };
 
     useEffect(() => {
-        // const fetchItems = () => {
-        //     setError(null);
-        //     setIsLoading(true);
-        //     axiosInstance.get(`/workspace`, {
-        //         params: { pageNumber: currentPage, pageSize: pageSize },
-        //     })
-        //     .then(response => {
-        //         setWorkspaces(response.data.workspaces.items || []);
-        //         setTotalPages(response.data.workspaces.totalPages || 0);
-        //         setTotalItems(response.data.workspaces.totalItems || 0);
-        //     })
-        //     .catch(error => {
-        //         setError(error);
-        //         console.error(ScriptResources.ErrorFetchingWorkspaces, error);
-        //         setWorkspaces([]);
-        //     })
-        //     .finally(() => {
-        //         setIsLoading(false);
-        //     });
-        // }
-
         if (keycloak.authenticated) {
             fetchItems();
         }
@@ -81,15 +64,36 @@ const Workspaces: React.FC = () => {
         return <Loading message={ScriptResources.LoadingOrLogin} />;
     }
 
-    const handleCreateNew = () => {
-        navigate('/workspaces/new');
+    const handleEditClick = (workspaceId: string) => {
+        const workspace = workspaces.find(w => w.id === workspaceId);
+        if (workspace) {
+            setWorkspaceToEdit(workspace);
+            setEditedName(workspace.name);
+            setShowEditModal(true);
+        }
     };
 
-    const handleIconClick = (workspaceId: string) => {
-        // Turėtų naviguoti į workspace readagavimo puslapį, kuriame bus visi task'ai parodyti. Kosto dalis.
-        navigate(`/task-page/${workspaceId}`);
+    // Edit workspace
+    const handleEditWorkspace = async () => {
+        if (!workspaceToEdit) return;
+    
+        try {
+            await axiosInstance.put(`/workspace/`, {
+                id: workspaceToEdit.id,
+                name: editedName,
+                createdByUserEmail: workspaceToEdit.createdByUserEmail,
+            });
+    
+            setShowEditModal(false);
+            fetchItems();
+        } catch (err) {
+            console.error("Error updating workspace:", err);
+            setAlertMessage(ScriptResources.ErrorUpdatingWorkspace);
+            setAlertVariant("danger");
+        }
     };
 
+    // Delete workspace
     const handleDelete = (workspaceId: string) => {
         if (window.confirm(ScriptResources.DeleteConfirmation)) {
             axiosInstance.delete(`/workspace/${workspaceId}`)
@@ -109,6 +113,7 @@ const Workspaces: React.FC = () => {
         }
     };
 
+    // Create new workspace
     const handleModalShow = () => setShowModal(true);
 
     const handleCreateWorkspace = async () => {
@@ -165,7 +170,7 @@ const Workspaces: React.FC = () => {
                 <tbody>
                 {workspaces.map((workspace) => (
                     <tr key={workspace.id}
-                        onDoubleClick={() => handleIconClick(workspace.id)}>
+                        onDoubleClick={() => handleEditClick(workspace.id)}>
                         <td>{workspace.id}</td>
                         <td>{workspace.name}</td>
                         <td>{workspace.createdByUserEmail}</td>
@@ -174,7 +179,7 @@ const Workspaces: React.FC = () => {
                                 <span
                                     className="material-icons"
                                     style={{cursor: 'pointer'}}
-                                    onClick={() => handleIconClick(workspace.id)}
+                                    onClick={() => handleEditClick(workspace.id)}
                                 >
                                     open_in_new
                                 </span>
@@ -224,6 +229,29 @@ const Workspaces: React.FC = () => {
                     <Button variant="primary" onClick={handleCreateWorkspace}>
                         {ScriptResources.Create}
                     </Button>
+                </Modal.Footer>
+            </Modal>
+
+            // Edit modal
+            <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{ScriptResources.EditWorkspace}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={editedName}
+                        onChange={(e) => setEditedName(e.target.value)}
+                    />
+                </Modal.Body>
+                <Modal.Footer>
+                    <button className="btn btn-secondary" onClick={() => setShowEditModal(false)}>
+                        {ScriptResources.Cancel}
+                    </button>
+                    <button className="btn btn-primary" onClick={handleEditWorkspace}>
+                        {ScriptResources.Save}
+                    </button>
                 </Modal.Footer>
             </Modal>
         </div>
