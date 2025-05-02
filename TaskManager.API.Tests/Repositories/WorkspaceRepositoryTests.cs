@@ -27,7 +27,7 @@ public class WorkspaceRepositoryTests
     }
 
     [TestMethod]
-    public async Task GetAllAsync_ReturnsAllWorkspacesCorrectly()
+    public async Task GetRangeAsync_ReturnsRangeOfWorkspacesCorrectly()
     {
         await TransactionHelper.WrapInTransactionAndRollbackAsync(async context =>
         {
