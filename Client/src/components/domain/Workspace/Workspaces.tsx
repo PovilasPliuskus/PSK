@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
-import { Table, Container } from 'react-bootstrap';
+import { Table, Container, Modal, Button, Form } from 'react-bootstrap';
 import Pagination from '../../base/Pagination';
 import keycloak from '../../../keycloak';
 import ScriptResources from '../../../assets/resources/strings';
@@ -19,28 +19,53 @@ const Workspaces: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const [showModal, setShowModal] = useState(false);
+    const [newWorkspaceName, setNewWorkspaceName] = useState('');
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
+    const [alertVariant, setAlertVariant] = useState<'success' | 'danger' | null>(null);
+
+    const fetchItems = () => {
+        setError(null);
+        setIsLoading(true);
+        axiosInstance.get(`/workspace`, {
+            params: { pageNumber: currentPage, pageSize: pageSize },
+        })
+        .then(response => {
+            setWorkspaces(response.data.workspaces.items || []);
+            setTotalPages(response.data.workspaces.totalPages || 0);
+            setTotalItems(response.data.workspaces.totalItems || 0);
+        })
+        .catch(error => {
+            setError(error);
+            console.error(ScriptResources.ErrorFetchingWorkspaces, error);
+            setWorkspaces([]);
+        })
+        .finally(() => {
+            setIsLoading(false);
+        });
+    };
 
     useEffect(() => {
-        const fetchItems = () => {
-            setError(null);
-            setIsLoading(true);
-            axiosInstance.get(`/workspace`, {
-                params: { pageNumber: currentPage, pageSize: pageSize },
-            })
-            .then(response => {
-                setWorkspaces(response.data.workspaces.items || []);
-                setTotalPages(response.data.workspaces.totalPages || 0);
-                setTotalItems(response.data.workspaces.totalItems || 0);
-            })
-            .catch(error => {
-                setError(error);
-                console.error(ScriptResources.ErrorFetchingWorkspaces, error);
-                setWorkspaces([]);
-            })
-            .finally(() => {
-                setIsLoading(false);
-            });
-        }
+        // const fetchItems = () => {
+        //     setError(null);
+        //     setIsLoading(true);
+        //     axiosInstance.get(`/workspace`, {
+        //         params: { pageNumber: currentPage, pageSize: pageSize },
+        //     })
+        //     .then(response => {
+        //         setWorkspaces(response.data.workspaces.items || []);
+        //         setTotalPages(response.data.workspaces.totalPages || 0);
+        //         setTotalItems(response.data.workspaces.totalItems || 0);
+        //     })
+        //     .catch(error => {
+        //         setError(error);
+        //         console.error(ScriptResources.ErrorFetchingWorkspaces, error);
+        //         setWorkspaces([]);
+        //     })
+        //     .finally(() => {
+        //         setIsLoading(false);
+        //     });
+        // }
 
         if (keycloak.authenticated) {
             fetchItems();
@@ -66,12 +91,63 @@ const Workspaces: React.FC = () => {
     };
 
     const handleDelete = (workspaceId: string) => {
-        alert("Delete functionality is not implemented yet.");
-    }
+        if (window.confirm(ScriptResources.DeleteConfirmation)) {
+            axiosInstance.delete(`/workspace/${workspaceId}`)
+                .then(() => {
+                    setWorkspaces(workspaces.filter(workspace => workspace.id !== workspaceId));
+                    setAlertMessage(ScriptResources.WorkspaceDeleted);
+                    setAlertVariant('success');
+                    setTimeout(() => {
+                        setAlertMessage(null);
+                    }, 3000); // Clear alert after 3 seconds
+                })
+                .catch(error => {
+                    console.error('Error deleting workspace:', error);
+                    setAlertMessage(ScriptResources.ErrorDeletingWorkspace);
+                    setAlertVariant('danger');
+                });
+        }
+    };
+
+    const handleModalShow = () => setShowModal(true);
+
+    const handleCreateWorkspace = async () => {
+        try {
+            const userEmail = keycloak.tokenParsed?.email;
+            if (!userEmail) {
+                alert("User email not found in token.");
+                return;
+            }
+
+            const response = await axiosInstance.post('/workspace', {
+                name: newWorkspaceName,
+                createdByUserEmail: userEmail
+            });
+
+            if (response.status === 201 || response.status === 200) {
+                handleModalClose();
+                fetchItems();
+                setCurrentPage(1);
+            }
+        } catch (err) {
+            console.error('Error creating workspace:', err);
+            alert('Failed to create workspace.');
+        }
+    };
+
+    const handleModalClose = () => {
+        setShowModal(false);
+        setNewWorkspaceName('');
+    };
     
     return (
         <div className="m-5">
-            <button className="btn btn-primary mb-3" onClick={handleCreateNew}>
+            {alertMessage && (
+                <div className={`alert alert-${alertVariant} alert-dismissible fade show`} role="alert">
+                    {alertMessage}
+                </div>
+            )}
+            <button className="btn btn-primary mb-3" onClick={handleModalShow}>
                 <span className="material-icons me-2" style={{verticalAlign: 'middle'}}>add</span>
                 {ScriptResources.CreateNew}
             </button>
@@ -123,6 +199,33 @@ const Workspaces: React.FC = () => {
                 onPageChange={(page) => setCurrentPage(page)}
                 onPageSizeChange={(size) => setPageSize(size)}
             />
+
+            <Modal show={showModal} onHide={handleModalClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{ScriptResources.CreateNew}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group controlId="workspaceName">
+                            <Form.Label>{ScriptResources.WorkspaceName}</Form.Label>
+                            <Form.Control
+                                type="text"
+                                value={newWorkspaceName}
+                                onChange={(e) => setNewWorkspaceName(e.target.value)}
+                                placeholder="Enter workspace name"
+                            />
+                        </Form.Group>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleModalClose}>
+                        {ScriptResources.Cancel}
+                    </Button>
+                    <Button variant="primary" onClick={handleCreateWorkspace}>
+                        {ScriptResources.Create}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };

@@ -25,6 +25,11 @@ const ScriptResources = {
     Loading: 'Loading...',
     PleaseWait: 'Please wait while we load the data.',
     LoadingTakeLonger: 'If this takes longer than expected, please check your internet connection or try refreshing the page.',
+    Cancel: 'Cancel',
+    Create: 'Create',
+    DeleteConfirmation: 'Are you sure you want to delete this item?',
+    WorkspaceDeleted: 'Workspace deleted successfully.',
+    ErrorDeletingWorkspace: 'Error deleting workspace',
 }
 
 export default ScriptResources;
