@@ -1,8 +1,9 @@
 using Contracts.Models;
+using Contracts.Pagination;
 
 namespace Contracts.ResponseBodies;
 
 public class GetWorkspacesResponse
 {
-    public List<WorkspaceWithoutTasks>? Workspaces { get; init; }
+    public PaginatedResult<WorkspaceWithoutTasks>? Workspaces { get; init; }
 }

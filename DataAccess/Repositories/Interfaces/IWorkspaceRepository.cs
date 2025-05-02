@@ -1,11 +1,12 @@
 using Contracts.Models;
+using Contracts.Pagination;
 using Task = System.Threading.Tasks.Task;
 
 namespace DataAccess.Repositories.Interfaces;
 
 public interface IWorkspaceRepository
 {
-    Task<List<WorkspaceWithoutTasks>> GetAllAsync();
+    Task<PaginatedResult<WorkspaceWithoutTasks>> GetRangeAsync(int pageNumber, int pageSize);
     Task<Workspace> GetSingleAsync(Guid id);
     Task AddAsync(WorkspaceWithoutTasks workspace);
     Task UpdateAsync(WorkspaceWithoutTasks workspace);

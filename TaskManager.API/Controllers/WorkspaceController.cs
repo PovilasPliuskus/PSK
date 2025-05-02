@@ -18,9 +18,9 @@ public class WorkspaceController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetWorkspacesAsync()
+    public async Task<IActionResult> GetWorkspacePageAsync(int pageNumber, int pageSize)
     {
-        GetWorkspacesResponse response = await _workspaceService.GetAllWorkspacesAsync();
+        GetWorkspacesResponse response = await _workspaceService.GetWorkspacePageAsync(pageNumber, pageSize);
 
         return Ok(response);
     }

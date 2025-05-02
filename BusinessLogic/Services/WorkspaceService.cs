@@ -19,9 +19,9 @@ public class WorkspaceService : IWorkspaceService
         _mapper = mapper;
     }
     
-    public async Task<GetWorkspacesResponse> GetAllWorkspacesAsync()
+    public async Task<GetWorkspacesResponse> GetWorkspacePageAsync(int pageNumber, int pageSize)
     {
-        var workspaces = await _workspaceRepository.GetAllAsync();
+        var workspaces = await _workspaceRepository.GetRangeAsync(pageNumber, pageSize);
         
         return _mapper.Map<GetWorkspacesResponse>(workspaces);
     }

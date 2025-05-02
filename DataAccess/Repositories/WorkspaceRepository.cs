@@ -1,7 +1,9 @@
 using AutoMapper;
 using Contracts.Models;
+using Contracts.Pagination;
 using DataAccess.Context;
 using DataAccess.Entities;
+using DataAccess.Extensions;
 using DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Task = System.Threading.Tasks.Task;
@@ -19,12 +21,17 @@ public class WorkspaceRepository : IWorkspaceRepository
         _mapper = mapper;
     }
     
-    public async Task<List<WorkspaceWithoutTasks>> GetAllAsync()
+    public async Task<PaginatedResult<WorkspaceWithoutTasks>> GetRangeAsync(int pageNumber, int pageSize)
     {
-        List<WorkspaceEntity> workspaces = await _context.Workspaces
+        List<WorkspaceEntity> workspaceEntities = await _context.Workspaces
+            .Paginate(pageNumber, pageSize)
             .ToListAsync();
         
-        return _mapper.Map<List<WorkspaceWithoutTasks>>(workspaces);
+        int workspaceCount = await _context.Workspaces.CountAsync();
+        
+        var workspaces = _mapper.Map<List<WorkspaceWithoutTasks>>(workspaceEntities);
+        
+        return new PaginatedResult<WorkspaceWithoutTasks>(workspaces, workspaceCount, pageNumber, pageSize);
     }
 
     public async Task<Workspace> GetSingleAsync(Guid id)

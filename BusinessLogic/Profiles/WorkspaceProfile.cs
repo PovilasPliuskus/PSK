@@ -1,5 +1,6 @@
 using AutoMapper;
 using Contracts.Models;
+using Contracts.Pagination;
 using Contracts.RequestBodies;
 using Contracts.ResponseBodies;
 
@@ -9,7 +10,7 @@ public class WorkspaceProfile : Profile
 {
     public WorkspaceProfile()
     {
-        CreateMap<List<WorkspaceWithoutTasks>, GetWorkspacesResponse>()
+        CreateMap<PaginatedResult<WorkspaceWithoutTasks>, GetWorkspacesResponse>()
             .ForMember(dest => dest.Workspaces, opt => opt.MapFrom(src => src));
         
         CreateMap<Workspace, GetWorkspaceResponse>()
