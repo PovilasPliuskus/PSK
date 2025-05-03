@@ -1,7 +1,3 @@
-import { BiSave } from "react-icons/bi";
-import Loading from "../../components/base/Loading";
-import SomethingWentWrong from "../../components/base/SomethingWentWrong";
-
 const ScriptResources = {
     Page404: '404 - Page Not Found',
     PageDoNotExist: 'The page you are looking for does not exist.',
