@@ -139,17 +139,41 @@ const Column = ({
     // make patch api call
     console.log("api call to change task status: ");
     console.log(card);
-    
-    const cardPutRequest = (card : CardType) => {
-      axiosInstance.put(`/task`, card)
-      .then(response => {
-        console.log(response);
-        const returnedCard = response.data;
-      })
-      .catch(error => {
-        console.log(error);
-      })
-    }
+
+    const cardPutRequest = async (card: CardType, force: boolean = false) => {
+      try {
+          const response = await axiosInstance.put(`/task`, {
+              ...card,
+              force
+          });
+          console.log("Task updated:", response.data);
+      } catch (error: any) {
+          if (error.status === 409) {
+              const userChoice = window.confirm(
+                  "This task has been modified by someone else. Would you like to overwrite their changes?\n\n" +
+                  "• Click 'OK' to overwrite with your changes\n" +
+                  "• Click 'Cancel' to refresh and see the latest version"
+              );
+
+              if (userChoice) {
+                  try {
+                      const forceResponse = await axiosInstance.put(`/task`, {
+                          ...card,
+                          force: true
+                      });
+                      console.log("Task forcibly updated:", forceResponse.data);
+                  } catch (forceErr) {
+                      console.error("Error forcing task update:", forceErr);
+                  }
+              } else {
+                  console.log("User opted to refresh instead of overwriting.");
+                  fetchTasks();
+              }
+          } else {
+              console.error("Error updating task:", error);
+          }
+      }
+    };
     cardPutRequest(card);
   }
 
@@ -268,7 +292,7 @@ const Column = ({
         className={`column-content ${active ? "column-content-active" : ""}`}
       >
         {filteredCards.map((c) => {
-          return <Card key={c.id} {...c} handleDragStart={handleDragStart} />;
+          return <Card key={c.id} {...c} handleDragStart={handleDragStart} fetchTasks={fetchTasks} />;
         })}
         <DropIndicator beforeId={null} column={column} />
         <AddCard column={column} setCards={setCards} fetchTasks={fetchTasks} />
@@ -279,6 +303,7 @@ const Column = ({
 
 type CardProps = CardType & {
   handleDragStart: Function;
+  fetchTasks: () => void;
 };
 
 
@@ -292,6 +317,7 @@ const Card = ({
   estimate,
   type,
   priority,
+  fetchTasks,
 }: CardProps) => {
   const [isOver, setIsOver] = useState(null);
   const [show, setShow] = useState(false);
@@ -305,6 +331,8 @@ const Card = ({
       estimate,
       type,
       priority,
+      version: 0,
+      force: false,
   });
 
   const handleClose = () => setShow(false);
@@ -339,21 +367,44 @@ const Card = ({
       status : taskDetails.status,
       estimate : taskDetails.estimate,
       type : taskDetails.type,
-      priority : taskDetails.priority
+      priority : taskDetails.priority,
+      version: taskDetails.version,
+      force: taskDetails.force,
     }
 
     console.log("Saving changes:", updatedCard);
-    const cardPutRequest = (updatedCard : UpdateCardType) => {
-      axiosInstance.put(`/task`, updatedCard)
-      .then(response => {
-        console.log(response);
-        const returnedCard = response.data;
-      })
-      .catch(error => {
-        console.log(error);
-      })
-    }
 
+    const cardPutRequest = async (updatedCard: UpdateCardType) => {
+      try {
+          const response = await axiosInstance.put(`/task`, updatedCard);
+          console.log("Task updated:", response.data);
+      } catch (error: any) {
+          if (error.status === 409) {
+              const userChoice = window.confirm(
+                  "This task has been modified by someone else. Would you like to overwrite their changes?\n\n" +
+                  "• Click 'OK' to overwrite with your changes\n" +
+                  "• Click 'Cancel' to refresh and see the latest version"
+              );
+  
+              if (userChoice) {
+                  try {
+                      const forceResponse = await axiosInstance.put(`/task`, {
+                          ...updatedCard,
+                          force: true
+                      });
+                      console.log("Task forcibly updated:", forceResponse.data);
+                  } catch (forceErr) {
+                      console.error("Error forcing task update:", forceErr);
+                  }
+              } else {
+                  console.log("User opted to refresh instead of overwriting.");
+                  fetchTasks();
+              }
+          } else {
+              console.error("Error updating task:", error);
+          }
+      }
+    };
     cardPutRequest(updatedCard);
     setShow(false);
   };
@@ -567,6 +618,8 @@ const AddCard = ({ column, setCards, fetchTasks }: AddCardProps) => {
       Estimate: 1, // Default value
       Type: 2, // Default value
       Priority: 2, // Default value
+      version: 0,
+      force: false,
     };
 
     // using pre-set workspace id while workspaces are not implemented

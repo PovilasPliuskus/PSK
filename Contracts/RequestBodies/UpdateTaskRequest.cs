@@ -13,4 +13,6 @@ public class UpdateTaskRequest
     public EstimateEnum? Estimate { get; set; }
     public TypeEnum? Type { get; set; }
     public PriorityEnum? Priority { get; set; }
+    public required uint Version { get; set; }
+    public bool Force { get; set; } = false;
 }
