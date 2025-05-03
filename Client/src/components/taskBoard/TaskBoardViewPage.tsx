@@ -38,7 +38,7 @@ export const TaskBoardViewPage = () => {
     })
     .catch(error => {
       setError(error);
-      console.log(error);
+      console.error(error);
     })
     .finally(() => {
       setIsLoading(false);
@@ -53,7 +53,6 @@ export const TaskBoardViewPage = () => {
   },[id, keycloak.authenticated])
 
   if(error != null){
-    // tas global error dinksta po 5s, gal vertetu tureti bendra komponenta ilgesniam error'o atvaizdavimui?
     return <SomethingWentWrong onRetry={() => window.location.reload()} />;
   } if(isLoading){
     return <Loading message={ScriptResources.LoadingOrLogin} />;
@@ -136,17 +135,12 @@ const Column = ({
   };
 
   const changeCardStatusInBackend = (card : CardType) => {
-    // make patch api call
-    console.log("api call to change task status: ");
-    console.log(card);
-
     const cardPutRequest = async (card: CardType, force: boolean = false) => {
       try {
-          const response = await axiosInstance.put(`/task`, {
+          await axiosInstance.put(`/task`, {
               ...card,
               force
           });
-          console.log("Task updated:", response.data);
       } catch (error: any) {
           if (error.status === 409) {
               const userChoice = window.confirm(
@@ -157,16 +151,14 @@ const Column = ({
 
               if (userChoice) {
                   try {
-                      const forceResponse = await axiosInstance.put(`/task`, {
+                      await axiosInstance.put(`/task`, {
                           ...card,
                           force: true
                       });
-                      console.log("Task forcibly updated:", forceResponse.data);
                   } catch (forceErr) {
                       console.error("Error forcing task update:", forceErr);
                   }
               } else {
-                  console.log("User opted to refresh instead of overwriting.");
                   fetchTasks();
               }
           } else {
@@ -340,8 +332,6 @@ const Card = ({
 
   const handleEditClick = () => {
     handleShow();
-    console.log("clicked with id" + id);
-    console.log("Clicked with dueDate" + dueDate);
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -372,12 +362,9 @@ const Card = ({
       force: taskDetails.force,
     }
 
-    console.log("Saving changes:", updatedCard);
-
     const cardPutRequest = async (updatedCard: UpdateCardType) => {
       try {
-          const response = await axiosInstance.put(`/task`, updatedCard);
-          console.log("Task updated:", response.data);
+          await axiosInstance.put(`/task`, updatedCard);
       } catch (error: any) {
           if (error.status === 409) {
               const userChoice = window.confirm(
@@ -388,16 +375,13 @@ const Card = ({
   
               if (userChoice) {
                   try {
-                      const forceResponse = await axiosInstance.put(`/task`, {
+                      await axiosInstance.put(`/task`, {
                           ...updatedCard,
                           force: true
                       });
-                      console.log("Task forcibly updated:", forceResponse.data);
                   } catch (forceErr) {
-                      console.error("Error forcing task update:", forceErr);
                   }
               } else {
-                  console.log("User opted to refresh instead of overwriting.");
                   fetchTasks();
               }
           } else {
@@ -568,13 +552,12 @@ const BurnBarrel = ({
     const cardDeletionRequest = (cardId : string) => {
       axiosInstance.delete(`/task/${cardId}`)
       .then(response => {
-        console.log(response);
         if (response.status === 200){
           setCards((pv) => pv.filter((c) => c.id !== cardId));
         }
       })
       .catch(error => {
-        console.log(error);
+        console.error(error);
       })
     }
 
@@ -613,26 +596,23 @@ const AddCard = ({ column, setCards, fetchTasks }: AddCardProps) => {
     const newCard: CreateCardType = {
       name: name.trim(),
       createdByUserEmail: keycloak.tokenParsed?.email || "",
-      workspaceId: id,
-      Status: column,
-      Estimate: 1, // Default value
-      Type: 2, // Default value
-      Priority: 2, // Default value
-      version: 0,
-      force: false,
+      workspaceId: id || "",
+      status: column,
+      estimate: 1, // Default value
+      type: 2, // Default value
+      priority: 2, // Default value
     };
 
     // using pre-set workspace id while workspaces are not implemented
     const cardCreationRequest = () => {
       axiosInstance.post(`/task`, newCard)
       .then(response => {
-        console.log(response);
         const returnedCard = response.data;
         setCards((pv) => [...pv, returnedCard]);
         fetchTasks();
       })
       .catch(error => {
-        console.log(error);
+        console.error(error);
       })
     }
     
