@@ -82,11 +82,44 @@ const Workspaces: React.FC = () => {
                 id: workspaceToEdit.id,
                 name: editedName,
                 createdByUserEmail: workspaceToEdit.createdByUserEmail,
+                version: workspaceToEdit.version,
             });
     
             setShowEditModal(false);
             fetchItems();
-        } catch (err) {
+        } catch (err: any) {
+            if (err.status === 409)
+            {
+                const userChoice = window.confirm(
+                    "This workspace has been modified by someone else. Would you like to overwrite their changes?\n\n" +
+                    "• Click 'OK' to overwrite with your changes\n" +
+                    "• Click 'Cancel' to refresh and see the latest version"
+                );
+
+                if (userChoice) {
+                    // User chose to overwrite - make the API call with force=true
+                    try {
+                        await axiosInstance.put(`/workspace/`, {
+                            id: workspaceToEdit.id,
+                            name: editedName,
+                            createdByUserEmail: workspaceToEdit.createdByUserEmail,
+                            version: workspaceToEdit.version,
+                            force: true
+                        });
+                        setShowEditModal(false);
+                        fetchItems();
+                    } catch (forceErr: any) {
+                        console.error("Error forcing workspace update:", forceErr);
+                        setAlertMessage(ScriptResources.ErrorUpdatingWorkspace);
+                        setAlertVariant("danger");
+                    }
+                } else {
+                    // User chose to get latest data
+                    setShowEditModal(false);
+                    fetchItems(); // Refresh to get the latest data
+                }
+                return;
+            }
             console.error("Error updating workspace:", err);
             setAlertMessage(ScriptResources.ErrorUpdatingWorkspace);
             setAlertVariant("danger");

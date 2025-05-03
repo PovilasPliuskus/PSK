@@ -30,6 +30,7 @@ public class WorkspaceProfile : Profile
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.CreatedByUserEmail, opt => opt.MapFrom(src => src.CreatedByUserEmail))
-            .ForMember(dest => dest.Version, opt => opt.MapFrom(src => src.Version));
+            .ForMember(dest => dest.Version, opt => opt.MapFrom(src => src.Version))
+            .ForMember(dest => dest.Force, opt => opt.MapFrom(src => src.Force));
     }
 }

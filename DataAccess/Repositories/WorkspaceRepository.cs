@@ -57,6 +57,11 @@ public class WorkspaceRepository : IWorkspaceRepository
         WorkspaceEntity existingEntity = await _context.Workspaces
             .FirstAsync(w => w.Id == workspace.Id);
 
+        if (!workspace.Force && existingEntity.Version != workspace.Version)
+        {
+            throw new DbUpdateConcurrencyException("The workspace has been modified by another user.");
+        }
+
         existingEntity.Name = workspace.Name;
         existingEntity.FkCreatedByUserEmail = workspace.CreatedByUserEmail;
 
