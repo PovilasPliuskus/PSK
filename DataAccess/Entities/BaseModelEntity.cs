@@ -12,4 +12,7 @@ public abstract class BaseModelEntity
 
     [Required]
     public DateTime UpdatedAt { get; set; }
+
+    [Timestamp]
+    public uint Version { get; set; }
 }

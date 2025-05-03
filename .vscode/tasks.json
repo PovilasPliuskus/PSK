@@ -27,6 +27,24 @@
           "kind": "build",
           "isDefault": true
         }
+      },
+      {
+        "label": "Run Both And Debug",
+        "dependsOn": ["Run Client", "Run API Debug"],
+        "dependsOrder": "parallel",
+        "group": {
+          "kind": "build",
+          "isDefault": false
+        }
+      },
+      {
+        "label": "Run API Debug",
+        "type": "shell",
+        "command": "dotnet run --configuration Debug",
+        "options": {
+          "cwd": "TaskManager.API"
+        },
+        "problemMatcher": []
       }
     ]
   }
