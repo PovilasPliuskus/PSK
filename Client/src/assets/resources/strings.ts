@@ -30,6 +30,21 @@ const ScriptResources = {
     EditWorkspace: 'Edit Workspace',
     Save: 'Save',
     ErrorUpdatingWorkspace: 'Error updating workspace',
+    OptimisticLockingUserChoice: 'This entity has been modified by someone else. Would you like to overwrite their changes?\n\n' + '• Click \'OK\' to overwrite with your changes\n' + '• Click \'Cancel\' to refresh and see the latest version',
+    EditTask: 'Edit Task',
+    Name: 'Name',
+    EnterTaskName: 'Enter task name',
+    EnterDescription: 'Enter description',
+    Description: 'Description',
+    DueDate: 'Due Date',
+    Estimate: 'Estimate',
+    Type: 'Type',
+    Priority: 'Priority',
+    Close: 'Close',
+    AddNewTaskName: 'Add New Task Name...',
+    Add: 'Add',
+    AddCard: 'Add Card',
+    DoubleClickToSeeAllTasks: 'Double click on workspace to see all tasks',
 }
 
 export default ScriptResources;

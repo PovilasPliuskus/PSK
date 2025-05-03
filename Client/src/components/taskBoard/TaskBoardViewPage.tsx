@@ -143,12 +143,7 @@ const Column = ({
           });
       } catch (error: any) {
           if (error.status === 409) {
-              const userChoice = window.confirm(
-                  "This task has been modified by someone else. Would you like to overwrite their changes?\n\n" +
-                  "• Click 'OK' to overwrite with your changes\n" +
-                  "• Click 'Cancel' to refresh and see the latest version"
-              );
-
+              const userChoice = window.confirm(ScriptResources.OptimisticLockingUserChoice);
               if (userChoice) {
                   try {
                       await axiosInstance.put(`/task`, {
@@ -367,12 +362,7 @@ const Card = ({
           await axiosInstance.put(`/task`, updatedCard);
       } catch (error: any) {
           if (error.status === 409) {
-              const userChoice = window.confirm(
-                  "This task has been modified by someone else. Would you like to overwrite their changes?\n\n" +
-                  "• Click 'OK' to overwrite with your changes\n" +
-                  "• Click 'Cancel' to refresh and see the latest version"
-              );
-  
+              const userChoice = window.confirm(ScriptResources.OptimisticLockingUserChoice);
               if (userChoice) {
                   try {
                       await axiosInstance.put(`/task`, {
@@ -427,33 +417,33 @@ const Card = ({
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Edit Task</Modal.Title>
+          <Modal.Title>{ScriptResources.EditTask}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3" controlId="taskName">
-              <Form.Label>Name</Form.Label>
+              <Form.Label>{ScriptResources.Name}</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter task name"
+                placeholder={ScriptResources.EnterTaskName}
                 name="name"
                 value={taskDetails.name}
                 onChange={handleInputChange}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="taskDescription">
-              <Form.Label>Description</Form.Label>
+              <Form.Label>{ScriptResources.Description}</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
-                placeholder="Enter description"
+                placeholder={ScriptResources.EnterDescription}
                 name="description"
                 value={taskDetails.description || ""}
                 onChange={handleInputChange}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="taskDueDate">
-              <Form.Label>Due Date</Form.Label>
+              <Form.Label>{ScriptResources.DueDate}</Form.Label>
               <Form.Control
                 type="date"
                 name="dueDate"
@@ -462,7 +452,7 @@ const Card = ({
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="taskEstimate">
-              <Form.Label>Estimate</Form.Label>
+              <Form.Label>{ScriptResources.Estimate}</Form.Label>
               <Form.Control
                 as="select"
                 name="estimate"
@@ -475,7 +465,7 @@ const Card = ({
               </Form.Control>
             </Form.Group>
             <Form.Group className="mb-3" controlId="taskType">
-              <Form.Label>Type</Form.Label>
+              <Form.Label>{ScriptResources.Type}</Form.Label>
               <Form.Control
                 as="select"
                 name="type"
@@ -488,7 +478,7 @@ const Card = ({
               </Form.Control>
             </Form.Group>
             <Form.Group className="mb-3" controlId="taskPriority">
-              <Form.Label>Priority</Form.Label>
+              <Form.Label>{ScriptResources.Priority}</Form.Label>
               <Form.Control
                 as="select"
                 name="priority"
@@ -504,10 +494,10 @@ const Card = ({
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-            Close
+            {ScriptResources.Close}
           </Button>
           <Button variant="primary" onClick={handleSave}>
-            Save changes
+            {ScriptResources.Save}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -630,7 +620,7 @@ const AddCard = ({ column, setCards, fetchTasks }: AddCardProps) => {
           <textarea
             onChange={(e) => setName(e.target.value)}
             autoFocus
-            placeholder="Add new task name..."
+            placeholder={ScriptResources.AddNewTaskName}
             className="add-card-textarea"
             value={name}
           />
@@ -639,13 +629,13 @@ const AddCard = ({ column, setCards, fetchTasks }: AddCardProps) => {
               onClick={() => setAdding(false)}
               className="close-button"
             >
-              Close
+              {ScriptResources.Close}
             </button>
             <button
               type="submit"
               className="add-button"
             >
-              <span>Add</span>
+              <span>{ScriptResources.Add}</span>
               <FiPlus />
             </button>
           </div>
@@ -656,7 +646,7 @@ const AddCard = ({ column, setCards, fetchTasks }: AddCardProps) => {
           onClick={() => setAdding(true)}
           className="add-card-button"
         >
-          <span>Add card</span>
+          <span>{ScriptResources.AddCard}</span>
           <FiPlus />
         </motion.button>
       )}

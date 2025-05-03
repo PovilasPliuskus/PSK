@@ -90,12 +90,7 @@ const Workspaces: React.FC = () => {
         } catch (err: any) {
             if (err.status === 409)
             {
-                const userChoice = window.confirm(
-                    "This workspace has been modified by someone else. Would you like to overwrite their changes?\n\n" +
-                    "• Click 'OK' to overwrite with your changes\n" +
-                    "• Click 'Cancel' to refresh and see the latest version"
-                );
-
+                const userChoice = window.confirm(ScriptResources.OptimisticLockingUserChoice);
                 if (userChoice) {
                     // User chose to overwrite - make the API call with force=true
                     try {
@@ -189,7 +184,7 @@ const Workspaces: React.FC = () => {
                     {alertMessage}
                 </div>
             )}
-            <p>Double click on workspace to see all tasks.</p>
+            <p>{ScriptResources.DoubleClickToSeeAllTasks}</p>
             <button className="btn btn-primary mb-3" onClick={handleModalShow}>
                 <span className="material-icons me-2" style={{verticalAlign: 'middle'}}>add</span>
                 {ScriptResources.CreateNew}
