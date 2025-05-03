@@ -13,7 +13,7 @@ import { BsHammer } from "react-icons/bs";
 import './TaskBoardViewPage.css';
 import { Button, Modal, Form } from "react-bootstrap";
 import { estimateMapper, priorityMapper, statusMapper, typeMapper } from "../utils/enumMapper.tsx";
-import { CardType, StatusEnum } from "../utils/types.ts";
+import { CardType, CreateCardType, StatusEnum, UpdateCardType } from "../utils/types.ts";
 import { axiosInstance } from '../../utils/axiosInstance';
 import { useParams } from "react-router-dom";
 import keycloak from '../../keycloak';
@@ -23,28 +23,29 @@ import ScriptResources from "../../assets/resources/strings.ts";
 
 export const TaskBoardViewPage = () => {
   const { id } = useParams();
-  const [cards, setCards] = useState([]);
+  const [cards, setCards] = useState<CardType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   
+  const fetchTasks = () => {
+    setError(null);
+    setIsLoading(true);
+    axiosInstance.get(`/task/${id}`, {
+      params: { pageNumber: 1, pageSize: 10 },
+    })
+    .then(response => {
+      setCards(response.data.tasks);
+    })
+    .catch(error => {
+      setError(error);
+      console.log(error);
+    })
+    .finally(() => {
+      setIsLoading(false);
+    })
+  }
+
   useEffect(() => {
-    const fetchTasks = () => {
-      setError(null);
-      setIsLoading(true);
-      axiosInstance.get(`/task/${id}`, {
-        params: { pageNumber: 1, pageSize: 10 },
-      })
-      .then(response => {
-        setCards(response.data);
-      })
-      .catch(error => {
-        setError(error);
-        console.log(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      })
-    }
     if (keycloak.authenticated) {
       fetchTasks();
     }
@@ -59,13 +60,19 @@ export const TaskBoardViewPage = () => {
   } else {
     return (
       <div className="kanban-container">
-      <Board cards={cards} setCards={setCards}/>
+      <Board cards={cards} setCards={setCards} fetchTasks={fetchTasks}/>
     </div>
     )
   }
+};  
+
+type BoardProps = {
+  cards: CardType[];
+  setCards: React.Dispatch<React.SetStateAction<CardType[]>>;
+  fetchTasks: () => void;
 };
 
-const Board = ({cards, setCards}) => {
+const Board: React.FC<BoardProps> = ({ cards, setCards, fetchTasks }) => {
   return (
     <div className="board">
       <Column
@@ -74,6 +81,7 @@ const Board = ({cards, setCards}) => {
         headingColor="backlog-color"
         cards={cards}
         setCards={setCards}
+        fetchTasks={fetchTasks}
       />
       <Column
         title={statusMapper[1]}
@@ -81,6 +89,7 @@ const Board = ({cards, setCards}) => {
         headingColor="todo-color"
         cards={cards}
         setCards={setCards}
+        fetchTasks={fetchTasks}
       />
       <Column
         title={statusMapper[2]}
@@ -88,6 +97,7 @@ const Board = ({cards, setCards}) => {
         headingColor="in-progress-color"
         cards={cards}
         setCards={setCards}
+        fetchTasks={fetchTasks}
       />
       <Column
         title={statusMapper[3]}
@@ -95,6 +105,7 @@ const Board = ({cards, setCards}) => {
         headingColor="complete-color"
         cards={cards}
         setCards={setCards}
+        fetchTasks={fetchTasks}
       />
       <BurnBarrel setCards={setCards} />
     </div>
@@ -107,6 +118,7 @@ type ColumnProps = {
   cards: CardType[];
   column: StatusEnum;
   setCards: Dispatch<SetStateAction<CardType[]>>;
+  fetchTasks: () => void;
 };
 
 const Column = ({
@@ -115,6 +127,7 @@ const Column = ({
   cards,
   column,
   setCards,
+  fetchTasks
 }: ColumnProps) => {
   const [active, setActive] = useState(false);
 
@@ -126,6 +139,18 @@ const Column = ({
     // make patch api call
     console.log("api call to change task status: ");
     console.log(card);
+    
+    const cardPutRequest = (card : CardType) => {
+      axiosInstance.put(`/task`, card)
+      .then(response => {
+        console.log(response);
+        const returnedCard = response.data;
+      })
+      .catch(error => {
+        console.log(error);
+      })
+    }
+    cardPutRequest(card);
   }
 
   const handleDragEnd = (e: DragEvent) => {
@@ -246,7 +271,7 @@ const Column = ({
           return <Card key={c.id} {...c} handleDragStart={handleDragStart} />;
         })}
         <DropIndicator beforeId={null} column={column} />
-        <AddCard column={column} setCards={setCards} />
+        <AddCard column={column} setCards={setCards} fetchTasks={fetchTasks} />
       </div>
     </div>
   );
@@ -270,18 +295,16 @@ const Card = ({
 }: CardProps) => {
   const [isOver, setIsOver] = useState(null);
   const [show, setShow] = useState(false);
-  const [taskDetails, setTaskDetails] = useState<CardType>({
-    name,
-    id,
-    status,
-    fkCreatedByUserId: "00000000-0000-0000-0000-000000000000", 
-    fkWorkspaceId: "00000000-0000-0000-0000-000000000000", 
-    fkAssignedToUserId: null,
-    dueDate,
-    description,
-    estimate,
-    type,
-    priority,
+  const [taskDetails, setTaskDetails] = useState<UpdateCardType>({
+      id,
+      name,
+      dueDate: dueDate ? new Date(dueDate) : null,
+      assignedToUserEmail: null,
+      description,
+      status,
+      estimate,
+      type,
+      priority,
   });
 
   const handleClose = () => setShow(false);
@@ -290,6 +313,7 @@ const Card = ({
   const handleEditClick = () => {
     handleShow();
     console.log("clicked with id" + id);
+    console.log("Clicked with dueDate" + dueDate);
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -297,36 +321,40 @@ const Card = ({
 
     setTaskDetails((prevDetails) => ({
       ...prevDetails,
-      [name]: name === "status" || name === "estimate" || name === "type" || name === "priority" 
-      ? parseInt(value, 10)
-      : value,
+      [name]: name === "status" || name === "estimate" || name === "type" || name === "priority"
+        ? parseInt(value, 10)  // Ensure parsing for integer fields
+        : name === "dueDate"
+        ? new Date(value) // Parse dueDate field as a Date object
+        : value,
     }));
   };
 
   const handleSave = () => {
     const updatedCard = {
-      Name : taskDetails.name,
-      Status : taskDetails.status,
-      Estimate : taskDetails.estimate,
-      Type : taskDetails.type,
-      Priority : taskDetails.priority
+      id: taskDetails.id,
+      name : taskDetails.name,
+      dueDate: taskDetails.dueDate,
+      assignedToUserEmail: taskDetails.assignedToUserEmail,
+      description: taskDetails.description,
+      status : taskDetails.status,
+      estimate : taskDetails.estimate,
+      type : taskDetails.type,
+      priority : taskDetails.priority
     }
 
     console.log("Saving changes:", updatedCard);
-    // using pre-set workspace id while workspaces are not implemented
-    const cardPatchRequest = (updatedCard) => {
-      axiosInstance.patch(`/task/${taskDetails.id}`, updatedCard)
+    const cardPutRequest = (updatedCard : UpdateCardType) => {
+      axiosInstance.put(`/task`, updatedCard)
       .then(response => {
         console.log(response);
         const returnedCard = response.data;
-        // TODO update cards once response is received.
       })
       .catch(error => {
         console.log(error);
       })
     }
 
-    cardPatchRequest(updatedCard);
+    cardPutRequest(updatedCard);
     setShow(false);
   };
 
@@ -394,7 +422,7 @@ const Card = ({
               <Form.Control
                 type="date"
                 name="dueDate"
-                value={taskDetails.dueDate}
+                value={taskDetails.dueDate ? taskDetails.dueDate.toISOString().split("T")[0] : ""}
                 onChange={handleInputChange}
               />
             </Form.Group>
@@ -486,7 +514,7 @@ const BurnBarrel = ({
   const handleDragEnd = (e: DragEvent) => {
     const cardId = e.dataTransfer.getData("cardId");
 
-    const cardDeletionRequest = (cardId) => {
+    const cardDeletionRequest = (cardId : string) => {
       axiosInstance.delete(`/task/${cardId}`)
       .then(response => {
         console.log(response);
@@ -518,20 +546,24 @@ const BurnBarrel = ({
 type AddCardProps = {
   column: StatusEnum;
   setCards: Dispatch<SetStateAction<CardType[]>>;
+  fetchTasks: () => void;
 };
 
-const AddCard = ({ column, setCards }: AddCardProps) => {
+const AddCard = ({ column, setCards, fetchTasks }: AddCardProps) => {
   const [name, setName] = useState("");
   const [adding, setAdding] = useState(false);
+  const { id } = useParams();
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!name.trim().length) return;
 
-    const newCard: CardType = {
+    const newCard: CreateCardType = {
+      name: name.trim(),
+      createdByUserEmail: keycloak.tokenParsed?.email || "",
+      workspaceId: id,
       Status: column,
-      Name: name.trim(),
       Estimate: 1, // Default value
       Type: 2, // Default value
       Priority: 2, // Default value
@@ -539,11 +571,12 @@ const AddCard = ({ column, setCards }: AddCardProps) => {
 
     // using pre-set workspace id while workspaces are not implemented
     const cardCreationRequest = () => {
-      axiosInstance.post(`/task/0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c`, newCard)
+      axiosInstance.post(`/task`, newCard)
       .then(response => {
         console.log(response);
         const returnedCard = response.data;
         setCards((pv) => [...pv, returnedCard]);
+        fetchTasks();
       })
       .catch(error => {
         console.log(error);

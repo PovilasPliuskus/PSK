@@ -64,4 +64,27 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
             .HasForeignKey(a => a.FkSubTaskId)
             .OnDelete(DeleteBehavior.Cascade);
     }
+
+    // This overrides the SaveChangesAsync method to set the CreatedAt and UpdatedAt properties
+    // for entities that inherit from BaseModelEntity.
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker.Entries()
+        .Where(e => e.Entity is BaseModelEntity &&
+                    (e.State == EntityState.Added || e.State == EntityState.Modified));
+
+        foreach (var entry in entries)
+        {
+            var entity = (BaseModelEntity)entry.Entity;
+
+            if (entry.State == EntityState.Added)
+            {
+                entity.CreatedAt = DateTime.UtcNow;
+            }
+
+            entity.UpdatedAt = DateTime.UtcNow;
+        }
+
+        return base.SaveChangesAsync(cancellationToken);
+    }
 }

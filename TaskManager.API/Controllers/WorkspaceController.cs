@@ -1,7 +1,9 @@
 using BusinessLogic.Interfaces;
 using Contracts.RequestBodies;
 using Contracts.ResponseBodies;
+using DataAccess.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using TaskManager.API.Exceptions;
 
 namespace TaskManager.API.Controllers;
 
@@ -11,12 +13,12 @@ public class WorkspaceController : ControllerBase
 {
 
     private readonly IWorkspaceService _workspaceService;
-    
+
     public WorkspaceController(IWorkspaceService workspaceService)
     {
         _workspaceService = workspaceService;
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> GetWorkspacePageAsync(int pageNumber, int pageSize)
     {
@@ -29,13 +31,20 @@ public class WorkspaceController : ControllerBase
     public async Task<IActionResult> GetWorkspaceAsync(Guid id)
     {
         GetWorkspaceResponse response = await _workspaceService.GetWorkspaceByIdAsync(id);
-        
+
         return Ok(response);
     }
 
     [HttpPost]
     public async Task<IActionResult> CreateWorkspaceAsync([FromBody] CreateWorkspaceRequest request)
     {
+        var userEmail = User.GetUserEmail();
+
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            throw new NotAuthenticatedException("User is not authenticated");
+        }
+        request.CreatedByUserEmail = userEmail;
         await _workspaceService.CreateWorkspaceAsync(request);
 
         return Ok();
