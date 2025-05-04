@@ -79,10 +79,6 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
         modelBuilder.Entity<WorkspaceEntity>()
             .Property(v => v.Version)
             .IsRowVersion();
-
-        modelBuilder.Entity<WorkspaceEntity>()
-            .Property(v => v.Version)
-            .IsRowVersion();
     }
 
     // This overrides the SaveChangesAsync method to set the CreatedAt and UpdatedAt properties

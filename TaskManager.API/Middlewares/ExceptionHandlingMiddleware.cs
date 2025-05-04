@@ -14,7 +14,14 @@ namespace TaskManager.API.Middlewares
         private static readonly Dictionary<Type, int> BuiltInExceptionStatusCodeMap = new()
         {
             { typeof(ArgumentNullException), StatusCodes.Status400BadRequest },
+            { typeof(DbUpdateConcurrencyException), StatusCodes.Status409Conflict},
             // Here, add more built-in exceptions as needed
+        };
+
+        private static readonly Dictionary<Type, string> DefaultMessages = new()
+        {
+            { typeof(DbUpdateConcurrencyException), "A concurrency conflict occurred. Please try again." },
+            // Here, add more default messages for built-in exceptions as needed
         };
 
         public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
@@ -40,19 +47,18 @@ namespace TaskManager.API.Middlewares
                 // - Otherwise, return 500.
                 response.StatusCode = error switch
                 {
-                    DbUpdateConcurrencyException => StatusCodes.Status409Conflict,
                     CustomException e => (int)e.StatusCode,
                     _ => BuiltInExceptionStatusCodeMap.GetValueOrDefault(error.GetType(), StatusCodes.Status500InternalServerError)
                 };
 
+                var title = !string.IsNullOrWhiteSpace(error.Message)
+                    ? error.Message
+                    : DefaultMessages.GetValueOrDefault(error.GetType(), "An unexpected error occurred.");
+
                 var problemDetails = new ProblemDetails
                 {
                     Status = response.StatusCode,
-                    Title = response.StatusCode switch
-                    {
-                        StatusCodes.Status409Conflict => "A concurrency conflict occurred. Please try again.",
-                        _ => error.Message
-                    }
+                    Title = title
                 };
 
                 _logger.LogError(error.Message);
