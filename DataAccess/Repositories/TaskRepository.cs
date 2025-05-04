@@ -84,6 +84,11 @@ public class TaskRepository : ITaskRepository
         TaskEntity existingEntity = await _context.Tasks
             .FirstAsync(t => t.Id == task.Id);
 
+        if (!task.Force && existingEntity.Version != task.Version)
+        {
+            throw new DbUpdateConcurrencyException("The task has been modified by another user.");
+        }
+
         existingEntity.Name = task.Name;
         existingEntity.DueDate = task.DueDate;
         existingEntity.FkAssignedToUserEmail = task.AssignedToUserEmail;

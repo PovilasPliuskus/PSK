@@ -15,6 +15,8 @@ const useAxiosInterceptor = () => {
     const responseInterceptor = axiosInstance.interceptors.response.use(
       (response) => response, // Pass through successful responses
       (error) => {
+        if (error.response.status === 409)
+          return Promise.reject(error); // Handle 409 errors separately
         if (error.response) {
           // Response exists, handle based on status code
           if (error.response.status === 401) {

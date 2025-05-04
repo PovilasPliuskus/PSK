@@ -38,7 +38,7 @@ export const TaskBoardViewPage = () => {
     })
     .catch(error => {
       setError(error);
-      console.log(error);
+      console.error(error);
     })
     .finally(() => {
       setIsLoading(false);
@@ -53,7 +53,6 @@ export const TaskBoardViewPage = () => {
   },[id, keycloak.authenticated])
 
   if(error != null){
-    // tas global error dinksta po 5s, gal vertetu tureti bendra komponenta ilgesniam error'o atvaizdavimui?
     return <SomethingWentWrong onRetry={() => window.location.reload()} />;
   } if(isLoading){
     return <Loading message={ScriptResources.LoadingOrLogin} />;
@@ -136,20 +135,32 @@ const Column = ({
   };
 
   const changeCardStatusInBackend = (card : CardType) => {
-    // make patch api call
-    console.log("api call to change task status: ");
-    console.log(card);
-    
-    const cardPutRequest = (card : CardType) => {
-      axiosInstance.put(`/task`, card)
-      .then(response => {
-        console.log(response);
-        const returnedCard = response.data;
-      })
-      .catch(error => {
-        console.log(error);
-      })
-    }
+    const cardPutRequest = async (card: CardType, force: boolean = false) => {
+      try {
+          await axiosInstance.put(`/task`, {
+              ...card,
+              force
+          });
+      } catch (error: any) {
+          if (error.status === 409) {
+              const userChoice = window.confirm(ScriptResources.OptimisticLockingUserChoice);
+              if (userChoice) {
+                  try {
+                      await axiosInstance.put(`/task`, {
+                          ...card,
+                          force: true
+                      });
+                  } catch (forceErr) {
+                      console.error("Error forcing task update:", forceErr);
+                  }
+              } else {
+                  fetchTasks();
+              }
+          } else {
+              console.error("Error updating task:", error);
+          }
+      }
+    };
     cardPutRequest(card);
   }
 
@@ -268,7 +279,7 @@ const Column = ({
         className={`column-content ${active ? "column-content-active" : ""}`}
       >
         {filteredCards.map((c) => {
-          return <Card key={c.id} {...c} handleDragStart={handleDragStart} />;
+          return <Card key={c.id} {...c} handleDragStart={handleDragStart} fetchTasks={fetchTasks} />;
         })}
         <DropIndicator beforeId={null} column={column} />
         <AddCard column={column} setCards={setCards} fetchTasks={fetchTasks} />
@@ -279,6 +290,7 @@ const Column = ({
 
 type CardProps = CardType & {
   handleDragStart: Function;
+  fetchTasks: () => void;
 };
 
 
@@ -292,6 +304,7 @@ const Card = ({
   estimate,
   type,
   priority,
+  fetchTasks,
 }: CardProps) => {
   const [isOver, setIsOver] = useState(null);
   const [show, setShow] = useState(false);
@@ -305,6 +318,8 @@ const Card = ({
       estimate,
       type,
       priority,
+      version: 0,
+      force: false,
   });
 
   const handleClose = () => setShow(false);
@@ -312,8 +327,6 @@ const Card = ({
 
   const handleEditClick = () => {
     handleShow();
-    console.log("clicked with id" + id);
-    console.log("Clicked with dueDate" + dueDate);
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -339,21 +352,33 @@ const Card = ({
       status : taskDetails.status,
       estimate : taskDetails.estimate,
       type : taskDetails.type,
-      priority : taskDetails.priority
+      priority : taskDetails.priority,
+      version: taskDetails.version,
+      force: taskDetails.force,
     }
 
-    console.log("Saving changes:", updatedCard);
-    const cardPutRequest = (updatedCard : UpdateCardType) => {
-      axiosInstance.put(`/task`, updatedCard)
-      .then(response => {
-        console.log(response);
-        const returnedCard = response.data;
-      })
-      .catch(error => {
-        console.log(error);
-      })
-    }
-
+    const cardPutRequest = async (updatedCard: UpdateCardType) => {
+      try {
+          await axiosInstance.put(`/task`, updatedCard);
+      } catch (error: any) {
+          if (error.status === 409) {
+              const userChoice = window.confirm(ScriptResources.OptimisticLockingUserChoice);
+              if (userChoice) {
+                  try {
+                      await axiosInstance.put(`/task`, {
+                          ...updatedCard,
+                          force: true
+                      });
+                  } catch (forceErr) {
+                  }
+              } else {
+                  fetchTasks();
+              }
+          } else {
+              console.error("Error updating task:", error);
+          }
+      }
+    };
     cardPutRequest(updatedCard);
     setShow(false);
   };
@@ -392,33 +417,33 @@ const Card = ({
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Edit Task</Modal.Title>
+          <Modal.Title>{ScriptResources.EditTask}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3" controlId="taskName">
-              <Form.Label>Name</Form.Label>
+              <Form.Label>{ScriptResources.Name}</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Enter task name"
+                placeholder={ScriptResources.EnterTaskName}
                 name="name"
                 value={taskDetails.name}
                 onChange={handleInputChange}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="taskDescription">
-              <Form.Label>Description</Form.Label>
+              <Form.Label>{ScriptResources.Description}</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
-                placeholder="Enter description"
+                placeholder={ScriptResources.EnterDescription}
                 name="description"
                 value={taskDetails.description || ""}
                 onChange={handleInputChange}
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="taskDueDate">
-              <Form.Label>Due Date</Form.Label>
+              <Form.Label>{ScriptResources.DueDate}</Form.Label>
               <Form.Control
                 type="date"
                 name="dueDate"
@@ -427,7 +452,7 @@ const Card = ({
               />
             </Form.Group>
             <Form.Group className="mb-3" controlId="taskEstimate">
-              <Form.Label>Estimate</Form.Label>
+              <Form.Label>{ScriptResources.Estimate}</Form.Label>
               <Form.Control
                 as="select"
                 name="estimate"
@@ -440,7 +465,7 @@ const Card = ({
               </Form.Control>
             </Form.Group>
             <Form.Group className="mb-3" controlId="taskType">
-              <Form.Label>Type</Form.Label>
+              <Form.Label>{ScriptResources.Type}</Form.Label>
               <Form.Control
                 as="select"
                 name="type"
@@ -453,7 +478,7 @@ const Card = ({
               </Form.Control>
             </Form.Group>
             <Form.Group className="mb-3" controlId="taskPriority">
-              <Form.Label>Priority</Form.Label>
+              <Form.Label>{ScriptResources.Priority}</Form.Label>
               <Form.Control
                 as="select"
                 name="priority"
@@ -469,10 +494,10 @@ const Card = ({
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
-            Close
+            {ScriptResources.Close}
           </Button>
           <Button variant="primary" onClick={handleSave}>
-            Save changes
+            {ScriptResources.Save}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -517,13 +542,12 @@ const BurnBarrel = ({
     const cardDeletionRequest = (cardId : string) => {
       axiosInstance.delete(`/task/${cardId}`)
       .then(response => {
-        console.log(response);
         if (response.status === 200){
           setCards((pv) => pv.filter((c) => c.id !== cardId));
         }
       })
       .catch(error => {
-        console.log(error);
+        console.error(error);
       })
     }
 
@@ -562,24 +586,23 @@ const AddCard = ({ column, setCards, fetchTasks }: AddCardProps) => {
     const newCard: CreateCardType = {
       name: name.trim(),
       createdByUserEmail: keycloak.tokenParsed?.email || "",
-      workspaceId: id,
-      Status: column,
-      Estimate: 1, // Default value
-      Type: 2, // Default value
-      Priority: 2, // Default value
+      workspaceId: id || "",
+      status: column,
+      estimate: 1, // Default value
+      type: 2, // Default value
+      priority: 2, // Default value
     };
 
     // using pre-set workspace id while workspaces are not implemented
     const cardCreationRequest = () => {
       axiosInstance.post(`/task`, newCard)
       .then(response => {
-        console.log(response);
         const returnedCard = response.data;
         setCards((pv) => [...pv, returnedCard]);
         fetchTasks();
       })
       .catch(error => {
-        console.log(error);
+        console.error(error);
       })
     }
     
@@ -597,7 +620,7 @@ const AddCard = ({ column, setCards, fetchTasks }: AddCardProps) => {
           <textarea
             onChange={(e) => setName(e.target.value)}
             autoFocus
-            placeholder="Add new task name..."
+            placeholder={ScriptResources.AddNewTaskName}
             className="add-card-textarea"
             value={name}
           />
@@ -606,13 +629,13 @@ const AddCard = ({ column, setCards, fetchTasks }: AddCardProps) => {
               onClick={() => setAdding(false)}
               className="close-button"
             >
-              Close
+              {ScriptResources.Close}
             </button>
             <button
               type="submit"
               className="add-button"
             >
-              <span>Add</span>
+              <span>{ScriptResources.Add}</span>
               <FiPlus />
             </button>
           </div>
@@ -623,7 +646,7 @@ const AddCard = ({ column, setCards, fetchTasks }: AddCardProps) => {
           onClick={() => setAdding(true)}
           className="add-card-button"
         >
-          <span>Add card</span>
+          <span>{ScriptResources.AddCard}</span>
           <FiPlus />
         </motion.button>
       )}

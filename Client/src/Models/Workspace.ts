@@ -3,4 +3,5 @@ export interface Workspace {
     name: string;
     createdAt: Date;
     createdByUserEmail: string;
+    version: number;
 }

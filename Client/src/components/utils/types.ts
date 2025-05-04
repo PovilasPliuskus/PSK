@@ -15,6 +15,7 @@ export type CardType = {
   estimate: EstimateEnum;
   type: TypeEnum;
   priority: PriorityEnum;
+  version: number;
 };
 
 export type CreateCardType = {
@@ -37,4 +38,6 @@ export type UpdateCardType = {
   estimate: EstimateEnum;
   type: TypeEnum;
   priority: PriorityEnum;
+  version: number;
+  force: boolean | null;
 }

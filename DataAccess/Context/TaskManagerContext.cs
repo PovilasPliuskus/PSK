@@ -31,6 +31,10 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
             .HasForeignKey(t => t.FkWorkspaceId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<TaskEntity>()
+            .Property(v => v.Version)
+            .IsRowVersion();
+
         // SubtaskEntity
         modelBuilder.Entity<SubTaskEntity>()
             .HasOne(st => st.Task)
@@ -38,12 +42,20 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
             .HasForeignKey(st => st.FkTaskId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<SubTaskEntity>()
+            .Property(v => v.Version)
+            .IsRowVersion();
+
         // CommentEntity
         modelBuilder.Entity<CommentEntity>()
             .HasOne(c => c.Task)
             .WithMany()
             .HasForeignKey(c => c.FkTaskId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CommentEntity>()
+            .Property(v => v.Version)
+            .IsRowVersion();
 
         modelBuilder.Entity<CommentEntity>()
             .HasOne(c => c.SubTask)
@@ -63,6 +75,10 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
             .WithMany()
             .HasForeignKey(a => a.FkSubTaskId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<WorkspaceEntity>()
+            .Property(v => v.Version)
+            .IsRowVersion();
     }
 
     // This overrides the SaveChangesAsync method to set the CreatedAt and UpdatedAt properties

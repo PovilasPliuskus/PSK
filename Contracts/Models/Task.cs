@@ -14,6 +14,7 @@ public class Task : BaseModel
     public required EstimateEnum Estimate { get; set; }
     public required TypeEnum Type { get; set; }
     public required PriorityEnum Priority { get; set; }
+    public bool Force { get; set; } = false;
     public ICollection<SubTask>? SubTasks { get; set; }
     public ICollection<Comment>? Comments { get; set; }
     public ICollection<Attachment>? Attachments { get; set; }
