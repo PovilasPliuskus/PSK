@@ -29,7 +29,9 @@ export const TaskBoardViewPage = () => {
   
   const fetchTasks = () => {
     setError(null);
-    setIsLoading(true);
+    const loadingTimeout = setTimeout(() => {
+      setIsLoading(true);
+    }, 500);
     axiosInstance.get(`/task/${id}`, {
       params: { pageNumber: 1, pageSize: 10 },
     })
@@ -41,6 +43,7 @@ export const TaskBoardViewPage = () => {
       console.error(error);
     })
     .finally(() => {
+      clearTimeout(loadingTimeout);
       setIsLoading(false);
     })
   }
@@ -141,6 +144,7 @@ const Column = ({
               ...card,
               force
           });
+          fetchTasks();
       } catch (error: any) {
           if (error.status === 409) {
               const userChoice = window.confirm(ScriptResources.OptimisticLockingUserChoice);
