@@ -65,6 +65,8 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
+app.UseMiddleware<LoggingMiddleware>();
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseCors("AllowFrontend");
