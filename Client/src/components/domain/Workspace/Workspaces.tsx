@@ -30,7 +30,9 @@ const Workspaces: React.FC = () => {
 
     const fetchItems = () => {
         setError(null);
-        setIsLoading(true);
+        const loadingTimeout = setTimeout(() => {
+            setIsLoading(true);
+          }, 500);
         axiosInstance.get(`/workspace`, {
             params: { pageNumber: currentPage, pageSize: pageSize },
         })
@@ -45,6 +47,7 @@ const Workspaces: React.FC = () => {
             setWorkspaces([]);
         })
         .finally(() => {
+            clearTimeout(loadingTimeout);
             setIsLoading(false);
         });
     };
