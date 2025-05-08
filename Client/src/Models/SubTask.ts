@@ -1,11 +1,9 @@
 import { EstimateEnum, PriorityEnum, StatusEnum, TypeEnum } from "./TaskEnums";
 import { Comment } from "./Comment";
+import { BaseModel } from "./BaseModel";
 
-export interface SubTask {
+export interface SubTask extends BaseModel{
     name: string;
-    id: string;
-    createdAt: string;
-    updatedAt: string;
     taskId: string;
     createdByUserId: string; // Sita paliekam kol dar naudojam userId vietoj userEmail
     createdByUserEmail: string;

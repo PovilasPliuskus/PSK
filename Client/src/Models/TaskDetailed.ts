@@ -1,12 +1,10 @@
 import { SubTask } from "./SubTask";
 import { Comment } from "./Comment";
 import { EstimateEnum, PriorityEnum, StatusEnum, TypeEnum } from "./TaskEnums";
+import { BaseModel } from "./BaseModel";
 
-export interface TaskDetailed {
+export interface TaskDetailed extends BaseModel{
     name: string;
-    id: string;
-    createdAt: string;
-    updatedAt: string;
     fkCreatedByUserId: string; // Sita paliekam kol dar naudojam userId vietoj userEmail
     createdByUserEmail: string; 
     workspaceId: string;

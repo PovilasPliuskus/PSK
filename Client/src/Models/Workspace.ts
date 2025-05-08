@@ -1,6 +1,5 @@
-export interface Workspace {
-    id: string;
+import { BaseModel } from "./BaseModel";
+
+export interface Workspace extends BaseModel {
     name: string;
-    createdAt: Date;
-    createdBy: string;
 }

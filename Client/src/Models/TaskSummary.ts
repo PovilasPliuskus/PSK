@@ -1,10 +1,8 @@
+import { BaseModel } from "./BaseModel";
 import { StatusEnum, EstimateEnum, TypeEnum, PriorityEnum } from "./TaskEnums";
 
-export interface TaskSummary {
+export interface TaskSummary extends BaseModel {
   name: string;
-  id: string;
-  createdAt: string;
-  updatedAt: string;
   fkCreatedByUserId: string; // Sita paliekam kol dar naudojam userId vietoj userEmail
   createdByUserEmail: string; 
   workspaceId: string;
