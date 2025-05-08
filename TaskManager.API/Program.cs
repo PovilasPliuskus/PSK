@@ -8,6 +8,11 @@ using BusinessLogic.Services;
 using DataAccess.Repositories.Interfaces;
 using DataAccess.Repositories;
 using AutoMapper;
+using DataAccess.Extensions;
+using NpgsqlTypes;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.PostgreSQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,7 +68,43 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddSerilog();
+
 var app = builder.Build();
+
+if (builder.Configuration.GetValue<bool>("UseRequestLogging")) {
+    app.UseSerilogRequestLogging(options => {
+        options.GetMessageTemplateProperties = (httpContext, requestPath, elapsedMs, statusCode) =>
+            new[] {
+                new LogEventProperty("StatusCode", new ScalarValue(statusCode)),
+                new LogEventProperty("RequestMethod", new ScalarValue(httpContext.Request.Method)),
+                new LogEventProperty("RequestPath", new ScalarValue(requestPath)),
+                new LogEventProperty("RequestController", new ScalarValue(httpContext.GetRouteData().Values["controller"])),
+                new LogEventProperty("ControllerAction", new ScalarValue(httpContext.GetRouteData().Values["action"])),
+                new LogEventProperty("UserEmail", new ScalarValue(httpContext.User.GetUserEmail())),
+            };
+        options.MessageTemplate = "{StatusCode} HTTP {RequestMethod} {RequestPath}, {RequestController} {ControllerAction} {UserEmail}";
+        
+        var columnWriters = new Dictionary<string, ColumnWriterBase>{
+            {"StatusCode", new SinglePropertyColumnWriter("StatusCode") },
+            {"RequestMethod", new SinglePropertyColumnWriter("RequestMethod") },
+            {"RequestPath", new SinglePropertyColumnWriter("RequestPath") },
+            {"RequestController", new SinglePropertyColumnWriter("RequestController") },
+            {"ControllerAction", new SinglePropertyColumnWriter("ControllerAction") },
+            {"UserEmail", new SinglePropertyColumnWriter("UserEmail") },
+        };
+        
+        options.Logger = new LoggerConfiguration()
+            .WriteTo.PostgreSQL(
+                builder.Configuration.GetConnectionString("DefaultConnection"),
+                "RequestLog",
+                columnWriters,
+                needAutoCreateTable: true,
+                respectCase: true
+            )
+            .CreateLogger();
+    });
+}
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
