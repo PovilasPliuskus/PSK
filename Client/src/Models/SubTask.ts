@@ -5,9 +5,7 @@ import { BaseModel } from "./BaseModel";
 export interface SubTask extends BaseModel{
     name: string;
     taskId: string;
-    createdByUserId: string; // Sita paliekam kol dar naudojam userId vietoj userEmail
     createdByUserEmail: string;
-    assignedToUserId?: string; // Sita paliekam kol dar naudojam userId vietoj userEmail
     assignedToUserEmail?: string;
     dueDate?: Date | null;
     description?: string;

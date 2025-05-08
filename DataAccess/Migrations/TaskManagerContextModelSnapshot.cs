@@ -36,8 +36,10 @@ namespace DataAccess.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<Guid>("FkCreatedByUserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("FkCreatedByUserEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<Guid?>("FkSubTaskId")
                         .HasColumnType("uuid");
@@ -45,16 +47,30 @@ namespace DataAccess.Migrations
                     b.Property<Guid?>("FkTaskId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("SubTaskEntityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("TaskEntityId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
-                    b.HasIndex("FkCreatedByUserId");
+                    b.HasKey("Id");
 
                     b.HasIndex("FkSubTaskId");
 
                     b.HasIndex("FkTaskId");
+
+                    b.HasIndex("SubTaskEntityId");
+
+                    b.HasIndex("TaskEntityId");
 
                     b.ToTable("Attachment");
                 });
@@ -77,7 +93,15 @@ namespace DataAccess.Migrations
                     b.Property<Guid?>("FkTaskId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("FkWrittenByUserId")
+                    b.Property<string>("FkWrittenByUserEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<Guid?>("SubTaskEntityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("TaskEntityId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Text")
@@ -87,13 +111,21 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
 
                     b.HasIndex("FkSubTaskId");
 
                     b.HasIndex("FkTaskId");
 
-                    b.HasIndex("FkWrittenByUserId");
+                    b.HasIndex("SubTaskEntityId");
+
+                    b.HasIndex("TaskEntityId");
 
                     b.ToTable("Comment");
                 });
@@ -117,11 +149,14 @@ namespace DataAccess.Migrations
                     b.Property<int>("Estimate")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("FkAssignedToUserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("FkAssignedToUserEmail")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
-                    b.Property<Guid>("FkCreatedByUserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("FkCreatedByUserEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<Guid>("FkTaskId")
                         .HasColumnType("uuid");
@@ -137,19 +172,26 @@ namespace DataAccess.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<Guid?>("TaskEntityId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("FkAssignedToUserId");
-
-                    b.HasIndex("FkCreatedByUserId");
-
                     b.HasIndex("FkTaskId");
+
+                    b.HasIndex("TaskEntityId");
 
                     b.ToTable("SubTask");
                 });
@@ -173,11 +215,14 @@ namespace DataAccess.Migrations
                     b.Property<int>("Estimate")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("FkAssignedToUserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("FkAssignedToUserEmail")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
-                    b.Property<Guid>("FkCreatedByUserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("FkCreatedByUserEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<Guid>("FkWorkspaceId")
                         .HasColumnType("uuid");
@@ -199,63 +244,22 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<Guid?>("WorkspaceEntityId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
-
-                    b.HasIndex("FkAssignedToUserId");
-
-                    b.HasIndex("FkCreatedByUserId");
 
                     b.HasIndex("FkWorkspaceId");
 
+                    b.HasIndex("WorkspaceEntityId");
+
                     b.ToTable("Task");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.UserEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("StudentId")
-                        .IsRequired()
-                        .HasMaxLength(7)
-                        .HasColumnType("character varying(7)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.HasIndex("StudentId")
-                        .IsUnique();
-
-                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.WorkspaceEntity", b =>
@@ -267,8 +271,10 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("FkCreatedByUserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("FkCreatedByUserEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -278,22 +284,27 @@ namespace DataAccess.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
-                    b.HasIndex("FkCreatedByUserId");
+                    b.HasKey("Id");
 
                     b.ToTable("Workspace");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.WorkspaceUsersEntity", b =>
                 {
-                    b.Property<Guid>("FkUserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("FkUserEmail")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<Guid>("FkWorkspaceId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("FkUserId", "FkWorkspaceId");
+                    b.HasKey("FkUserEmail", "FkWorkspaceId");
 
                     b.HasIndex("FkWorkspaceId");
 
@@ -302,12 +313,6 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entities.AttachmentEntity", b =>
                 {
-                    b.HasOne("DataAccess.Entities.UserEntity", "CreatedByUserId")
-                        .WithMany()
-                        .HasForeignKey("FkCreatedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("DataAccess.Entities.SubTaskEntity", "SubTask")
                         .WithMany()
                         .HasForeignKey("FkSubTaskId")
@@ -318,7 +323,13 @@ namespace DataAccess.Migrations
                         .HasForeignKey("FkTaskId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Navigation("CreatedByUserId");
+                    b.HasOne("DataAccess.Entities.SubTaskEntity", null)
+                        .WithMany("Attachments")
+                        .HasForeignKey("SubTaskEntityId");
+
+                    b.HasOne("DataAccess.Entities.TaskEntity", null)
+                        .WithMany("Attachments")
+                        .HasForeignKey("TaskEntityId");
 
                     b.Navigation("SubTask");
 
@@ -337,95 +348,77 @@ namespace DataAccess.Migrations
                         .HasForeignKey("FkTaskId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("DataAccess.Entities.UserEntity", "WrittenByUserId")
-                        .WithMany()
-                        .HasForeignKey("FkWrittenByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("DataAccess.Entities.SubTaskEntity", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("SubTaskEntityId");
+
+                    b.HasOne("DataAccess.Entities.TaskEntity", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("TaskEntityId");
 
                     b.Navigation("SubTask");
 
                     b.Navigation("Task");
-
-                    b.Navigation("WrittenByUserId");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.SubTaskEntity", b =>
                 {
-                    b.HasOne("DataAccess.Entities.UserEntity", "AssignedToUserId")
-                        .WithMany()
-                        .HasForeignKey("FkAssignedToUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("DataAccess.Entities.UserEntity", "CreatedByUserId")
-                        .WithMany()
-                        .HasForeignKey("FkCreatedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("DataAccess.Entities.TaskEntity", "Task")
                         .WithMany()
                         .HasForeignKey("FkTaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AssignedToUserId");
-
-                    b.Navigation("CreatedByUserId");
+                    b.HasOne("DataAccess.Entities.TaskEntity", null)
+                        .WithMany("SubTasks")
+                        .HasForeignKey("TaskEntityId");
 
                     b.Navigation("Task");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.TaskEntity", b =>
                 {
-                    b.HasOne("DataAccess.Entities.UserEntity", "AssignedToUserId")
-                        .WithMany()
-                        .HasForeignKey("FkAssignedToUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("DataAccess.Entities.UserEntity", "CreatedByUserId")
-                        .WithMany()
-                        .HasForeignKey("FkCreatedByUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("DataAccess.Entities.WorkspaceEntity", "Workspace")
                         .WithMany()
                         .HasForeignKey("FkWorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AssignedToUserId");
-
-                    b.Navigation("CreatedByUserId");
+                    b.HasOne("DataAccess.Entities.WorkspaceEntity", null)
+                        .WithMany("Tasks")
+                        .HasForeignKey("WorkspaceEntityId");
 
                     b.Navigation("Workspace");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.WorkspaceEntity", b =>
-                {
-                    b.HasOne("DataAccess.Entities.UserEntity", "CreatedByUserId")
-                        .WithMany()
-                        .HasForeignKey("FkCreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CreatedByUserId");
-                });
-
             modelBuilder.Entity("DataAccess.Entities.WorkspaceUsersEntity", b =>
                 {
-                    b.HasOne("DataAccess.Entities.UserEntity", null)
-                        .WithMany()
-                        .HasForeignKey("FkUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("DataAccess.Entities.WorkspaceEntity", null)
                         .WithMany()
                         .HasForeignKey("FkWorkspaceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.SubTaskEntity", b =>
+                {
+                    b.Navigation("Attachments");
+
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.TaskEntity", b =>
+                {
+                    b.Navigation("Attachments");
+
+                    b.Navigation("Comments");
+
+                    b.Navigation("SubTasks");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.WorkspaceEntity", b =>
+                {
+                    b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
         }

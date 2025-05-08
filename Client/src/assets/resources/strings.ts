@@ -1,6 +1,3 @@
-import Loading from "../../components/base/Loading";
-import SomethingWentWrong from "../../components/base/SomethingWentWrong";
-
 const ScriptResources = {
     Page404: '404 - Page Not Found',
     PageDoNotExist: 'The page you are looking for does not exist.',
@@ -25,6 +22,29 @@ const ScriptResources = {
     Loading: 'Loading...',
     PleaseWait: 'Please wait while we load the data.',
     LoadingTakeLonger: 'If this takes longer than expected, please check your internet connection or try refreshing the page.',
+    Cancel: 'Cancel',
+    Create: 'Create',
+    DeleteConfirmation: 'Are you sure you want to delete this item?',
+    WorkspaceDeleted: 'Workspace deleted successfully.',
+    ErrorDeletingWorkspace: 'Error deleting workspace',
+    EditWorkspace: 'Edit Workspace',
+    Save: 'Save',
+    ErrorUpdatingWorkspace: 'Error updating workspace',
+    OptimisticLockingUserChoice: 'This entity has been modified by someone else. Would you like to overwrite their changes?\n\n' + '• Click \'OK\' to overwrite with your changes\n' + '• Click \'Cancel\' to refresh and see the latest version',
+    EditTask: 'Edit Task',
+    Name: 'Name',
+    EnterTaskName: 'Enter task name',
+    EnterDescription: 'Enter description',
+    Description: 'Description',
+    DueDate: 'Due Date',
+    Estimate: 'Estimate',
+    Type: 'Type',
+    Priority: 'Priority',
+    Close: 'Close',
+    AddNewTaskName: 'Add New Task Name...',
+    Add: 'Add',
+    AddCard: 'Add Card',
+    DoubleClickToSeeAllTasks: 'Double click on workspace to see all tasks',
 }
 
 export default ScriptResources;

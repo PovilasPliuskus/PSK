@@ -2,8 +2,9 @@
 
 public enum StatusEnum
 {
-    Backlog = 0,
-    Todo = 1,
-    InProgress = 2,
-    Complete = 3,
+    None = 0,
+    Backlog = 1,
+    Todo = 2,
+    InProgress = 3,
+    Complete = 4,
 }

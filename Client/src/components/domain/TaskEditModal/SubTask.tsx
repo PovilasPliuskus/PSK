@@ -1,16 +1,21 @@
 import { Button, ButtonGroup, Form } from "react-bootstrap";
 import type { SubTask } from "../../../Models/SubTask";
-import { useState, Dispatch } from "react";
+import { useState, Dispatch, version, useEffect } from "react";
 import { estimateMapper, priorityMapper, statusMapper, typeMapper } from "../../utility/enumMapper";
+import { axiosInstance } from "../../../utils/axiosInstance";
+import ScriptResources from "../../../assets/resources/strings";
+import { UpdateTaskBody } from "../../../Models/RequestBodies/UpdateTaskBody";
+import { UpdateSubTaskBody } from "../../../Models/RequestBodies/UpdateSubTaskBody";
 
 type SubTaskProps = {
     subTask: SubTask,
     setSelectedSubtask: Dispatch<React.SetStateAction<SubTask | null>>
+    fetchDetailedTask: () => void
 }
 
 // TODO html datetime-local format skiriasi nuo dotnet DateTime. Kai turesim endpointus, reiks sutvarkyt.
 
-const Comment: React.FC<SubTaskProps> = ({ subTask }) => {
+const Comment: React.FC<SubTaskProps> = ({ subTask, fetchDetailedTask }) => {
     const [subtask, setSubtask] = useState<SubTask>(subTask);
     const [subtaskEdited, setSubtaskEdited] = useState<SubTask>(subTask);
     const [isEdited, setIsEdited] = useState<boolean>(false);
@@ -29,10 +34,50 @@ const Comment: React.FC<SubTaskProps> = ({ subTask }) => {
         }
     };
 
+    useEffect(() => {
+        setSubtaskEdited(subtask);
+    }, [subtask]);
+
     const handleSubTaskInfoChange = () => {
-        // susisiekiam su endpointu
-        console.log("EDITED SUBTASK: ");
-        console.log(subtaskEdited);
+        const updateSubTaskBody: UpdateSubTaskBody = {
+            name: subtaskEdited.name,
+            taskId: subtaskEdited.taskId,
+            createdByUserEmail: subtaskEdited.createdByUserEmail,
+            assignedToUserEmail: subtaskEdited.assignedToUserEmail,
+            dueDate: subtaskEdited.dueDate ? new Date(subtaskEdited.dueDate) : null,
+            description: subtaskEdited.description,
+            status: subtaskEdited.status,
+            estimate: subtaskEdited.estimate,
+            type: subtaskEdited.type,
+            priority: subtaskEdited.priority,
+            version: subtaskEdited.version,
+            force: false,
+        }
+
+        axiosInstance.put(`/subtask`, subtaskEdited)
+            .then(response => {
+                // TODO: Kazka cia reikia daryti
+                fetchDetailedTask();
+            })
+            .catch(error => {
+                if (error.status === 409) {
+                    const userChoice = window.confirm(ScriptResources.OptimisticLockingUserChoice);
+                    if (userChoice) {
+                        updateSubTaskBody.force = true;
+                        axiosInstance.put(`/subtask`, updateSubTaskBody)
+                            .catch(error => {
+                                console.error("Error forcing subtask update:", error);
+                            })
+                    }
+                    else {
+                        fetchDetailedTask();
+                    }
+                }
+                else {
+                    console.error("Error updating task:", error);
+                    console.log(error);
+                }
+            })
     }
 
     return (
@@ -109,7 +154,7 @@ const Comment: React.FC<SubTaskProps> = ({ subTask }) => {
                 <Form.Control
                     type="datetime-local"
                     name="dueDate"
-                    value={subtaskEdited.dueDate}
+                    value={subtaskEdited.dueDate ? subtaskEdited.dueDate.toISOString().split("T")[0] : ""}
                     onChange={handleInputChange}
                 />
             </Form.Group>

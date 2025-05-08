@@ -1,16 +1,21 @@
 import { Button, ButtonGroup, Form } from "react-bootstrap";
 import { TaskDetailed } from "../../../Models/TaskDetailed";
 import { estimateMapper, priorityMapper, typeMapper } from "../../utility/enumMapper";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { UpdateTaskBody } from "../../../Models/RequestBodies/UpdateTaskBody";
+import { axiosInstance } from "../../../utils/axiosInstance";
+import ScriptResources from "../../../assets/resources/strings";
 
 type taskInfoSectionProps = {
     taskDetailed: TaskDetailed,
     setTaskDetailed: Dispatch<SetStateAction<TaskDetailed>>
+    workspaceId: string
+    fetchDetailedTask: () => void
 }
 
 // TODO html datetime-local format skiriasi nuo dotnet DateTime. Kai turesim endpointus, reiks sutvarkyt.
 
-const TaskInfoSection: React.FC<taskInfoSectionProps> = ({ taskDetailed, setTaskDetailed }) => {
+const TaskInfoSection: React.FC<taskInfoSectionProps> = ({ taskDetailed, setTaskDetailed, workspaceId, fetchDetailedTask }) => {
     const [taskDetailedEdited, setTaskDetailedEdited] = useState<TaskDetailed>(taskDetailed);
     const [isEdited, setIsEdited] = useState<boolean>(false);
 
@@ -21,16 +26,59 @@ const TaskInfoSection: React.FC<taskInfoSectionProps> = ({ taskDetailed, setTask
             setTaskDetailedEdited((prevDetails) => ({
                 ...prevDetails,
                 [name]: name === "status" || name === "estimate" || name === "type" || name === "priority"
-                    ? parseInt(value, 10)
-                    : value,
+                    ? parseInt(value, 10)  // Ensure parsing for integer fields
+                    : name === "dueDate"
+                        ? new Date(value) // Parse dueDate field as a Date object
+                        : value,
             }));
         }
     };
 
+    useEffect(() => {
+        setTaskDetailedEdited(taskDetailed);
+    }, [taskDetailed]);
+
     const handleTaskInfoChange = () => {
-        // susisiekiam su endpointu
-        console.log("TASK INFO CHANGE: ");
-        console.log(taskDetailedEdited);
+        const updateTaskBody: UpdateTaskBody = {
+            name: taskDetailedEdited.name,
+            id: taskDetailedEdited.id,
+            workspaceId: workspaceId,
+            createdByUserEmail: taskDetailedEdited.createdByUserEmail,
+            assignedToUserEmail: taskDetailedEdited.assignedToUserEmail,
+            dueDate: taskDetailedEdited.dueDate ? new Date(taskDetailedEdited.dueDate) : null,
+            description: taskDetailedEdited.description,
+            status: taskDetailedEdited.status,
+            estimate: taskDetailedEdited.estimate,
+            type: taskDetailedEdited.type,
+            priority: taskDetailedEdited.priority,
+            version: taskDetailedEdited.version,
+            force: false,
+        }
+
+        axiosInstance.put(`/task`, updateTaskBody)
+            .then(response => {
+                // TODO: Kazka cia reikia daryti
+                fetchDetailedTask();
+            })
+            .catch(error => {
+                if (error.status === 409) {
+                    const userChoice = window.confirm(ScriptResources.OptimisticLockingUserChoice);
+                    if (userChoice) {
+                        updateTaskBody.force = true;
+                        axiosInstance.put(`/subtask`, updateTaskBody)
+                            .catch(error => {
+                                console.error("Error forcing subtask update:", error);
+                            })
+                    }
+                    else {
+                        fetchDetailedTask();
+                    }
+                }
+                else {
+                    console.error("Error updating task:", error);
+                    console.log(error);
+                }
+            })
     }
 
     return (
@@ -50,7 +98,7 @@ const TaskInfoSection: React.FC<taskInfoSectionProps> = ({ taskDetailed, setTask
                 <Form.Control
                     type="date"
                     name="dueDate"
-                    value={taskDetailedEdited.dueDate}
+                    value={taskDetailedEdited.dueDate ? taskDetailedEdited.dueDate.toISOString().split("T")[0] : ""}
                     onChange={handleInputChange}
                 />
             </Form.Group>

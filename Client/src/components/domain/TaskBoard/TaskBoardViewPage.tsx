@@ -25,28 +25,29 @@ export const TaskBoardViewPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchTasks = () => {
-      setError(null);
-      setIsLoading(true);
-      axiosInstance.get(`/task/${id}`, {
-        params: { pageNumber: 1, pageSize: 10 },
+  const fetchTasks = () => {
+    setError(null);
+    setIsLoading(true);
+    axiosInstance.get(`/task/${id}`, {
+      params: { pageNumber: 1, pageSize: 10 },
+    })
+      .then(response => {
+        setCards(response.data.tasks);
       })
-        .then(response => {
-          setCards(response.data);
-        })
-        .catch(error => {
-          setError(error);
-          console.log(error);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        })
-    }
+      .catch(error => {
+        setError(error);
+        console.log(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      })
+  }
+
+  useEffect(() => {
     if (keycloak.authenticated) {
-      //fetchTasks();
+      fetchTasks();
       // TODO kolkas naudojam dummy data
-      setCards(dummyTasks);
+      //setCards(dummyTasks);
       setIsLoading(false);
     }
   }, [id, keycloak.authenticated])
@@ -58,7 +59,7 @@ export const TaskBoardViewPage = () => {
   } else {
     return (
       <div className="kanban-container">
-        <Board cards={cards} setCards={setCards} />
+        <Board cards={cards} setCards={setCards} fetchTasks={fetchTasks} workspaceId={id}/>
       </div>
     )
   }
@@ -67,9 +68,11 @@ export const TaskBoardViewPage = () => {
 type BoardProps = {
   cards: TaskSummary[],
   setCards: Dispatch<React.SetStateAction<TaskSummary[]>>
+  fetchTasks: () => void;
+  workspaceId: string;
 }
 
-const Board: React.FC<BoardProps> = ({ cards, setCards }) => {
+const Board: React.FC<BoardProps> = ({ cards, setCards, fetchTasks, workspaceId }) => {
   return (
     <div className="board">
       <Column
@@ -78,6 +81,8 @@ const Board: React.FC<BoardProps> = ({ cards, setCards }) => {
         headingColor="backlog-color"
         cards={cards}
         setCards={setCards}
+        fetchTasks={fetchTasks}
+        workspaceId={workspaceId}
       />
       <Column
         title={statusMapper[1]}
@@ -85,6 +90,8 @@ const Board: React.FC<BoardProps> = ({ cards, setCards }) => {
         headingColor="todo-color"
         cards={cards}
         setCards={setCards}
+        fetchTasks={fetchTasks}
+        workspaceId={workspaceId}
       />
       <Column
         title={statusMapper[2]}
@@ -92,6 +99,8 @@ const Board: React.FC<BoardProps> = ({ cards, setCards }) => {
         headingColor="in-progress-color"
         cards={cards}
         setCards={setCards}
+        fetchTasks={fetchTasks}
+        workspaceId={workspaceId}
       />
       <Column
         title={statusMapper[3]}
@@ -99,6 +108,8 @@ const Board: React.FC<BoardProps> = ({ cards, setCards }) => {
         headingColor="complete-color"
         cards={cards}
         setCards={setCards}
+        fetchTasks={fetchTasks}
+        workspaceId={workspaceId}
       />
       <BurnBarrel setCards={setCards} />
     </div>
@@ -127,13 +138,12 @@ const BurnBarrel: React.FC<BurnBarrelProps> = ({ setCards }) => {
     const cardDeletionRequest = (cardId: string) => {
       axiosInstance.delete(`/task/${cardId}`)
         .then(response => {
-          console.log(response);
           if (response.status === 200) {
             setCards((pv) => pv.filter((c) => c.id !== cardId));
           }
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
         })
     }
 

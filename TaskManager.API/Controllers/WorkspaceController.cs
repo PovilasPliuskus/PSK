@@ -1,58 +1,68 @@
-using Microsoft.AspNetCore.Authorization;
+using BusinessLogic.Interfaces;
+using Contracts.RequestBodies;
+using Contracts.ResponseBodies;
+using DataAccess.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using TaskManager.API.Exceptions;
 
-[Route("api")]
+namespace TaskManager.API.Controllers;
+
 [ApiController]
+[Route("api/[controller]")]
 public class WorkspaceController : ControllerBase
 {
-    // Kas šitą darys, reikia pakeisti controllerį, kad gautų duomenis iš DB.
-    [HttpGet("workspaces")]
-    [Authorize]
-    public IActionResult GetWorkspaces(int pageNumber, int pageSize)
-    {
-        // Generate dummy data
-        var workspaces = GenerateDummyWorkspaces(pageNumber, pageSize);
 
-        return Ok(new
-        {
-            pageNumber,
-            pageSize,
-            totalItems = 100, // You can dynamically calculate the total count if needed
-            totalPages = (int)Math.Ceiling(100 / (double)pageSize), // Example total pages
-            data = workspaces
-        });
+    private readonly IWorkspaceService _workspaceService;
+
+    public WorkspaceController(IWorkspaceService workspaceService)
+    {
+        _workspaceService = workspaceService;
     }
 
-    // Šitą ištrinti po to, kai bus padarytas duomenų gavimas iš DB
-    private List<Workspace> GenerateDummyWorkspaces(int pageNumber, int pageSize)
+    [HttpGet]
+    public async Task<IActionResult> GetWorkspacePageAsync(int pageNumber, int pageSize)
     {
-        var workspaces = new List<Workspace>();
+        GetWorkspacesResponse response = await _workspaceService.GetWorkspacePageAsync(pageNumber, pageSize);
 
-        // Create dummy data (100 items for example)
-        for (int i = 0; i < 100; i++)
+        return Ok(response);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetWorkspaceAsync(Guid id)
+    {
+        GetWorkspaceResponse response = await _workspaceService.GetWorkspaceByIdAsync(id);
+
+        return Ok(response);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateWorkspaceAsync([FromBody] CreateWorkspaceRequest request)
+    {
+        var userEmail = User.GetUserEmail();
+
+        if (string.IsNullOrEmpty(userEmail))
         {
-            workspaces.Add(new Workspace
-            {
-                Id = Guid.NewGuid(),
-                Name = $"Workspace {i + 1}",
-                CreatedAt = DateTime.UtcNow.AddDays(-i), // CreatedAt decreasing over time
-                CreatedBy = $"User{(i % 10) + 1}" // CreatedBy with dummy user names
-            });
+            throw new NotAuthenticatedException("User is not authenticated");
         }
+        request.CreatedByUserEmail = userEmail;
+        await _workspaceService.CreateWorkspaceAsync(request);
 
-        // Paginate the data based on pageNumber and pageSize
-        return workspaces
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
+        return Ok();
     }
-}
 
-// Šitą ištrinti po to, kai bus padarytas gavimas iš DB
-public class Workspace
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public string CreatedBy { get; set; }
+    [HttpPut]
+    public async Task<IActionResult> UpdateWorkspaceAsync([FromBody] UpdateWorkspaceRequest request)
+    {
+        await _workspaceService.UpdateWorkspaceAsync(request);
+
+        return Ok();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteWorkspaceAsync(Guid id)
+    {
+        await _workspaceService.DeleteWorkspaceAsync(id);
+
+        return Ok();
+    }
 }

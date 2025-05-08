@@ -23,31 +23,35 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({editingTaskId, setShowEdit
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    useEffect(() => {
-        const fetchDetailedTask = () => {
-            setError(null);
-            setIsLoading(true);
-            // Reikia naujo endpoint, kad gautume pilna task objekta pagal id (Dabartinis endpoint yra skirtas task summary sarasa gauti)
-            axiosInstance.get(`/task/detailed/${editingTaskId}`, {
+    const fetchDetailedTask = () => {
+        setError(null);
+        setIsLoading(true);
+
+        axiosInstance.get(`/task/detailed/${editingTaskId}`, {
+        })
+            .then(response => {
+                const taskData = response.data;
+                if (taskData && taskData.dueDate) {
+                    taskData.dueDate = new Date(taskData.dueDate);
+                }
+                setTaskDetailed(taskData);
             })
-                .then(response => {
-                    setTaskDetailed(response.data);
-                })
-                .catch(error => {
-                    setTaskDetailed(null);
-                    setError(error);
-                    console.log(error);
-                })
-                .finally(() => {
-                    setIsLoading(false);
-                })
-        }
+            .catch(error => {
+                setTaskDetailed(null);
+                setError(error);
+                console.log(error);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            })
+    }
+
+    useEffect(() => {
         if (keycloak.authenticated) {
-            //fetchDetailedTask();
+            fetchDetailedTask();
             // TODO kolkas naudojam dummy data
-            setTaskDetailed(dummyTasks[0]);
+            //setTaskDetailed(dummyTasks[0]);
             setIsLoading(false);
-            console.log("FETCH ENDPOINT");
         }
     }, [])
 
@@ -60,21 +64,16 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({editingTaskId, setShowEdit
                 {taskDetailed && (
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
-                            <TaskInfoSection taskDetailed={taskDetailed} setTaskDetailed={setTaskDetailed}/>
-
+                            <TaskInfoSection taskDetailed={taskDetailed} setTaskDetailed={setTaskDetailed} workspaceId={taskDetailed.workspaceId} fetchDetailedTask={fetchDetailedTask}/>
                             {!selectedSubtask && (
-                                <SubTaskListSection SubTasks={taskDetailed.SubTasks} setSelectedSubtask={setSelectedSubtask}/>
+                                <SubTaskListSection SubTasks={taskDetailed.SubTasks} setSelectedSubtask={setSelectedSubtask} workspaceId={taskDetailed.workspaceId} fetchDetailedTask={fetchDetailedTask}/>
                             )}
-
-
                             {selectedSubtask && (
-                                <SubTaskExpandedSection selectedSubtask={selectedSubtask} setSelectedSubtask={setSelectedSubtask}/>
+                                <SubTaskExpandedSection selectedSubtask={selectedSubtask} setSelectedSubtask={setSelectedSubtask} workspaceId={taskDetailed.workspaceId} fetchDetailedTask={fetchDetailedTask}/>
                             )}
                         </div>
-                        
-                        <TaskCommentSection comments={taskDetailed.Comments}/>
+                        <TaskCommentSection comments={taskDetailed.Comments} workspaceId={taskDetailed.workspaceId} taskId={taskDetailed.id}/>
                     </div>
-
                 )}
                 {error && (
                     <div>Error</div>

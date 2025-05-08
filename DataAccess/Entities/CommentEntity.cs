@@ -17,10 +17,9 @@ public class CommentEntity : BaseModelEntity
     public SubTaskEntity? SubTask { get; set; }
 
     [Required]
-    public required Guid FkWrittenByUserId { get; set; }
-
-    [ForeignKey(nameof(FkWrittenByUserId))]
-    public UserEntity? WrittenByUserId { get; set; }
+    [EmailAddress]
+    [StringLength(255)]
+    public required string FkWrittenByUserEmail { get; set; }
 
     [Required]
     public required bool Edited { get; set; } = false;

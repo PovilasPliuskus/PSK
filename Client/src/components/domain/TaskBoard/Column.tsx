@@ -7,12 +7,18 @@ import { axiosInstance } from "../../../utils/axiosInstance";
 import DropIndicator from "./DropIndicator";
 import './TaskBoardViewPage.css';
 import Card from "./Card";
+import { UpdateTaskBody } from "../../../Models/RequestBodies/UpdateTaskBody";
+import ScriptResources from "../../../../src/assets/resources/strings"
+import { CreateTaskBody } from "../../../Models/RequestBodies/CreateTaskBody";
+
 type ColumnProps = {
   title: string;
   headingColor: string;
   cards: TaskSummary[];
   column: StatusEnum;
   setCards: Dispatch<SetStateAction<TaskSummary[]>>;
+  fetchTasks: () => void;
+  workspaceId: string;
 };
 
 const Column: React.FC<ColumnProps> = ({
@@ -21,6 +27,8 @@ const Column: React.FC<ColumnProps> = ({
   cards,
   column,
   setCards,
+  fetchTasks,
+  workspaceId
 }) => {
   const [active, setActive] = useState(false);
 
@@ -29,19 +37,51 @@ const Column: React.FC<ColumnProps> = ({
   };
 
   const changeCardStatusInBackend = (card: TaskSummary) => {
-    const cardPatchRequest = (taskSummary: TaskSummary) => {
-      axiosInstance.patch(`/task/${taskSummary.id}`, taskSummary)
+    const cardPutRequest = (taskSummary: TaskSummary) => {
+      const updateTaskBody: UpdateTaskBody = {
+        id: taskSummary.id,
+        workspaceId: taskSummary.workspaceId,
+        name: taskSummary.name,
+        createdByUserEmail: taskSummary.createdByUserEmail,
+        dueDate: taskSummary.dueDate ? new Date(taskSummary.dueDate) : null,
+        assignedToUserEmail: taskSummary.assignedToUserEmail,
+        status: taskSummary.status,
+        estimate: taskSummary.estimate,
+        type: taskSummary.type,
+        priority: taskSummary.priority,
+        version: taskSummary.version,
+        force: false,
+      }
+
+      axiosInstance.put(`/task`, updateTaskBody)
         .then(response => {
           console.log(response);
           const returnedCard = response.data;
           // TODO update cards once response is received.
         })
         .catch(error => {
-          console.log(error);
+          if (error.status === 409) {
+            const userChoice = window.confirm(ScriptResources.OptimisticLockingUserChoice);
+            if (userChoice) {
+              updateTaskBody.force = true;
+              axiosInstance.put(`/task`, updateTaskBody)
+                .catch(error => {
+                  console.error("Error forcing task update:", error);
+                })
+            }
+            else {
+              fetchTasks();
+            }
+          }
+          else {
+            console.error("Error updating task:", error);
+            console.log(error);
+          }
         })
     }
+
     if (card != null) {
-      cardPatchRequest(card);
+      cardPutRequest(card);
     }
   }
 
@@ -63,7 +103,7 @@ const Column: React.FC<ColumnProps> = ({
       if (!cardToTransfer) return;
       cardToTransfer = { ...cardToTransfer, status: column };
 
-      changeCardStatusInBackend(cardToTransfer, column);
+      changeCardStatusInBackend(cardToTransfer);
 
       copy = copy.filter((c) => c.id !== cardId);
       const moveToBack = before === "-1";
@@ -143,6 +183,7 @@ const Column: React.FC<ColumnProps> = ({
     setActive(false);
   };
 
+
   const filteredCards = cards.filter((c) => c.status === column);
 
   return (
@@ -163,7 +204,7 @@ const Column: React.FC<ColumnProps> = ({
           return <Card key={c.id} task={c} handleDragStart={handleDragStart} />;
         })}
         <DropIndicator beforeId={null} column={column} />
-        <AddCard column={column} setCards={setCards} />
+        <AddCard column={column} setCards={setCards} workspaceId={workspaceId} fetchTasks={fetchTasks}/>
       </div>
     </div>
   );
@@ -172,9 +213,11 @@ const Column: React.FC<ColumnProps> = ({
 type AddCardProps = {
   column: StatusEnum;
   setCards: Dispatch<SetStateAction<TaskSummary[]>>;
+  workspaceId: string;
+  fetchTasks: () => void;
 };
 
-const AddCard = ({ column, setCards }: AddCardProps) => {
+const AddCard = ({ column, setCards, workspaceId, fetchTasks }: AddCardProps) => {
   const [name, setName] = useState("");
   const [adding, setAdding] = useState(false);
 
@@ -183,32 +226,22 @@ const AddCard = ({ column, setCards }: AddCardProps) => {
 
     if (!name.trim().length) return;
 
-    type taskSummaryRequestBody = {
-      status: number,
-      name: string,
-      estimate: number,
-      type: number,
-      priority: number
+    const createTaskBody : CreateTaskBody = {
+      name: name.trim(),
+      workspaceId: workspaceId,
+      status: column,
+      version: 0,
     }
 
-    const newCard: taskSummaryRequestBody = {
-      status: column,
-      name: name.trim(),
-      estimate: 1,
-      type: 2,
-      priority: 2,
-    };
-
-    // using pre-set workspace id while workspaces are not implemented
     const cardCreationRequest = () => {
-      axiosInstance.post(`/task/0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c`, newCard)
+      axiosInstance.post(`/task`, createTaskBody)
         .then(response => {
-          console.log(response);
-          const returnedCard = response.data;
-          setCards((pv) => [...pv, returnedCard]);
+          fetchTasks();
+          //const returnedCard = response.data;
+          //setCards((pv) => [...pv, returnedCard]);
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
         })
     }
 

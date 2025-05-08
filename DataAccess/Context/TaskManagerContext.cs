@@ -9,37 +9,14 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
     public DbSet<CommentEntity>? Comments { get; set; }
     public DbSet<SubTaskEntity>? SubTasks { get; set; }
     public DbSet<TaskEntity>? Tasks { get; set; }
-    public DbSet<UserEntity>? Users { get; set; }
     public DbSet<WorkspaceEntity>? Workspaces { get; set; }
     public DbSet<WorkspaceUsersEntity>? WorkspaceUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // UserEntity
-        modelBuilder.Entity<UserEntity>()
-            .HasIndex(u => u.StudentId)
-            .IsUnique();
-
-        modelBuilder.Entity<UserEntity>()
-            .HasIndex(u => u.Email)
-            .IsUnique();
-
-        // WorkspaceEntity
-        modelBuilder.Entity<WorkspaceEntity>()
-            .HasOne(w => w.CreatedByUserId)
-            .WithMany()
-            .HasForeignKey(w => w.FkCreatedByUserId)
-            .OnDelete(DeleteBehavior.Restrict);
-
         // WorkspaceUsersEntity
         modelBuilder.Entity<WorkspaceUsersEntity>()
-            .HasKey(wu => new { wu.FkUserId, wu.FkWorkspaceId });
-
-        modelBuilder.Entity<WorkspaceUsersEntity>()
-            .HasOne<UserEntity>()
-            .WithMany()
-            .HasForeignKey(wu => wu.FkUserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasKey(wu => new { wu.FkUserEmail, wu.FkWorkspaceId });
 
         modelBuilder.Entity<WorkspaceUsersEntity>()
             .HasOne<WorkspaceEntity>()
@@ -55,16 +32,8 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<TaskEntity>()
-            .HasOne(t => t.CreatedByUserId)
-            .WithMany()
-            .HasForeignKey(t => t.FkCreatedByUserId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<TaskEntity>()
-            .HasOne(t => t.AssignedToUserId)
-            .WithMany()
-            .HasForeignKey(t => t.FkAssignedToUserId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .Property(v => v.Version)
+            .IsRowVersion();
 
         // SubtaskEntity
         modelBuilder.Entity<SubTaskEntity>()
@@ -74,16 +43,8 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<SubTaskEntity>()
-            .HasOne(st => st.CreatedByUserId)
-            .WithMany()
-            .HasForeignKey(st => st.FkCreatedByUserId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<SubTaskEntity>()
-            .HasOne(st => st.AssignedToUserId)
-            .WithMany()
-            .HasForeignKey(st => st.FkAssignedToUserId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .Property(v => v.Version)
+            .IsRowVersion();
 
         // CommentEntity
         modelBuilder.Entity<CommentEntity>()
@@ -93,15 +54,13 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<CommentEntity>()
+            .Property(v => v.Version)
+            .IsRowVersion();
+
+        modelBuilder.Entity<CommentEntity>()
             .HasOne(c => c.SubTask)
             .WithMany()
             .HasForeignKey(c => c.FkSubTaskId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<CommentEntity>()
-            .HasOne(c => c.WrittenByUserId)
-            .WithMany()
-            .HasForeignKey(c => c.FkWrittenByUserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // AttachmentEntity
@@ -117,10 +76,31 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
             .HasForeignKey(a => a.FkSubTaskId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<AttachmentEntity>()
-            .HasOne(a => a.CreatedByUserId)
-            .WithMany()
-            .HasForeignKey(a => a.FkCreatedByUserId)
-            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkspaceEntity>()
+            .Property(v => v.Version)
+            .IsRowVersion();
+    }
+
+    // This overrides the SaveChangesAsync method to set the CreatedAt and UpdatedAt properties
+    // for entities that inherit from BaseModelEntity.
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker.Entries()
+        .Where(e => e.Entity is BaseModelEntity &&
+                    (e.State == EntityState.Added || e.State == EntityState.Modified));
+
+        foreach (var entry in entries)
+        {
+            var entity = (BaseModelEntity)entry.Entity;
+
+            if (entry.State == EntityState.Added)
+            {
+                entity.CreatedAt = DateTime.UtcNow;
+            }
+
+            entity.UpdatedAt = DateTime.UtcNow;
+        }
+
+        return base.SaveChangesAsync(cancellationToken);
     }
 }

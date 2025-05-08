@@ -4,23 +4,39 @@ import SubTask from "./SubTask"
 import { Form } from "react-bootstrap"
 import Comment from "./Comment";
 import { BsChevronLeft } from "react-icons/bs";
+import { axiosInstance } from "../../../utils/axiosInstance";
+import { CreateCommentBody } from "../../../Models/RequestBodies/CreateCommentBody";
+
 type subTaskExpandedSectionProps = {
     selectedSubtask: SubTaskType,
     setSelectedSubtask: Dispatch<SetStateAction<SubTaskType | null>>,
+    workspaceId: string,
+    fetchDetailedTask: () => void
 }
 
 
-const SubTaskExpandedSection: React.FC<subTaskExpandedSectionProps> = ({ selectedSubtask, setSelectedSubtask }) => {
+const SubTaskExpandedSection: React.FC<subTaskExpandedSectionProps> = ({ selectedSubtask, setSelectedSubtask, workspaceId, fetchDetailedTask }) => {
     const [commentText, setCommentText] = useState("");
     const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setCommentText(e.target.value);
     }
 
     const handleCommentAdd = () => {
-        // susisiekiam su endpointu
-        console.log("ADD SUBTASK COMMENT: " + commentText);
+        const createCommentBody : CreateCommentBody = {
+            text: commentText,
+            subTaskId: selectedSubtask.id,
+            version: 0,
+        }
+        axiosInstance.post(`/comment`, createCommentBody)
+        .then(response => {
+            // TODO: Kazka cia reikia daryti
+            fetchDetailedTask();
+        })
+        .catch(error => {
+            console.error(error);
+        })
     }
-
+    
 
     return (
         <div className="subtask-expanded-section">
@@ -30,7 +46,7 @@ const SubTaskExpandedSection: React.FC<subTaskExpandedSectionProps> = ({ selecte
             </div>
 
             <div className="subtask-expanded-section-content">
-                <SubTask subTask={selectedSubtask} setSelectedSubtask={setSelectedSubtask}></SubTask>
+                <SubTask subTask={selectedSubtask} setSelectedSubtask={setSelectedSubtask} fetchDetailedTask={fetchDetailedTask}></SubTask>
                 <div className="subtask-comment-section" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginLeft: '20px' }}>
                     <div>
                         {selectedSubtask.comments.map((c) => {
