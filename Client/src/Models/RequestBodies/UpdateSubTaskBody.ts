@@ -1,6 +1,7 @@
 import { EstimateEnum, PriorityEnum, StatusEnum, TypeEnum } from "../TaskEnums";
 
 export interface UpdateSubTaskBody {
+    id: string;
     name: string;
     taskId: string;
     createdByUserEmail: string;

@@ -8,10 +8,11 @@ type SubTaskListSectionProps = {
     SubTasks: SubTask[],
     setSelectedSubtask: Dispatch<React.SetStateAction<SubTask | null>>,
     workspaceId: string,
-    fetchDetailedTask: () => void
+    fetchDetailedTask: () => void,
+    taskId: string
 }
 
-const SubTaskListSection: React.FC<SubTaskListSectionProps> = ({ SubTasks, setSelectedSubtask, workspaceId, fetchDetailedTask }) => {
+const SubTaskListSection: React.FC<SubTaskListSectionProps> = ({ SubTasks, setSelectedSubtask, workspaceId, fetchDetailedTask, taskId }) => {
     const [newSubTaskName, setNewSubTaskName] = useState<string>("New SubTask")
 
     const handleNewSubTaskNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -22,6 +23,7 @@ const SubTaskListSection: React.FC<SubTaskListSectionProps> = ({ SubTasks, setSe
         const createSubTaskBody: CreateSubTaskBody = {
             name: newSubTaskName,
             workspaceId: workspaceId,
+            taskId: taskId,
             version: 0,
         }
         axiosInstance.post(`/subtask`, createSubTaskBody)

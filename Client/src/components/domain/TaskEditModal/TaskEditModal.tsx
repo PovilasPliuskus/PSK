@@ -34,7 +34,20 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({editingTaskId, setShowEdit
                 if (taskData && taskData.dueDate) {
                     taskData.dueDate = new Date(taskData.dueDate);
                 }
+                if (taskData && taskData.subTasks) {
+                    taskData.subTasks = taskData.subTasks.map(st => {
+                        
+                        if (st.dueDate){
+                            st.dueDate = new Date(st.dueDate);
+                            return st;
+                        }
+                        return st;
+                    })
+                }
                 setTaskDetailed(taskData);
+                if(selectedSubtask){
+                    setSelectedSubtask(taskData.subTasks.filter(st => st.id === selectedSubtask.id)[0]);
+                }
             })
             .catch(error => {
                 setTaskDetailed(null);
@@ -49,8 +62,6 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({editingTaskId, setShowEdit
     useEffect(() => {
         if (keycloak.authenticated) {
             fetchDetailedTask();
-            // TODO kolkas naudojam dummy data
-            //setTaskDetailed(dummyTasks[0]);
             setIsLoading(false);
         }
     }, [])
@@ -66,13 +77,13 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({editingTaskId, setShowEdit
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
                             <TaskInfoSection taskDetailed={taskDetailed} setTaskDetailed={setTaskDetailed} workspaceId={taskDetailed.workspaceId} fetchDetailedTask={fetchDetailedTask}/>
                             {!selectedSubtask && (
-                                <SubTaskListSection SubTasks={taskDetailed.SubTasks} setSelectedSubtask={setSelectedSubtask} workspaceId={taskDetailed.workspaceId} fetchDetailedTask={fetchDetailedTask}/>
+                                <SubTaskListSection SubTasks={taskDetailed.subTasks} setSelectedSubtask={setSelectedSubtask} workspaceId={taskDetailed.workspaceId} fetchDetailedTask={fetchDetailedTask} taskId={taskDetailed.id}/>
                             )}
                             {selectedSubtask && (
                                 <SubTaskExpandedSection selectedSubtask={selectedSubtask} setSelectedSubtask={setSelectedSubtask} workspaceId={taskDetailed.workspaceId} fetchDetailedTask={fetchDetailedTask}/>
                             )}
                         </div>
-                        <TaskCommentSection comments={taskDetailed.Comments} workspaceId={taskDetailed.workspaceId} taskId={taskDetailed.id}/>
+                        <TaskCommentSection comments={taskDetailed.comments} workspaceId={taskDetailed.workspaceId} taskId={taskDetailed.id}/>
                     </div>
                 )}
                 {error && (

@@ -13,10 +13,7 @@ type SubTaskProps = {
     fetchDetailedTask: () => void
 }
 
-// TODO html datetime-local format skiriasi nuo dotnet DateTime. Kai turesim endpointus, reiks sutvarkyt.
-
 const Comment: React.FC<SubTaskProps> = ({ subTask, fetchDetailedTask }) => {
-    const [subtask, setSubtask] = useState<SubTask>(subTask);
     const [subtaskEdited, setSubtaskEdited] = useState<SubTask>(subTask);
     const [isEdited, setIsEdited] = useState<boolean>(false);
 
@@ -28,19 +25,22 @@ const Comment: React.FC<SubTaskProps> = ({ subTask, fetchDetailedTask }) => {
             setSubtaskEdited((prevDetails) => ({
                 ...prevDetails,
                 [name]: name === "status" || name === "estimate" || name === "type" || name === "priority"
-                    ? parseInt(value, 10)
-                    : value,
+                    ? parseInt(value, 10)  // Ensure parsing for integer fields
+                    : name === "dueDate"
+                        ? new Date(value) // Parse dueDate field as a Date object
+                        : value,
             }));
         }
     };
 
     useEffect(() => {
-        setSubtaskEdited(subtask);
-    }, [subtask]);
-
+        setSubtaskEdited(subTask);
+    }, [subTask]);
+    
     const handleSubTaskInfoChange = () => {
         const updateSubTaskBody: UpdateSubTaskBody = {
             name: subtaskEdited.name,
+            id: subtaskEdited.id,
             taskId: subtaskEdited.taskId,
             createdByUserEmail: subtaskEdited.createdByUserEmail,
             assignedToUserEmail: subtaskEdited.assignedToUserEmail,
@@ -54,7 +54,7 @@ const Comment: React.FC<SubTaskProps> = ({ subTask, fetchDetailedTask }) => {
             force: false,
         }
 
-        axiosInstance.put(`/subtask`, subtaskEdited)
+        axiosInstance.put(`/subtask`, updateSubTaskBody)
             .then(response => {
                 // TODO: Kazka cia reikia daryti
                 fetchDetailedTask();
@@ -152,7 +152,7 @@ const Comment: React.FC<SubTaskProps> = ({ subTask, fetchDetailedTask }) => {
             <Form.Group className="mb-3" controlId="subtaskDueDate">
                 <Form.Label>Due Date</Form.Label>
                 <Form.Control
-                    type="datetime-local"
+                    type="date"
                     name="dueDate"
                     value={subtaskEdited.dueDate ? subtaskEdited.dueDate.toISOString().split("T")[0] : ""}
                     onChange={handleInputChange}
@@ -170,8 +170,8 @@ const Comment: React.FC<SubTaskProps> = ({ subTask, fetchDetailedTask }) => {
             {isEdited && (
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <ButtonGroup size="sm">
-                        <Button variant="success" onClick={() => { handleSubTaskInfoChange(); setIsEdited(false); setSubtask(subtaskEdited) }} >Save</Button>
-                        <Button variant="danger" onClick={() => { setIsEdited(false); setSubtaskEdited(subtask) }}>Cancel</Button>
+                        <Button variant="success" onClick={() => { handleSubTaskInfoChange(); setIsEdited(false) }} >Save</Button>
+                        <Button variant="danger" onClick={() => { setIsEdited(false); setSubtaskEdited(subTask) }}>Cancel</Button>
                     </ButtonGroup>
                 </div>
             )}

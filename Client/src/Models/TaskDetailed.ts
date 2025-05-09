@@ -14,7 +14,7 @@ export interface TaskDetailed extends BaseModel{
     estimate: EstimateEnum;
     type: TypeEnum;
     priority: PriorityEnum;
-    SubTasks: SubTask[];
-    Comments: Comment[];
+    subTasks: SubTask[];
+    comments: Comment[];
     // TODO dar truksta Attachment, reikes nusprest kaip jis atrodys
 }

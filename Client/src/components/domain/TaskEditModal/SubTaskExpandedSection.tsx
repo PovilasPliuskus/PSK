@@ -22,21 +22,21 @@ const SubTaskExpandedSection: React.FC<subTaskExpandedSectionProps> = ({ selecte
     }
 
     const handleCommentAdd = () => {
-        const createCommentBody : CreateCommentBody = {
+        const createCommentBody: CreateCommentBody = {
             text: commentText,
             subTaskId: selectedSubtask.id,
             version: 0,
         }
         axiosInstance.post(`/comment`, createCommentBody)
-        .then(response => {
-            // TODO: Kazka cia reikia daryti
-            fetchDetailedTask();
-        })
-        .catch(error => {
-            console.error(error);
-        })
+            .then(response => {
+                // TODO: Kazka cia reikia daryti
+                fetchDetailedTask();
+            })
+            .catch(error => {
+                console.error(error);
+            })
     }
-    
+
 
     return (
         <div className="subtask-expanded-section">
@@ -48,13 +48,16 @@ const SubTaskExpandedSection: React.FC<subTaskExpandedSectionProps> = ({ selecte
             <div className="subtask-expanded-section-content">
                 <SubTask subTask={selectedSubtask} setSelectedSubtask={setSelectedSubtask} fetchDetailedTask={fetchDetailedTask}></SubTask>
                 <div className="subtask-comment-section" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginLeft: '20px' }}>
-                    <div>
-                        {selectedSubtask.comments.map((c) => {
-                            return (
-                                <Comment comment={c} key={c.id}></Comment>
-                            )
-                        })}
-                    </div>
+                    {selectedSubtask.comments && (
+                        <div>
+                            {selectedSubtask.comments.map((c) => {
+                                return (
+                                    <Comment comment={c} key={c.id}></Comment>
+                                )
+                            })}
+                        </div>
+                    )}
+
                     <div style={{ display: 'flex' }}>
                         <Form>
                             <Form.Group className="mb-3">

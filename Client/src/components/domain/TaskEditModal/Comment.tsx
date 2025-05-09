@@ -12,7 +12,7 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
                 {comment.writtenByUserEmail}
             </Card.Title>
             <Card.Subtitle className="text-muted" style={{fontSize: '10px'}}>
-                {comment.createdAt}
+                {/* {comment.createdAt} */}
             </Card.Subtitle>
             <Card.Text style={{fontSize: '15px'}}>
                 {comment.text}
