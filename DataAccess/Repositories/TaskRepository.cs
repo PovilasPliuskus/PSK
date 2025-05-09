@@ -6,7 +6,8 @@ using DataAccess.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Model = Contracts.Models;
 using Threading = System.Threading.Tasks;
-
+using System.Text.Json;
+using System.Text.Json.Serialization;
 namespace DataAccess.Repositories;
 
 public class TaskRepository : ITaskRepository
@@ -25,17 +26,7 @@ public class TaskRepository : ITaskRepository
     {
         List<TaskEntity> taskEntities = await _context.Tasks
             .Where(t => t.FkWorkspaceId == workspaceId)
-            .Include(t => t.SubTasks)
-                .ThenInclude(st => st.Comments)
-            .Include(t => t.SubTasks)
-                .ThenInclude(st => st.Attachments)
-            .Include(t => t.Comments)
-            .Include(t => t.Attachments)
             .ToListAsync();
-
-        /* TO-DO: this query doesn't fetch the child elements (SubTasks, Comments and Attachments).
-         * Not completely sure, but maybe mappers for them are needed to work correctly.
-         */
 
         return _mapper.Map<List<Model.Task>>(taskEntities);
     }
@@ -50,8 +41,8 @@ public class TaskRepository : ITaskRepository
             .Include(t => t.Comments)
             .Include(t => t.Attachments)
             .FirstAsync(t => t.Id == id);
-
-        return _mapper.Map<Model.Task>(taskEntity);
+        
+    return _mapper.Map<Model.Task>(taskEntity);
     }
 
     public async Threading.Task AddAsync(Model.Task task)

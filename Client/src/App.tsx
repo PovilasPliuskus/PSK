@@ -5,7 +5,7 @@ import { Container, Navbar, Nav, Button } from 'react-bootstrap';
 import DemoForm from './components/domain/Demo';
 
 
-import {TaskBoardViewPage} from './components/taskBoard/TaskBoardViewPage';
+import {TaskBoardViewPage} from './components/domain/TaskBoard/TaskBoardViewPage';
 import { axiosInstance, useAxiosInterceptor } from './utils/axiosInstance';
 import { ErrorProvider } from './components/base/ErrorContext';
 import GlobalAlert from './components/base/GlobalAlert';

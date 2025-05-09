@@ -20,8 +20,10 @@ builder.Services.AddDbContext<TaskManagerContext>(options =>
 
 builder.Services.AddTransient<ITaskService, TaskService>();
 builder.Services.AddTransient<IWorkspaceService, WorkspaceService>();
+builder.Services.AddTransient<ISubTaskService, SubTaskService>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
+builder.Services.AddScoped<ISubTaskRepository, SubTaskRepository>();
 
 var mapperConfig = new MapperConfiguration(cfg =>
 {
@@ -29,6 +31,8 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<DataAccess.Profiles.TaskProfile>();
     cfg.AddProfile<BusinessLogic.Profiles.WorkspaceProfile>();
     cfg.AddProfile<DataAccess.Profiles.WorkspaceProfile>();
+    cfg.AddProfile<BusinessLogic.Profiles.SubTaskProfile>();
+    cfg.AddProfile<DataAccess.Profiles.SubTaskProfile>();
 });
 
 builder.Services.AddSingleton(mapperConfig.CreateMapper());

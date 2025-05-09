@@ -1,6 +1,7 @@
 ﻿using Contracts.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace DataAccess.Entities;
 
@@ -15,6 +16,7 @@ public class SubTaskEntity : BaseModelEntity
     public required Guid FkTaskId { get; set; }
 
     [ForeignKey(nameof(FkTaskId))]
+    [JsonIgnore]
     public TaskEntity? Task { get; set; }
 
     [Required]
