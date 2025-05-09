@@ -27,7 +27,9 @@ public class TaskProfile : Profile
             .ForMember(dest => dest.Estimate, opt => opt.MapFrom(src => src.Estimate))
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type))
             .ForMember(dest => dest.Version, opt => opt.MapFrom(src => src.Version))
-            .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority));
+            .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority))
+            .ForMember(dest => dest.SubTasks, opt => opt.MapFrom(src => src.SubTasks))
+            .ForMember(dest => dest.Comments, opt => opt.MapFrom(src => src.Comments));
 
         CreateMap<List<Model.Task>, GetWorkspaceTasksResponse>()
             .ForMember(dest => dest.Tasks, opt => opt.MapFrom(src => src));

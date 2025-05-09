@@ -27,6 +27,9 @@ public class SubTaskProfile : Profile
             .ForMember(dest => dest.Version, opt => opt.MapFrom(src => src.Version))
             .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority));
 
+        CreateMap<List<Model.SubTask>, GetTaskSubTasksResponse>()
+            .ForMember(dest => dest.SubTasks, opt => opt.MapFrom(src => src));
+
         CreateMap<UpdateSubTaskRequest, Model.SubTask>()
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.DueDate, opt => opt.MapFrom(src => src.DueDate))
