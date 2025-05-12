@@ -1,7 +1,9 @@
 ﻿using BusinessLogic.Interfaces;
 using Contracts.RequestBodies;
 using Contracts.ResponseBodies;
+using DataAccess.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using TaskManager.API.Exceptions;
 
 namespace TaskManager.API.Controllers;
 
@@ -19,6 +21,14 @@ public class TaskController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateTaskAsync([FromBody] CreateTaskRequest request)
     {
+        var userEmail = User.GetUserEmail();
+
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            throw new NotAuthenticatedException("User is not authenticated");
+        }
+        request.CreatedByUserEmail = userEmail;
+        
         await _taskService.CreateTaskAsync(request);
 
         return Ok();
@@ -36,6 +46,14 @@ public class TaskController : ControllerBase
     public async Task<IActionResult> GetWorkspaceTasksAsync(Guid workspaceId)
     {
         GetWorkspaceTasksResponse response = await _taskService.GetWorkspaceTasksAsync(workspaceId);
+
+        return Ok(response);
+    }
+
+    [HttpGet("detailed/{id}")]
+    public async Task<IActionResult> GetTaskAsync(Guid id)
+    {
+        GetTaskResponse response = await _taskService.GetTaskAsync(id);
 
         return Ok(response);
     }

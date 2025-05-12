@@ -24,59 +24,63 @@ public class TaskManagerContext(DbContextOptions<TaskManagerContext> options) : 
             .HasForeignKey(wu => wu.FkWorkspaceId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // TaskEntity
+        // Task <-> Workspace
         modelBuilder.Entity<TaskEntity>()
             .HasOne(t => t.Workspace)
-            .WithMany()
+            .WithMany(w => w.Tasks)
             .HasForeignKey(t => t.FkWorkspaceId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // Task <-> SubTask
+        modelBuilder.Entity<TaskEntity>()
+            .HasMany(t => t.SubTasks)
+            .WithOne(st => st.Task)
+            .HasForeignKey(st => st.FkTaskId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Comment <-> SubTask
+        modelBuilder.Entity<CommentEntity>()
+            .HasOne(c => c.SubTask)
+            .WithMany(st => st.Comments)
+            .HasForeignKey(c => c.FkSubTaskId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Comment <-> Task
+        modelBuilder.Entity<CommentEntity>()
+            .HasOne(c => c.Task)
+            .WithMany(t => t.Comments)
+            .HasForeignKey(c => c.FkTaskId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Attachment <-> Task
+        modelBuilder.Entity<AttachmentEntity>()
+            .HasOne(a => a.Task)
+            .WithMany(t => t.Attachments)
+            .HasForeignKey(a => a.FkTaskId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Attachment <-> SubTask
+        modelBuilder.Entity<AttachmentEntity>()
+            .HasOne(a => a.SubTask)
+            .WithMany(st => st.Attachments)
+            .HasForeignKey(a => a.FkSubTaskId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<TaskEntity>()
             .Property(v => v.Version)
             .IsRowVersion();
 
-        // SubtaskEntity
-        modelBuilder.Entity<SubTaskEntity>()
-            .HasOne(st => st.Task)
-            .WithMany()
-            .HasForeignKey(st => st.FkTaskId)
-            .OnDelete(DeleteBehavior.Cascade);
-
         modelBuilder.Entity<SubTaskEntity>()
             .Property(v => v.Version)
             .IsRowVersion();
-
-        // CommentEntity
-        modelBuilder.Entity<CommentEntity>()
-            .HasOne(c => c.Task)
-            .WithMany()
-            .HasForeignKey(c => c.FkTaskId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<CommentEntity>()
-            .Property(v => v.Version)
-            .IsRowVersion();
-
-        modelBuilder.Entity<CommentEntity>()
-            .HasOne(c => c.SubTask)
-            .WithMany()
-            .HasForeignKey(c => c.FkSubTaskId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        // AttachmentEntity
-        modelBuilder.Entity<AttachmentEntity>()
-            .HasOne(a => a.Task)
-            .WithMany()
-            .HasForeignKey(a => a.FkTaskId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<AttachmentEntity>()
-            .HasOne(a => a.SubTask)
-            .WithMany()
-            .HasForeignKey(a => a.FkSubTaskId)
-            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<WorkspaceEntity>()
+            .Property(v => v.Version)
+            .IsRowVersion();
+        
+        modelBuilder.Entity<CommentEntity>()
             .Property(v => v.Version)
             .IsRowVersion();
     }

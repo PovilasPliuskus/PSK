@@ -38,6 +38,13 @@ public class TaskService : ITaskService
         return _mapper.Map<GetWorkspaceTasksResponse>(tasks);
     }
 
+    public async Task<GetTaskResponse> GetTaskAsync(Guid id)
+    {
+        Model.Task task = await _taskRepository.GetAsync(id);
+
+        return _mapper.Map<GetTaskResponse>(task);
+    }
+
     public async Task UpdateTaskAsync(UpdateTaskRequest request)
     {
         Model.Task task = _mapper.Map<Model.Task>(request);
