@@ -47,9 +47,22 @@ public class WorkspaceRepository : IWorkspaceRepository
     {
         WorkspaceEntity workspaceEntity = _mapper.Map<WorkspaceEntity>(workspace);
 
-        await _context.Workspaces.AddAsync(workspaceEntity);
+        // Create a new workspace entity with workspace user as owner
+        using (var transaction = await _context.Database.BeginTransactionAsync())
+        {
+            await _context.Workspaces.AddAsync(workspaceEntity);
 
-        await _context.SaveChangesAsync();
+            var workspaceUsersEntity = new WorkspaceUsersEntity
+            {
+                FkUserEmail = workspace.CreatedByUserEmail,
+                FkWorkspaceId = workspaceEntity.Id,
+                IsOwner = true
+            };
+
+            await _context.WorkspaceUsers.AddAsync(workspaceUsersEntity);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
     }
 
     public async Task UpdateAsync(WorkspaceWithoutTasks workspace)
