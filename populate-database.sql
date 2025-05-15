@@ -9,20 +9,20 @@ VALUES
     ('622da59d-82fb-4d9f-9b10-be4221de1911', 'PSP', 'TomJoe@mail.com', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('8f29abd4-b65c-4a84-9de4-965418858fcb', 'PSK', 'MikeFisher@mail.com', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-INSERT INTO public."WorkspaceUsers" ("FkUserEmail", "FkWorkspaceId")
+INSERT INTO public."WorkspaceUsers" ("FkUserEmail", "FkWorkspaceId", "IsOwner")
 VALUES
-    ('JohnSmith@mail.com', '0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c'),
-    ('TomJoe@mail.com', '0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c'),
-    ('MikeFisher@mail.com', '0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c'),
-    ('JohnSmith@mail.com', '622da59d-82fb-4d9f-9b10-be4221de1911'),
-    ('TomJoe@mail.com', '622da59d-82fb-4d9f-9b10-be4221de1911'),
-    ('JohnSmith@mail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb'),
-    ('TomJoe@mail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb'),
-    ('MikeFisher@mail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb'),
-    ('MichaelRose@mail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb'),
-    ('JaneSmith@mail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb'),
-    ('ElizabethMaple@gmail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb'),
-    ('BenForester@gmail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb');
+    ('JohnSmith@mail.com', '0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c', true),
+    ('TomJoe@mail.com', '0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c', false),
+    ('MikeFisher@mail.com', '0f2ca3a8-8372-4d7f-bf0f-97e79b922f3c', false),
+    ('JohnSmith@mail.com', '622da59d-82fb-4d9f-9b10-be4221de1911', false),
+    ('TomJoe@mail.com', '622da59d-82fb-4d9f-9b10-be4221de1911', true),
+    ('JohnSmith@mail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb', false),
+    ('TomJoe@mail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb', false),
+    ('MikeFisher@mail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb', true),
+    ('MichaelRose@mail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb', false),
+    ('JaneSmith@mail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb', false),
+    ('ElizabethMaple@gmail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb', false),
+    ('BenForester@gmail.com', '8f29abd4-b65c-4a84-9de4-965418858fcb', false);
     
 INSERT INTO public."Task" ("Id", "Name", "FkCreatedByUserEmail", "Status", "FkWorkspaceId", "CreatedAt",
     "UpdatedAt", "FkAssignedToUserEmail", "DueDate", "Description", "Estimate", "Type", "Priority")
