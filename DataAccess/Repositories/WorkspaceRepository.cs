@@ -47,6 +47,22 @@ public class WorkspaceRepository : IWorkspaceRepository
         return _mapper.Map<Workspace>(workspaceEntity);
     }
 
+    public async Task<PaginatedResult<WorkspaceUser>> GetUsersInWorkspaceAsync(int pageNumber, int pageSize, Guid workspaceId, string userEmail)
+    {
+        var query = _context.WorkspaceUsers
+            .Where(wu => wu.FkWorkspaceId == workspaceId && wu.FkUserEmail != userEmail);
+
+        List<WorkspaceUsersEntity> workspaceUsersEntities = await query
+            .Paginate(pageNumber, pageSize)
+            .ToListAsync();
+
+        int usersCount = await query.CountAsync();
+
+        var users = _mapper.Map<List<WorkspaceUser>>(workspaceUsersEntities);
+
+        return new PaginatedResult<WorkspaceUser>(users, usersCount, pageNumber, pageSize);
+    }
+
     public async Task AddAsync(WorkspaceWithoutTasks workspace)
     {
         WorkspaceEntity workspaceEntity = _mapper.Map<WorkspaceEntity>(workspace);

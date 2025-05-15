@@ -41,6 +41,20 @@ public class WorkspaceController : ControllerBase
         return Ok(response);
     }
 
+    [HttpGet("users/{workspaceId}")]
+    public async Task<IActionResult> GetUsersInWorkspaceAsync(int pageNumber, int pageSize, Guid workspaceId)
+    {
+        var userEmail = User.GetUserEmail();
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            throw new NotAuthenticatedException("User is not authenticated");
+        }
+
+        var response = await _workspaceService.GetUsersInWorkspaceAsync(pageNumber, pageSize, workspaceId, userEmail);
+
+        return Ok(response);
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateWorkspaceAsync([FromBody] CreateWorkspaceRequest request)
     {

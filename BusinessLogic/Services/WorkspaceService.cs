@@ -33,6 +33,13 @@ public class WorkspaceService : IWorkspaceService
         return _mapper.Map<GetWorkspaceResponse>(workspace);
     }
 
+    public async Task<GetUsersInWorkspaceResponse> GetUsersInWorkspaceAsync(int pageNumber, int pageSize, Guid workspaceId, string userEmail)
+    {
+        var users = await _workspaceRepository.GetUsersInWorkspaceAsync(pageNumber, pageSize, workspaceId, userEmail);
+
+        return _mapper.Map<GetUsersInWorkspaceResponse>(users);
+    }
+
     public async Task CreateWorkspaceAsync(CreateWorkspaceRequest request)
     {
         var workspace = _mapper.Map<WorkspaceWithoutTasks>(request);

@@ -70,6 +70,9 @@ const Workspaces: React.FC = () => {
     const handleEditClick = (workspaceId: string) => {
         const workspace = workspaces.find(w => w.id === workspaceId);
         if (workspace) {
+            axiosInstance.get(`/workspace/users/${workspaceId}`, {
+            params: { pageNumber: currentPage, pageSize: pageSize },
+        })
             setWorkspaceToEdit(workspace);
             setEditedName(workspace.name);
             setShowEditModal(true);
