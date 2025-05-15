@@ -21,9 +21,13 @@ public class WorkspaceRepository : IWorkspaceRepository
         _mapper = mapper;
     }
 
-    public async Task<PaginatedResult<WorkspaceWithoutTasks>> GetRangeAsync(int pageNumber, int pageSize)
+    public async Task<PaginatedResult<WorkspaceWithoutTasks>> GetRangeAsync(int pageNumber, int pageSize, string userEmail)
     {
-        List<WorkspaceEntity> workspaceEntities = await _context.Workspaces
+        var query = _context.Workspaces
+        .Where(w => _context.WorkspaceUsers
+            .Any(wu => wu.FkWorkspaceId == w.Id && wu.FkUserEmail == userEmail));
+
+        List<WorkspaceEntity> workspaceEntities = await query
             .Paginate(pageNumber, pageSize)
             .ToListAsync();
 

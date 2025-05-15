@@ -22,7 +22,13 @@ public class WorkspaceController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetWorkspacePageAsync(int pageNumber, int pageSize)
     {
-        GetWorkspacesResponse response = await _workspaceService.GetWorkspacePageAsync(pageNumber, pageSize);
+        var userEmail = User.GetUserEmail();
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            throw new NotAuthenticatedException("User is not authenticated");
+        }
+
+        GetWorkspacesResponse response = await _workspaceService.GetWorkspacePageAsync(pageNumber, pageSize, userEmail);
 
         return Ok(response);
     }
