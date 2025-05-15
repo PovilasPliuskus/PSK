@@ -31,7 +31,7 @@ public class WorkspaceRepository : IWorkspaceRepository
             .Paginate(pageNumber, pageSize)
             .ToListAsync();
 
-        int workspaceCount = await _context.Workspaces.CountAsync();
+        int workspaceCount = await query.CountAsync();
 
         var workspaces = _mapper.Map<List<WorkspaceWithoutTasks>>(workspaceEntities);
 
