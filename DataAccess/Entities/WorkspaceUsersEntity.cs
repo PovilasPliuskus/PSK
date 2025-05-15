@@ -13,4 +13,6 @@ public class WorkspaceUsersEntity
 
     [Key]
     public required Guid FkWorkspaceId { get; set; }
+
+    public bool IsOwner { get; set; }
 }
