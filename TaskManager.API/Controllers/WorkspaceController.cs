@@ -22,7 +22,13 @@ public class WorkspaceController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetWorkspacePageAsync(int pageNumber, int pageSize)
     {
-        GetWorkspacesResponse response = await _workspaceService.GetWorkspacePageAsync(pageNumber, pageSize);
+        var userEmail = User.GetUserEmail();
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            throw new NotAuthenticatedException("User is not authenticated");
+        }
+
+        GetWorkspacesResponse response = await _workspaceService.GetWorkspacePageAsync(pageNumber, pageSize, userEmail);
 
         return Ok(response);
     }
@@ -31,6 +37,20 @@ public class WorkspaceController : ControllerBase
     public async Task<IActionResult> GetWorkspaceAsync(Guid id)
     {
         GetWorkspaceResponse response = await _workspaceService.GetWorkspaceByIdAsync(id);
+
+        return Ok(response);
+    }
+
+    [HttpGet("users/{workspaceId}")]
+    public async Task<IActionResult> GetUsersInWorkspaceAsync(int pageNumber, int pageSize, Guid workspaceId)
+    {
+        var userEmail = User.GetUserEmail();
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            throw new NotAuthenticatedException("User is not authenticated");
+        }
+
+        var response = await _workspaceService.GetUsersInWorkspaceAsync(pageNumber, pageSize, workspaceId, userEmail);
 
         return Ok(response);
     }

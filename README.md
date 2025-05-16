@@ -9,6 +9,11 @@
 3. Using other IDE:
    1. In Client folder run: `npm run start:all`
 
+# How to create migrations
+1. Make changes for entities
+2. Create migration in global folder "PSK": `dotnet ef migrations add <migration name> --project DataAccess --startup-project TaskManager.API`
+3. Update databes in TaskManager.API folder: `dotnet ef database update`
+
 ## How to setup keycloak
 1. Go to docker folder.
 2. Run `docker compose up`.

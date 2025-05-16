@@ -19,9 +19,9 @@ public class WorkspaceService : IWorkspaceService
         _mapper = mapper;
     }
 
-    public async Task<GetWorkspacesResponse> GetWorkspacePageAsync(int pageNumber, int pageSize)
+    public async Task<GetWorkspacesResponse> GetWorkspacePageAsync(int pageNumber, int pageSize, string userEmail)
     {
-        var workspaces = await _workspaceRepository.GetRangeAsync(pageNumber, pageSize);
+        var workspaces = await _workspaceRepository.GetRangeAsync(pageNumber, pageSize, userEmail);
 
         return _mapper.Map<GetWorkspacesResponse>(workspaces);
     }
@@ -31,6 +31,13 @@ public class WorkspaceService : IWorkspaceService
         var workspace = await _workspaceRepository.GetSingleAsync(workspaceId);
 
         return _mapper.Map<GetWorkspaceResponse>(workspace);
+    }
+
+    public async Task<GetUsersInWorkspaceResponse> GetUsersInWorkspaceAsync(int pageNumber, int pageSize, Guid workspaceId, string userEmail)
+    {
+        var users = await _workspaceRepository.GetUsersInWorkspaceAsync(pageNumber, pageSize, workspaceId, userEmail);
+
+        return _mapper.Map<GetUsersInWorkspaceResponse>(users);
     }
 
     public async Task CreateWorkspaceAsync(CreateWorkspaceRequest request)

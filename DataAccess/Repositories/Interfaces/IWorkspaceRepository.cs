@@ -6,8 +6,9 @@ namespace DataAccess.Repositories.Interfaces;
 
 public interface IWorkspaceRepository
 {
-    Task<PaginatedResult<WorkspaceWithoutTasks>> GetRangeAsync(int pageNumber, int pageSize);
+    Task<PaginatedResult<WorkspaceWithoutTasks>> GetRangeAsync(int pageNumber, int pageSize, string userEmail);
     Task<Workspace> GetSingleAsync(Guid id);
+    Task<PaginatedResult<WorkspaceUser>> GetUsersInWorkspaceAsync(int pageNumber, int pageSize, Guid workspaceId, string userEmail);
     Task AddAsync(WorkspaceWithoutTasks workspace);
     Task UpdateAsync(WorkspaceWithoutTasks workspace);
     Task RemoveAsync(Guid id);
