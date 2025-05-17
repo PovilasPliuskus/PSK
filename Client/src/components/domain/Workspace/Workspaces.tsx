@@ -58,6 +58,16 @@ const Workspaces: React.FC = () => {
         }
     }, [currentPage, pageSize, keycloak.authenticated]);
 
+    useEffect(() => {
+        if (alertMessage) {
+            const timer = setTimeout(() => {
+                setAlertMessage('');
+            }, 5000); // Dismiss after 5 seconds
+
+            return () => clearTimeout(timer); // Clean up on change
+        }
+    }, [alertMessage]);
+
     if (error !== null)
     {
         return <SomethingWentWrong onRetry={() => window.location.reload()} />;

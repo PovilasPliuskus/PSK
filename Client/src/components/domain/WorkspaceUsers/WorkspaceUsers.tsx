@@ -58,6 +58,16 @@ const WorkspaceUsers: React.FC = () => {
         }
     }, [currentPage, pageSize, keycloak.authenticated]);
 
+    useEffect(() => {
+        if (alertMessage) {
+            const timer = setTimeout(() => {
+                setAlertMessage('');
+            }, 5000); // Dismiss after 5 seconds
+
+            return () => clearTimeout(timer); // Clean up on change
+        }
+    }, [alertMessage]);
+
     if (error !== null)
     {
         return <SomethingWentWrong onRetry={() => window.location.reload()} />;
@@ -68,9 +78,21 @@ const WorkspaceUsers: React.FC = () => {
     }
 
     // Delete workspace
-    const handleDelete = (workspaceId: string) => {
+    const handleDelete = (workspaceId: string, userEmailToDelete: string) => {
         if (window.confirm(ScriptResources.DeleteConfirmation)) {
-            console.log(`Deleting workspace with ID: ${workspaceId}`);
+            axiosInstance.delete(`/workspace/users/${workspaceId}`, {
+                data: { userEmail: userEmailToDelete }
+            })
+                .then(() => {
+                    setAlertMessage(ScriptResources.WorkspaceDeleted);
+                    setAlertVariant('success');
+                    fetchItems();
+                })
+                .catch(error => {
+                    console.error(ScriptResources.ErrorDeletingWorkspace, error);
+                    setAlertMessage(ScriptResources.SomethingWentWrong);
+                    setAlertVariant('danger');
+                });
         }
     };
 
@@ -94,19 +116,18 @@ const WorkspaceUsers: React.FC = () => {
             return;
         }
 
-        // axiosInstance.post(`/workspace/users/${id}`, { userEmail: newUserEmail })
-        //     .then(() => {
-        //         setAlertMessage(ScriptResources.WorkspaceDeleted);
-        //         setAlertVariant('success');
-        //         fetchItems();
-        //         handleModalClose();
-        //     })
-        //     .catch(error => {
-        //         console.error(ScriptResources.ErrorDeletingWorkspace, error);
-        //         setAlertMessage(ScriptResources.SomethingWentWrong);
-        //         setAlertVariant('danger');
-        //     });
-        console.log(`Adding user with email: ${newUserEmail}`);
+        axiosInstance.post(`/workspace/users/${id}`, { userEmail: newUserEmail })
+            .then(() => {
+                setAlertMessage(ScriptResources.WorkspaceUserAdded);
+                setAlertVariant('success');
+                fetchItems();
+                handleModalClose();
+            })
+            .catch(error => {
+                console.error(ScriptResources.ErrorAddingWorkspaceUser, error);
+                setAlertMessage(ScriptResources.SomethingWentWrong);
+                setAlertVariant('danger');
+            });
     };
 
 
@@ -132,7 +153,7 @@ const WorkspaceUsers: React.FC = () => {
                 <span className="material-icons me-2" style={{verticalAlign: 'middle'}}>add</span>
                 {ScriptResources.Add}
             </button>
-            <h2>{ScriptResources.WorkspaceUsers.replace("{0}", name)}</h2>
+            <h2>{ScriptResources.WorkspaceUsers.replace("{0}", name ?? '')}</h2>
 
             <Table striped bordered hover>
                 <thead>
@@ -149,7 +170,7 @@ const WorkspaceUsers: React.FC = () => {
                                 <span
                                     className="material-icons"
                                     style={{cursor: 'pointer', marginRight: '10px'}}
-                                    onClick={() => handleDelete(workspaceUser.id)}
+                                    onClick={() => handleDelete(workspaceUser.id, workspaceUser.userEmail)}
                                 >
                                         delete
                                 </span>
@@ -167,6 +188,11 @@ const WorkspaceUsers: React.FC = () => {
                 onPageChange={(page) => setCurrentPage(page)}
                 onPageSizeChange={(size) => setPageSize(size)}
             />
+
+            {/* Button to go back */}
+            <Button variant="secondary" onClick={() => navigate(`/workspaces`)}>
+                {ScriptResources.Back}
+            </Button>
 
             <Modal show={showModal} onHide={handleModalClose}>
                 <Modal.Header closeButton>

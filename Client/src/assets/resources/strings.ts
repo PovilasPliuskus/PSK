@@ -53,6 +53,9 @@ const ScriptResources = {
     ErrorFetchingWorkspacesUsers: 'Error fetching workspaces users',
     CannotBeEmpty: 'cannot be empty',
     InvalidEmailFormat: 'Invalid email format',
+    WorkspaceUserAdded: 'Workspace user added successfully',
+    ErrorAddingWorkspaceUser: 'Error adding workspace user',
+    Back: 'Back',
 }
 
 export default ScriptResources;
