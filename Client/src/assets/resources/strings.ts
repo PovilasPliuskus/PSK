@@ -1,3 +1,5 @@
+import WorkspaceUsers from "../../components/domain/WorkspaceUsers/WorkspaceUsers";
+
 const ScriptResources = {
     Page404: '404 - Page Not Found',
     PageDoNotExist: 'The page you are looking for does not exist.',
@@ -45,6 +47,12 @@ const ScriptResources = {
     Add: 'Add',
     AddCard: 'Add Card',
     DoubleClickToSeeAllTasks: 'Double click on workspace to see all tasks',
+    Email: 'Email',
+    Actions: 'Actions',
+    WorkspaceUsers: 'Workspace {0} Users',
+    ErrorFetchingWorkspacesUsers: 'Error fetching workspaces users',
+    CannotBeEmpty: 'cannot be empty',
+    InvalidEmailFormat: 'Invalid email format',
 }
 
 export default ScriptResources;

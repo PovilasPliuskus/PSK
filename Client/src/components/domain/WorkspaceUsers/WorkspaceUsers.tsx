@@ -1,32 +1,31 @@
 // SITAS BUS TVARKOMAS. CIA TIK TEMPLATE KURI REIKES PAKEISTI
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Table, Modal, Button, Form } from 'react-bootstrap';
 import Pagination from '../../base/Pagination';
 import keycloak from '../../../keycloak';
 import ScriptResources from '../../../assets/resources/strings';
 import { axiosInstance } from '../../../utils/axiosInstance';
-import { Workspace } from "../../../Models/Workspace";
+import { WorkspaceUser } from '../../../Models/WorkspaceUser';
 import SomethingWentWrong from '../../base/SomethingWentWrong';
 import Loading from '../../base/Loading';
 
-const Workspaces: React.FC = () => {
-    const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+const WorkspaceUsers: React.FC = () => {
+    const { id, name } = useParams<{id: string, name: string}>();
+    const [workspaceUsers, setWorkspaceUsers] = useState<WorkspaceUser[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [newUserEmail, setNewUserEmail] = useState('');
+    const [emailIsValid, setEmailIsValid] = useState(true);
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
-    const [newWorkspaceName, setNewWorkspaceName] = useState('');
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
     const [alertVariant, setAlertVariant] = useState<'success' | 'danger' | null>(null);
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [workspaceToEdit, setWorkspaceToEdit] = useState<Workspace | null>(null);
-    const [editedName, setEditedName] = useState('');
 
 
     const fetchItems = () => {
@@ -34,18 +33,18 @@ const Workspaces: React.FC = () => {
         const loadingTimeout = setTimeout(() => {
             setIsLoading(true);
           }, 500);
-        axiosInstance.get(`/workspace`, {
+        axiosInstance.get(`/workspace/users/${id}`, {
             params: { pageNumber: currentPage, pageSize: pageSize },
         })
         .then(response => {
-            setWorkspaces(response.data.workspaces.items || []);
-            setTotalPages(response.data.workspaces.totalPages || 0);
-            setTotalItems(response.data.workspaces.totalItems || 0);
+            setWorkspaceUsers(response.data.workspacesUsers.items || []);
+            setTotalPages(response.data.workspacesUsers.totalPages || 0);
+            setTotalItems(response.data.workspacesUsers.totalItems || 0);
         })
         .catch(error => {
             setError(error);
-            console.error(ScriptResources.ErrorFetchingWorkspaces, error);
-            setWorkspaces([]);
+            console.error(ScriptResources.ErrorFetchingWorkspacesUsers, error);
+            setWorkspaceUsers([]);
         })
         .finally(() => {
             clearTimeout(loadingTimeout);
@@ -71,20 +70,7 @@ const Workspaces: React.FC = () => {
     // Delete workspace
     const handleDelete = (workspaceId: string) => {
         if (window.confirm(ScriptResources.DeleteConfirmation)) {
-            axiosInstance.delete(`/workspace/${workspaceId}`)
-                .then(() => {
-                    setWorkspaces(workspaces.filter(workspace => workspace.id !== workspaceId));
-                    setAlertMessage(ScriptResources.WorkspaceDeleted);
-                    setAlertVariant('success');
-                    setTimeout(() => {
-                        setAlertMessage(null);
-                    }, 3000); // Clear alert after 3 seconds
-                })
-                .catch(error => {
-                    console.error('Error deleting workspace:', error);
-                    setAlertMessage(ScriptResources.ErrorDeletingWorkspace);
-                    setAlertVariant('danger');
-                });
+            console.log(`Deleting workspace with ID: ${workspaceId}`);
         }
     };
 
@@ -93,9 +79,48 @@ const Workspaces: React.FC = () => {
 
     const handleModalClose = () => {
         setShowModal(false);
-        setNewWorkspaceName('');
     };
-    
+
+    const handleAddUser = () => {
+        if (newUserEmail.trim() === '') {
+            setAlertMessage(ScriptResources.Email + ' ' + ScriptResources.CannotBeEmpty);
+            setAlertVariant('danger');
+            return;
+        }
+
+        if (!validateEmail(newUserEmail)) {
+            setAlertMessage(ScriptResources.InvalidEmailFormat || "Invalid email format.");
+            setAlertVariant('danger');
+            return;
+        }
+
+        // axiosInstance.post(`/workspace/users/${id}`, { userEmail: newUserEmail })
+        //     .then(() => {
+        //         setAlertMessage(ScriptResources.WorkspaceDeleted);
+        //         setAlertVariant('success');
+        //         fetchItems();
+        //         handleModalClose();
+        //     })
+        //     .catch(error => {
+        //         console.error(ScriptResources.ErrorDeletingWorkspace, error);
+        //         setAlertMessage(ScriptResources.SomethingWentWrong);
+        //         setAlertVariant('danger');
+        //     });
+        console.log(`Adding user with email: ${newUserEmail}`);
+    };
+
+
+    const validateEmail = (email: string) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const email = e.target.value;
+        setNewUserEmail(email);
+        setEmailIsValid(validateEmail(email));
+    };
+        
     return (
         <div className="m-5">
             {alertMessage && (
@@ -103,28 +128,28 @@ const Workspaces: React.FC = () => {
                     {alertMessage}
                 </div>
             )}
-            <p>{ScriptResources.DoubleClickToSeeAllTasks}</p>
             <button className="btn btn-primary mb-3" onClick={handleModalShow}>
                 <span className="material-icons me-2" style={{verticalAlign: 'middle'}}>add</span>
-                {ScriptResources.CreateNew}
+                {ScriptResources.Add}
             </button>
-            <h2>{ScriptResources.Workspaces}</h2>
+            <h2>{ScriptResources.WorkspaceUsers.replace("{0}", name)}</h2>
 
             <Table striped bordered hover>
                 <thead>
                 <tr>
-                    <th>{ScriptResources.WorkspaceName}</th>
+                    <th>{ScriptResources.Email}</th>
+                    <th>{ScriptResources.Actions}</th>
                 </tr>
                 </thead>
                 <tbody>
-                {workspaces.map((workspace) => (
-                    <tr key={workspace.id}>
-                        <td>{workspace.name}</td>
+                {workspaceUsers.map((workspaceUser) => (
+                    <tr key={workspaceUser.id}>
+                        <td>{workspaceUser.userEmail}</td>
                         <td>
                                 <span
                                     className="material-icons"
                                     style={{cursor: 'pointer', marginRight: '10px'}}
-                                    onClick={() => handleDelete(workspace.id)}
+                                    onClick={() => handleDelete(workspaceUser.id)}
                                 >
                                         delete
                                 </span>
@@ -142,8 +167,39 @@ const Workspaces: React.FC = () => {
                 onPageChange={(page) => setCurrentPage(page)}
                 onPageSizeChange={(size) => setPageSize(size)}
             />
+
+            <Modal show={showModal} onHide={handleModalClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{ScriptResources.CreateNew}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group controlId="workspaceUserEmail">
+                            <Form.Label>{ScriptResources.Email}</Form.Label>
+                            <Form.Control
+                                type="email"
+                                value={newUserEmail}
+                                onChange={(e) => setNewUserEmail(e.target.value)}
+                                placeholder="Enter user email"
+                                isInvalid={!emailIsValid && newUserEmail !== ''}
+                            />
+                        </Form.Group>
+                          <Form.Control.Feedback type="invalid">
+                            Please enter a valid email address.
+                          </Form.Control.Feedback>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleModalClose}>
+                        {ScriptResources.Cancel}
+                    </Button>
+                    <Button variant="primary" onClick={handleAddUser}>
+                        {ScriptResources.Add}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 };
 
-export default Workspaces;
+export default WorkspaceUsers;

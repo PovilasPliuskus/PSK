@@ -11,6 +11,7 @@ import { ErrorProvider } from './components/base/ErrorContext';
 import GlobalAlert from './components/base/GlobalAlert';
 import ScriptResources from './assets/resources/strings';
 import Workspaces from './components/domain/Workspace/Workspaces';
+import WorkspaceUsers from './components/domain/WorkspaceUsers/WorkspaceUsers';
 
 
 // Home Page Component
@@ -111,6 +112,7 @@ function InnerApp() {
           <Route path="/workspaces" element={<Workspaces />} />
           <Route path="/demo-form" element={<DemoForm />} />
           <Route path="/task-page/:id" element={<TaskBoardViewPage />} />
+          <Route path="/workspace/users/:id/:name" element={<WorkspaceUsers />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
