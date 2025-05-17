@@ -1,4 +1,3 @@
-// SITAS BUS TVARKOMAS. CIA TIK TEMPLATE KURI REIKES PAKEISTI
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate, useParams } from 'react-router-dom';
