@@ -1,6 +1,7 @@
 using AutoMapper;
 using Contracts.Models;
 using Contracts.Pagination;
+using Contracts.RequestBodies;
 using DataAccess.Context;
 using DataAccess.Entities;
 using DataAccess.Extensions;
@@ -61,6 +62,28 @@ public class WorkspaceRepository : IWorkspaceRepository
         var users = _mapper.Map<List<WorkspaceUser>>(workspaceUsersEntities);
 
         return new PaginatedResult<WorkspaceUser>(users, usersCount, pageNumber, pageSize);
+    }
+
+    public async Task AddUserToWorkspaceAsync(Guid workspaceId, AddUserRequest request)
+    {
+        var workspaceUsersEntity = new WorkspaceUsersEntity
+        {
+            FkUserEmail = request.UserEmail,
+            FkWorkspaceId = workspaceId,
+            IsOwner = false
+        };
+
+        await _context.WorkspaceUsers.AddAsync(workspaceUsersEntity);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RemoveUserFromWorkspaceAsync(Guid workspaceId, RemoveUserRequest request)
+    {
+        var workspaceUsersEntity = await _context.WorkspaceUsers
+            .FirstAsync(wu => wu.FkWorkspaceId == workspaceId && wu.FkUserEmail == request.UserEmail);
+
+        _context.WorkspaceUsers.Remove(workspaceUsersEntity);
+        await _context.SaveChangesAsync();
     }
 
     public async Task AddAsync(WorkspaceWithoutTasks workspace)

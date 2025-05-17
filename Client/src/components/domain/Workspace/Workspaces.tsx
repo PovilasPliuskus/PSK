@@ -58,6 +58,16 @@ const Workspaces: React.FC = () => {
         }
     }, [currentPage, pageSize, keycloak.authenticated]);
 
+    useEffect(() => {
+        if (alertMessage) {
+            const timer = setTimeout(() => {
+                setAlertMessage('');
+            }, 5000); // Dismiss after 5 seconds
+
+            return () => clearTimeout(timer); // Clean up on change
+        }
+    }, [alertMessage]);
+
     if (error !== null)
     {
         return <SomethingWentWrong onRetry={() => window.location.reload()} />;
@@ -147,6 +157,10 @@ const Workspaces: React.FC = () => {
         }
     };
 
+    const handleUsers = (workspaceId: string, workspaceName: string) => {
+        navigate(`/workspace/users/${workspaceId}/${workspaceName}`);
+    }
+
     // Create new workspace
     const handleModalShow = () => setShowModal(true);
 
@@ -228,6 +242,13 @@ const Workspaces: React.FC = () => {
                                     onClick={() => handleDelete(workspace.id)}
                                 >
                                         delete
+                                </span>
+                                <span
+                                    className="material-icons"
+                                    style={{cursor: 'pointer', marginRight: '10px'}}
+                                    onClick={() => handleUsers(workspace.id, workspace.name)}
+                                >
+                                        person_add
                                 </span>
                         </td>
                     </tr>

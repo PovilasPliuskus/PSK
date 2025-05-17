@@ -40,6 +40,16 @@ public class WorkspaceService : IWorkspaceService
         return _mapper.Map<GetUsersInWorkspaceResponse>(users);
     }
 
+    public async Task AddUserToWorkspaceAsync(Guid workspaceId, AddUserRequest request)
+    {
+        await _workspaceRepository.AddUserToWorkspaceAsync(workspaceId, request);
+    }
+
+    public async Task RemoveUserFromWorkspaceAsync(Guid workspaceId, RemoveUserRequest request)
+    {
+        await _workspaceRepository.RemoveUserFromWorkspaceAsync(workspaceId, request);
+    }
+
     public async Task CreateWorkspaceAsync(CreateWorkspaceRequest request)
     {
         var workspace = _mapper.Map<WorkspaceWithoutTasks>(request);
