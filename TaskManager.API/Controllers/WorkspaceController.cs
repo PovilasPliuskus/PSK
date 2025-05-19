@@ -55,6 +55,34 @@ public class WorkspaceController : ControllerBase
         return Ok(response);
     }
 
+    [HttpPost("users/{workspaceId}")]
+    public async Task<IActionResult> AddUserToWorkspaceAsync(Guid workspaceId, [FromBody] AddUserRequest request)
+    {
+        var currentUserEmail = User.GetUserEmail();
+        if (string.IsNullOrEmpty(currentUserEmail))
+        {
+            throw new NotAuthenticatedException("User is not authenticated");
+        }
+
+        await _workspaceService.AddUserToWorkspaceAsync(workspaceId, request);
+
+        return Ok();
+    }
+
+    [HttpDelete("users/{workspaceId}")]
+    public async Task<IActionResult> RemoveUserFromWorkspaceAsync(Guid workspaceId, [FromBody] RemoveUserRequest request)
+    {
+        var currentUserEmail = User.GetUserEmail();
+        if (string.IsNullOrEmpty(currentUserEmail))
+        {
+            throw new NotAuthenticatedException("User is not authenticated");
+        }
+
+        await _workspaceService.RemoveUserFromWorkspaceAsync(workspaceId, request);
+
+        return Ok();
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateWorkspaceAsync([FromBody] CreateWorkspaceRequest request)
     {
