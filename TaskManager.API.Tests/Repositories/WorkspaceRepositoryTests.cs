@@ -46,7 +46,7 @@ public class WorkspaceRepositoryTests
             WorkspaceRepository repository = new(context, _mapper);
             
             // Act
-            PaginatedResult<Model.WorkspaceWithoutTasks> paginatedResult = await repository.GetRangeAsync(1, 5);
+            PaginatedResult<Model.WorkspaceWithoutTasks> paginatedResult = await repository.GetRangeAsync(1, 5, "fakeuser@mail.com");
             List<Model.WorkspaceWithoutTasks> workspaces = paginatedResult.Items.ToList();
 
             // Assert
