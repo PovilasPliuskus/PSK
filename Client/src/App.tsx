@@ -83,23 +83,21 @@ function InnerApp() {
                 <Nav.Link as={Link} to="/">
                   Home
                 </Nav.Link>
-                <Nav.Link as={Link} to="/demo-form">
-                  Demo Form
-                </Nav.Link>
                 <Nav.Link as={Link} to="/workspaces">
                   Workspaces
                 </Nav.Link>
               </Nav>
-              <Nav className="m-2">
+              <Nav className="m-2 flex items-center gap-4">
                 {!keycloak.authenticated ? (
                   <Button onClick={() => keycloak.login()}>Sign In</Button>
                 ) : (
-                  <Button onClick={() => keycloak.logout()}>Sign Out</Button>
+                  <>
+                    <p className="text-sm text-gray-700">Hello, {keycloak.tokenParsed?.name}</p>
+                    <Button onClick={() => keycloak.logout()}>
+                      Sign Out
+                    </Button>
+                  </>
                 )}
-              </Nav>
-              <Nav>
-                <Button onClick={fetchProtectedData} className="m-2">Fetch Protected Data</Button>
-                <Button onClick={fetchErrorData} className="m-2">Error</Button>
               </Nav>
             </Navbar.Collapse>
           </Container>
