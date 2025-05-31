@@ -9,7 +9,6 @@ using DataAccess.Repositories.Interfaces;
 using DataAccess.Repositories;
 using AutoMapper;
 using DataAccess.Extensions;
-using NpgsqlTypes;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.PostgreSQL;
@@ -26,9 +25,11 @@ builder.Services.AddDbContext<TaskManagerContext>(options =>
 builder.Services.AddTransient<ITaskService, TaskService>();
 builder.Services.AddTransient<IWorkspaceService, WorkspaceService>();
 builder.Services.AddTransient<ISubTaskService, SubTaskService>();
+builder.Services.AddTransient<ICommentService, CommentService>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 builder.Services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
 builder.Services.AddScoped<ISubTaskRepository, SubTaskRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
 var mapperConfig = new MapperConfiguration(cfg =>
 {
@@ -38,6 +39,8 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile<DataAccess.Profiles.WorkspaceProfile>();
     cfg.AddProfile<BusinessLogic.Profiles.SubTaskProfile>();
     cfg.AddProfile<DataAccess.Profiles.SubTaskProfile>();
+    cfg.AddProfile<BusinessLogic.Profiles.CommentProfile>();
+    cfg.AddProfile<DataAccess.Profiles.CommentProfile>();
 });
 
 builder.Services.AddSingleton(mapperConfig.CreateMapper());
