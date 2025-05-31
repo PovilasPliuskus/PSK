@@ -22,6 +22,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({editingTaskId, setShowEdit
     const [selectedSubtask, setSelectedSubtask] = useState<SubTaskType | null>(null);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [comments, setComments] = useState<Comment[]>([]);
 
     const fetchDetailedTask = () => {
         setError(null);
@@ -45,6 +46,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({editingTaskId, setShowEdit
                     })
                 }
                 setTaskDetailed(taskData);
+                setComments(taskData.comments);
                 if(selectedSubtask){
                     setSelectedSubtask(taskData.subTasks.filter(st => st.id === selectedSubtask.id)[0]);
                 }
@@ -83,7 +85,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({editingTaskId, setShowEdit
                                 <SubTaskExpandedSection selectedSubtask={selectedSubtask} setSelectedSubtask={setSelectedSubtask} workspaceId={taskDetailed.workspaceId} fetchDetailedTask={fetchDetailedTask}/>
                             )}
                         </div>
-                        <TaskCommentSection comments={taskDetailed.comments} workspaceId={taskDetailed.workspaceId} taskId={taskDetailed.id}/>
+                        <TaskCommentSection comments={taskDetailed.comments} fetchDetailedTask={fetchDetailedTask} workspaceId={taskDetailed.workspaceId} taskId={taskDetailed.id}/>
                     </div>
                 )}
                 {error && (
