@@ -1,5 +1,5 @@
 export interface CreateCommentBody {
-    text: string;
+    commentText: string;
     subTaskId?: string;
     taskId?: string;
     version: number;

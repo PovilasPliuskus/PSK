@@ -20,14 +20,12 @@ const TaskCommentSection: React.FC<taskCommentSection> = ({ comments, fetchDetai
 
     const handleCommentAdd = () => {
         const createCommentBody : CreateCommentBody = {
-            text: commentText,
+            commentText: commentText,
             taskId: taskId,
             version: 0,
         }
-
         axiosInstance.post(`/comment`, createCommentBody)
         .then(response => {
-            // TODO: Kazka cia reikia daryti
             fetchDetailedTask();
             setCommentText("");
         })
@@ -58,7 +56,7 @@ const TaskCommentSection: React.FC<taskCommentSection> = ({ comments, fetchDetai
                         />
                     </Form.Group>
                 </Form>
-                <button onClick={handleCommentAdd} className="btn btn-primary">Primary</button>
+                <button onClick={handleCommentAdd} className="btn btn-primary">Comment</button>
             </div>
         </div>
     )
